@@ -21,6 +21,11 @@ import {
   message,
   Modal,
   Progress,
+  Form,
+  Input,
+  DatePicker,
+  Select,
+  Drawer,
 } from "antd"
 import {
   DashboardOutlined,
@@ -41,6 +46,10 @@ import {
   SendOutlined,
   ExclamationCircleOutlined,
   InfoCircleOutlined,
+  BellOutlined,
+  EditOutlined,
+  SaveOutlined,
+  CloseOutlined,
 } from "@ant-design/icons"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
@@ -54,6 +63,7 @@ import dayjs from "dayjs"
 
 const { Header, Sider, Content } = Layout
 const { Title, Paragraph } = Typography
+const { Option } = Select
 
 const UserDashboard: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
@@ -63,6 +73,12 @@ const UserDashboard: React.FC = () => {
   const [applyModalVisible, setApplyModalVisible] = useState(false)
   const [selectedJob, setSelectedJob] = useState<Convocatoria | null>(null)
   const [applying, setApplying] = useState(false)
+  const [profileModalVisible, setProfileModalVisible] = useState(false)
+  const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false)
+  const [applicationsModalVisible, setApplicationsModalVisible] = useState(false)
+  const [jobsModalVisible, setJobsModalVisible] = useState(false)
+  const [profileForm] = Form.useForm()
+  const [settingsForm] = Form.useForm()
   const navigate = useNavigate()
   const { user, logout } = useAuth()
 
@@ -76,21 +92,39 @@ const UserDashboard: React.FC = () => {
       key: "applications",
       icon: <FileTextOutlined />,
       label: "My Applications",
+      onClick: () => setApplicationsModalVisible(true),
     },
     {
       key: "profile",
       icon: <UserOutlined />,
       label: "Profile",
+      onClick: () => setProfileModalVisible(true),
     },
     {
       key: "settings",
       icon: <SettingOutlined />,
       label: "Settings",
+      onClick: () => setSettingsDrawerVisible(true),
     },
   ]
 
   useEffect(() => {
     loadDashboardData()
+    // Initialize forms with user data
+    if (user) {
+      profileForm.setFieldsValue({
+        name: user.name,
+        email: user.email,
+        phone: user.telefono,
+        birthDate: user.nacimiento ? dayjs(user.nacimiento) : null,
+      })
+      settingsForm.setFieldsValue({
+        notifications: true,
+        emailUpdates: true,
+        theme: 'auto',
+        language: 'en',
+      })
+    }
   }, [user])
 
   const loadDashboardData = async () => {
@@ -166,11 +200,13 @@ const UserDashboard: React.FC = () => {
         key: "profile",
         label: "Profile",
         icon: <UserOutlined />,
+        onClick: () => setProfileModalVisible(true),
       },
       {
         key: "settings",
         label: "Settings",
         icon: <SettingOutlined />,
+        onClick: () => setSettingsDrawerVisible(true),
       },
       {
         type: "divider",
@@ -280,6 +316,52 @@ const UserDashboard: React.FC = () => {
     },
   ]
 
+  const jobsColumns = [
+    {
+      title: "Job Title",
+      key: "title",
+      render: (_: any, record: Convocatoria) => (
+        <div>
+          <div className="font-medium text-gray-800 dark:text-gray-200">{record.titulo}</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">{record.empresa?.nombre}</div>
+        </div>
+      ),
+    },
+    {
+      title: "Position",
+      dataIndex: "puesto",
+      key: "puesto",
+      render: (puesto: string) => <Tag color="blue">{puesto}</Tag>,
+    },
+    {
+      title: "Closing Date",
+      dataIndex: "fechaCierre",
+      key: "fechaCierre",
+      render: (date: string) => (
+        <span className="text-gray-600 dark:text-gray-300">{dayjs(date).format("MMM DD, YYYY")}</span>
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_: any, record: Convocatoria) => {
+        const alreadyApplied = myApplications.some((app) => app.convocatoria?.id === record.id)
+        return (
+          <Button
+            type="primary"
+            size="small"
+            className="btn-gradient"
+            icon={<SendOutlined />}
+            disabled={alreadyApplied}
+            onClick={() => openApplyModal(record)}
+          >
+            {alreadyApplied ? "Applied" : "Apply Now"}
+          </Button>
+        )
+      },
+    },
+  ]
+
   const handleApplyToJob = async () => {
     if (!selectedJob || !user?.id) return
 
@@ -311,6 +393,18 @@ const UserDashboard: React.FC = () => {
     setApplyModalVisible(true)
   }
 
+  const handleProfileSave = (values: any) => {
+    console.log('Profile values:', values)
+    message.success('Profile updated successfully!')
+    setProfileModalVisible(false)
+  }
+
+  const handleSettingsSave = (values: any) => {
+    console.log('Settings values:', values)
+    message.success('Settings saved successfully!')
+    setSettingsDrawerVisible(false)
+  }
+
   return (
     <Layout className="main-layout min-h-screen">
       {/* Sidebar */}
@@ -324,7 +418,17 @@ const UserDashboard: React.FC = () => {
         </div>
 
         {/* Navigation Menu */}
-        <Menu mode="inline" defaultSelectedKeys={["dashboard"]} items={menuItems} className="border-r-0 mt-4" />
+        <Menu 
+          mode="inline" 
+          defaultSelectedKeys={["dashboard"]} 
+          items={menuItems} 
+          className="border-r-0 mt-4"
+          onClick={({ key, item }) => {
+            if (item?.props?.onClick) {
+              item.props.onClick()
+            }
+          }}
+        />
 
         {/* Mirabot Status */}
         {!collapsed && (
@@ -347,17 +451,17 @@ const UserDashboard: React.FC = () => {
       </Sider>
 
       <Layout>
-        {/* Header */}
-        <Header className="header-layout border-b">
-          <div className="flex justify-between items-center h-full">
-            <div className="flex items-center space-x-6">
+        {/* Enhanced Header */}
+        <Header className="header-layout border-b bg-white dark:bg-gray-800 shadow-sm">
+          <div className="flex justify-between items-center h-full px-6 lg:px-8">
+            <div className="flex items-center space-x-4 lg:space-x-6">
               <Button
                 type="text"
                 icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 onClick={() => setCollapsed(!collapsed)}
-                className="text-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="text-lg hover:bg-gray-100 dark:hover:bg-gray-700 p-2"
               />
-              <div>
+              <div className="hidden sm:block">
                 <Title level={4} className="mb-0">
                   My Dashboard
                 </Title>
@@ -367,45 +471,50 @@ const UserDashboard: React.FC = () => {
               </div>
             </div>
 
-            <Space size="large">
+            <Space size="middle" className="flex items-center">
               <Button
                 icon={<SearchOutlined />}
-                className="border-gray-300 hover:border-indigo-400 dark:border-gray-600 dark:hover:border-indigo-400"
+                className="border-gray-300 hover:border-indigo-400 dark:border-gray-600 dark:hover:border-indigo-400 hidden sm:inline-flex"
+                onClick={() => setJobsModalVisible(true)}
               >
-                Search Jobs
+                <span className="hidden md:inline">Search Jobs</span>
               </Button>
               <NotificationDropdown />
               <ThemeToggle />
-              <Dropdown menu={userMenu} trigger={["click"]}>
-                <Avatar src={user?.avatar} size="large" className="cursor-pointer border-2 border-indigo-200" />
+              <Dropdown menu={userMenu} trigger={["click"]} placement="bottomRight">
+                <Avatar 
+                  src={user?.avatar} 
+                  size="large" 
+                  className="cursor-pointer border-2 border-indigo-200 hover:border-indigo-300 transition-colors" 
+                />
               </Dropdown>
             </Space>
           </div>
         </Header>
 
         {/* Main Content */}
-        <Content className="content-layout">
+        <Content className="content-layout p-4 lg:p-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="space-y-8"
+            className="space-y-6 lg:space-y-8"
           >
             {/* Welcome Section */}
             <Card className="border-0 shadow-sm bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20">
               <Row align="middle" gutter={[24, 24]}>
-                <Col flex="auto">
+                <Col xs={24} lg={16}>
                   <Title level={3} className="mb-3">
                     Hello, {user?.name}! 👋
                   </Title>
-                  <Paragraph className="text-gray-600 dark:text-gray-300 text-lg mb-4">
+                  <Paragraph className="text-gray-600 dark:text-gray-300 text-base lg:text-lg mb-4">
                     You have{" "}
                     <strong>
                       {myApplications.filter((a) => a.estado === EstadoPostulacion.EN_EVALUACION).length} interviews
                     </strong>{" "}
                     in progress and <strong>{availableJobs.length} new job opportunities</strong> available.
                   </Paragraph>
-                  <Space>
+                  <Space wrap>
                     <Button
                       type="primary"
                       className="btn-gradient"
@@ -419,15 +528,15 @@ const UserDashboard: React.FC = () => {
                     >
                       Continue Interview
                     </Button>
-                    <Button>Browse Jobs</Button>
+                    <Button onClick={() => setJobsModalVisible(true)}>Browse Jobs</Button>
                   </Space>
                 </Col>
-                <Col>
+                <Col xs={24} lg={8}>
                   <div className="text-center">
                     <img
                       src="https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop"
                       alt="AI Assistant"
-                      className="w-24 h-24 rounded-full shadow-lg"
+                      className="w-20 h-20 lg:w-24 lg:h-24 rounded-full shadow-lg mx-auto"
                     />
                   </div>
                 </Col>
@@ -435,7 +544,7 @@ const UserDashboard: React.FC = () => {
             </Card>
 
             {/* Stats Cards */}
-            <Row gutter={[24, 24]}>
+            <Row gutter={[16, 16]} className="lg:gutter-24">
               {stats.map((stat, index) => (
                 <Col xs={24} sm={12} lg={6} key={index}>
                   <motion.div
@@ -443,19 +552,19 @@ const UserDashboard: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                   >
-                    <Card className="stats-card">
+                    <Card className="stats-card h-full">
                       <div className="flex justify-between items-start mb-4">
-                        <div className="text-3xl">{stat.icon}</div>
-                        <Tag color={stat.trend === "up" ? "success" : "default"} className="border-0">
+                        <div className="text-2xl lg:text-3xl">{stat.icon}</div>
+                        <Tag color={stat.trend === "up" ? "success" : "default"} className="border-0 text-xs">
                           {stat.change}
                         </Tag>
                       </div>
                       <Statistic
-                        title={<span className="text-gray-600 dark:text-gray-400 font-medium">{stat.title}</span>}
+                        title={<span className="text-gray-600 dark:text-gray-400 font-medium text-sm">{stat.title}</span>}
                         value={stat.value}
                         valueStyle={{
                           color: "var(--ant-color-text)",
-                          fontSize: "2rem",
+                          fontSize: "1.5rem",
                           fontWeight: "bold",
                           lineHeight: 1.2,
                         }}
@@ -469,36 +578,47 @@ const UserDashboard: React.FC = () => {
             {/* My Applications Table */}
             <Card
               title={
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                   <Title level={4} className="mb-0">
                     My Applications
                   </Title>
-                  <Button type="link" className="text-indigo-600 font-medium">
+                  <Button 
+                    type="link" 
+                    className="text-indigo-600 font-medium self-start sm:self-auto"
+                    onClick={() => setApplicationsModalVisible(true)}
+                  >
                     View All
                   </Button>
                 </div>
               }
               className="border-0 shadow-sm"
             >
-              <Table
-                columns={applicationColumns}
-                dataSource={myApplications}
-                loading={loading}
-                pagination={false}
-                className="custom-table"
-                scroll={{ x: 800 }}
-                rowKey="id"
-              />
+              <div className="overflow-x-auto">
+                <Table
+                  columns={applicationColumns}
+                  dataSource={myApplications.slice(0, 5)}
+                  loading={loading}
+                  pagination={false}
+                  className="custom-table"
+                  scroll={{ x: 800 }}
+                  rowKey="id"
+                  size="middle"
+                />
+              </div>
             </Card>
 
             {/* Available Jobs */}
             <Card
               title={
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                   <Title level={4} className="mb-0">
                     Available Job Opportunities
                   </Title>
-                  <Button type="link" className="text-indigo-600 font-medium">
+                  <Button 
+                    type="link" 
+                    className="text-indigo-600 font-medium self-start sm:self-auto"
+                    onClick={() => setJobsModalVisible(true)}
+                  >
                     Browse All
                   </Button>
                 </div>
@@ -506,7 +626,7 @@ const UserDashboard: React.FC = () => {
               className="border-0 shadow-sm"
             >
               {availableJobs.length > 0 ? (
-                <Row gutter={[24, 24]}>
+                <Row gutter={[16, 16]} className="lg:gutter-24">
                   {availableJobs.slice(0, 4).map((job) => {
                     const alreadyApplied = myApplications.some((app) => app.convocatoria?.id === job.id)
                     return (
@@ -517,11 +637,11 @@ const UserDashboard: React.FC = () => {
                           transition={{ duration: 0.3 }}
                           whileHover={{ y: -4 }}
                         >
-                          <Card className="hover-card border border-gray-200 dark:border-gray-600 transition-all duration-300">
+                          <Card className="hover-card border border-gray-200 dark:border-gray-600 transition-all duration-300 h-full">
                             <div className="space-y-4">
                               <div className="flex justify-between items-start">
                                 <div className="flex-1">
-                                  <Title level={5} className="mb-1">
+                                  <Title level={5} className="mb-1 line-clamp-2">
                                     {job.titulo}
                                   </Title>
                                   <Paragraph className="text-gray-600 dark:text-gray-300 mb-2">
@@ -531,13 +651,13 @@ const UserDashboard: React.FC = () => {
                                 </div>
                               </div>
 
-                              <Paragraph className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                              <Paragraph className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-3">
                                 {job.descripcion.length > 150
                                   ? `${job.descripcion.substring(0, 150)}...`
                                   : job.descripcion}
                               </Paragraph>
 
-                              <div className="flex justify-between items-center">
+                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                 <Space>
                                   <ClockCircleOutlined className="text-gray-400" />
                                   <span className="text-sm text-gray-600 dark:text-gray-300">
@@ -547,7 +667,7 @@ const UserDashboard: React.FC = () => {
                                 <Button
                                   type="primary"
                                   size="small"
-                                  className="btn-gradient"
+                                  className="btn-gradient w-full sm:w-auto"
                                   icon={<SendOutlined />}
                                   disabled={alreadyApplied}
                                   onClick={() => openApplyModal(job)}
@@ -568,11 +688,11 @@ const UserDashboard: React.FC = () => {
             </Card>
 
             {/* Performance Insights */}
-            <Row gutter={[24, 24]}>
+            <Row gutter={[16, 16]} className="lg:gutter-24">
               <Col xs={24} lg={12}>
                 <Card
                   title="Performance Insights"
-                  className="border-0 shadow-sm"
+                  className="border-0 shadow-sm h-full"
                   extra={<TrophyOutlined className="text-indigo-600" />}
                 >
                   <div className="space-y-4">
@@ -580,7 +700,7 @@ const UserDashboard: React.FC = () => {
                       <Paragraph className="text-green-800 dark:text-green-300 mb-2 font-medium">
                         🎯 Strong Areas
                       </Paragraph>
-                      <Paragraph className="text-green-700 dark:text-green-400 mb-0">
+                      <Paragraph className="text-green-700 dark:text-green-400 mb-0 text-sm">
                         Technical skills and problem-solving approach show consistent improvement.
                       </Paragraph>
                     </div>
@@ -588,7 +708,7 @@ const UserDashboard: React.FC = () => {
                       <Paragraph className="text-blue-800 dark:text-blue-300 mb-2 font-medium">
                         📈 Improvement Areas
                       </Paragraph>
-                      <Paragraph className="text-blue-700 dark:text-blue-400 mb-0">
+                      <Paragraph className="text-blue-700 dark:text-blue-400 mb-0 text-sm">
                         Focus on communication clarity and providing more detailed examples.
                       </Paragraph>
                     </div>
@@ -598,7 +718,7 @@ const UserDashboard: React.FC = () => {
               <Col xs={24} lg={12}>
                 <Card
                   title="AI Recommendations"
-                  className="border-0 shadow-sm"
+                  className="border-0 shadow-sm h-full"
                   extra={<RobotOutlined className="text-indigo-600" />}
                 >
                   <div className="space-y-4">
@@ -606,7 +726,7 @@ const UserDashboard: React.FC = () => {
                       <Paragraph className="text-purple-800 dark:text-purple-300 mb-2 font-medium">
                         💡 Skill Focus
                       </Paragraph>
-                      <Paragraph className="text-purple-700 dark:text-purple-400 mb-0">
+                      <Paragraph className="text-purple-700 dark:text-purple-400 mb-0 text-sm">
                         Based on your applications, consider strengthening your React and Node.js skills.
                       </Paragraph>
                     </div>
@@ -614,7 +734,7 @@ const UserDashboard: React.FC = () => {
                       <Paragraph className="text-orange-800 dark:text-orange-300 mb-2 font-medium">
                         🚀 Next Steps
                       </Paragraph>
-                      <Paragraph className="text-orange-700 dark:text-orange-400 mb-0">
+                      <Paragraph className="text-orange-700 dark:text-orange-400 mb-0 text-sm">
                         Apply to more senior positions to challenge yourself and grow your career.
                       </Paragraph>
                     </div>
@@ -629,7 +749,7 @@ const UserDashboard: React.FC = () => {
       {/* Apply to Job Modal */}
       <Modal
         title={
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 p-2">
             <SendOutlined className="text-indigo-600" />
             <span>Apply to Job</span>
           </div>
@@ -637,29 +757,31 @@ const UserDashboard: React.FC = () => {
         open={applyModalVisible}
         onCancel={() => setApplyModalVisible(false)}
         footer={[
-          <Button key="cancel" onClick={() => setApplyModalVisible(false)}>
+          <Button key="cancel" onClick={() => setApplyModalVisible(false)} className="mr-3">
             Cancel
           </Button>,
           <Button key="apply" type="primary" className="btn-gradient" loading={applying} onClick={handleApplyToJob}>
             Submit Application
           </Button>,
         ]}
+        width={600}
+        className="apply-modal"
       >
         {selectedJob && (
-          <div className="space-y-4">
+          <div className="space-y-6 p-4">
             <div>
-              <Title level={4}>{selectedJob.titulo}</Title>
-              <Paragraph className="text-gray-600 dark:text-gray-300">{selectedJob.empresa?.nombre}</Paragraph>
+              <Title level={4} className="mb-2">{selectedJob.titulo}</Title>
+              <Paragraph className="text-gray-600 dark:text-gray-300 mb-0">{selectedJob.empresa?.nombre}</Paragraph>
             </div>
 
             <div>
-              <Title level={5}>Job Description:</Title>
-              <Paragraph>{selectedJob.descripcion}</Paragraph>
+              <Title level={5} className="mb-3">Job Description:</Title>
+              <Paragraph className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">{selectedJob.descripcion}</Paragraph>
             </div>
 
             <div>
-              <Title level={5}>Position:</Title>
-              <Paragraph>{selectedJob.puesto}</Paragraph>
+              <Title level={5} className="mb-3">Position:</Title>
+              <Tag color="blue" className="text-base px-3 py-1">{selectedJob.puesto}</Tag>
             </div>
 
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
@@ -675,6 +797,273 @@ const UserDashboard: React.FC = () => {
           </div>
         )}
       </Modal>
+
+      {/* Profile Modal */}
+      <Modal
+        title={
+          <div className="flex items-center gap-3 p-2">
+            <UserOutlined className="text-indigo-600" />
+            <span>My Profile</span>
+          </div>
+        }
+        open={profileModalVisible}
+        onCancel={() => setProfileModalVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setProfileModalVisible(false)} className="mr-3">
+            Cancel
+          </Button>,
+          <Button 
+            key="save" 
+            type="primary" 
+            className="btn-gradient" 
+            icon={<SaveOutlined />}
+            onClick={() => profileForm.submit()}
+          >
+            Save Changes
+          </Button>,
+        ]}
+        width={600}
+        className="profile-modal"
+      >
+        <div className="p-4">
+          <Form
+            form={profileForm}
+            layout="vertical"
+            onFinish={handleProfileSave}
+            className="space-y-4"
+          >
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  name="name"
+                  label="Full Name"
+                  rules={[{ required: true, message: 'Please enter your name' }]}
+                >
+                  <Input placeholder="Enter your full name" />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="email"
+                  label="Email"
+                  rules={[
+                    { required: true, message: 'Please enter your email' },
+                    { type: 'email', message: 'Please enter a valid email' }
+                  ]}
+                >
+                  <Input placeholder="Enter your email" disabled />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  name="phone"
+                  label="Phone Number"
+                >
+                  <Input placeholder="Enter your phone number" />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="birthDate"
+                  label="Birth Date"
+                >
+                  <DatePicker className="w-full" placeholder="Select birth date" />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Form.Item
+              name="bio"
+              label="Bio"
+            >
+              <Input.TextArea 
+                rows={4} 
+                placeholder="Tell us about yourself..."
+                maxLength={500}
+                showCount
+              />
+            </Form.Item>
+          </Form>
+        </div>
+      </Modal>
+
+      {/* My Applications Modal */}
+      <Modal
+        title={
+          <div className="flex items-center gap-3 p-2">
+            <FileTextOutlined className="text-indigo-600" />
+            <span>My Applications ({myApplications.length})</span>
+          </div>
+        }
+        open={applicationsModalVisible}
+        onCancel={() => setApplicationsModalVisible(false)}
+        footer={[
+          <Button key="close" type="primary" onClick={() => setApplicationsModalVisible(false)}>
+            Close
+          </Button>,
+        ]}
+        width={1000}
+        className="applications-modal"
+      >
+        <div className="p-4">
+          <div className="overflow-x-auto">
+            <Table
+              columns={applicationColumns}
+              dataSource={myApplications}
+              loading={loading}
+              pagination={{
+                pageSize: 10,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} applications`,
+              }}
+              className="custom-table"
+              scroll={{ x: 800 }}
+              rowKey="id"
+            />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Browse Jobs Modal */}
+      <Modal
+        title={
+          <div className="flex items-center gap-3 p-2">
+            <SearchOutlined className="text-indigo-600" />
+            <span>Browse Jobs ({availableJobs.length})</span>
+          </div>
+        }
+        open={jobsModalVisible}
+        onCancel={() => setJobsModalVisible(false)}
+        footer={[
+          <Button key="close" type="primary" onClick={() => setJobsModalVisible(false)}>
+            Close
+          </Button>,
+        ]}
+        width={1000}
+        className="jobs-modal"
+      >
+        <div className="p-4">
+          <div className="overflow-x-auto">
+            <Table
+              columns={jobsColumns}
+              dataSource={availableJobs}
+              loading={loading}
+              pagination={{
+                pageSize: 10,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} jobs`,
+              }}
+              className="custom-table"
+              scroll={{ x: 800 }}
+              rowKey="id"
+            />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Settings Drawer */}
+      <Drawer
+        title={
+          <div className="flex items-center gap-3">
+            <SettingOutlined className="text-indigo-600" />
+            <span>Settings</span>
+          </div>
+        }
+        placement="right"
+        onClose={() => setSettingsDrawerVisible(false)}
+        open={settingsDrawerVisible}
+        width={400}
+        className="settings-drawer"
+        extra={
+          <Button 
+            type="primary" 
+            className="btn-gradient" 
+            icon={<SaveOutlined />}
+            onClick={() => settingsForm.submit()}
+          >
+            Save
+          </Button>
+        }
+      >
+        <div className="p-4">
+          <Form
+            form={settingsForm}
+            layout="vertical"
+            onFinish={handleSettingsSave}
+            className="space-y-6"
+          >
+            <div>
+              <Title level={5} className="mb-4">Notifications</Title>
+              <Form.Item
+                name="notifications"
+                valuePropName="checked"
+              >
+                <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <div className="font-medium">Push Notifications</div>
+                    <div className="text-sm text-gray-500">Receive notifications about your applications</div>
+                  </div>
+                  <input type="checkbox" className="toggle" />
+                </div>
+              </Form.Item>
+              <Form.Item
+                name="emailUpdates"
+                valuePropName="checked"
+              >
+                <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <div className="font-medium">Email Updates</div>
+                    <div className="text-sm text-gray-500">Get email updates about new job opportunities</div>
+                  </div>
+                  <input type="checkbox" className="toggle" />
+                </div>
+              </Form.Item>
+            </div>
+
+            <div>
+              <Title level={5} className="mb-4">Preferences</Title>
+              <Form.Item
+                name="theme"
+                label="Theme"
+              >
+                <Select placeholder="Select theme">
+                  <Option value="light">Light</Option>
+                  <Option value="dark">Dark</Option>
+                  <Option value="auto">Auto</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="language"
+                label="Language"
+              >
+                <Select placeholder="Select language">
+                  <Option value="en">English</Option>
+                  <Option value="es">Spanish</Option>
+                  <Option value="fr">French</Option>
+                </Select>
+              </Form.Item>
+            </div>
+
+            <div>
+              <Title level={5} className="mb-4">Privacy</Title>
+              <div className="space-y-3">
+                <div className="p-3 border rounded-lg">
+                  <div className="font-medium mb-1">Profile Visibility</div>
+                  <div className="text-sm text-gray-500 mb-2">Control who can see your profile</div>
+                  <Select defaultValue="public" className="w-full">
+                    <Option value="public">Public</Option>
+                    <Option value="private">Private</Option>
+                    <Option value="contacts">Contacts Only</Option>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          </Form>
+        </div>
+      </Drawer>
     </Layout>
   )
 }
