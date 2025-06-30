@@ -21,7 +21,8 @@ import {
   UserOutlined,
   ShieldCheckOutlined,
   LightningBoltOutlined,
-  ChartBarOutlined
+  ChartBarOutlined,
+  DownOutlined
 } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -145,121 +146,198 @@ const Landing: React.FC = () => {
 
   return (
     <Layout className="main-layout">
-      {/* Enhanced Header with Fixed Navigation */}
-      <Header className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 shadow-lg h-20">
-        <div className="flex justify-between items-center h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Logo */}
+      {/* Redesigned Superior Navigation Bar */}
+      <Header className="fixed top-0 left-0 right-0 z-50 h-24 border-0 shadow-none bg-transparent">
+        {/* Glassmorphism Container */}
+        <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border-b border-white/20 dark:border-gray-700/30">
+          {/* Gradient Border */}
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent"></div>
+        </div>
+
+        <div className="relative z-10 flex justify-between items-center h-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Enhanced Logo Section */}
           <motion.div 
-            className="flex items-center space-x-3 flex-shrink-0"
-            initial={{ opacity: 0, x: -20 }}
+            className="flex items-center space-x-4 flex-shrink-0"
+            initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
           >
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <RobotOutlined className="text-xl text-white" />
+            {/* Logo with Animated Glow */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl blur-lg opacity-30 animate-pulse"></div>
+              <div className="relative w-16 h-16 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-all duration-300">
+                <RobotOutlined className="text-2xl text-white" />
+              </div>
             </div>
-            <Title level={3} className="mb-0 font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              mirAI
-            </Title>
+            
+            {/* Brand Text with Gradient */}
+            <div className="flex flex-col">
+              <Title level={2} className="mb-0 font-black text-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                mirAI
+              </Title>
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+                Interview Platform
+              </span>
+            </div>
           </motion.div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation with Floating Pills */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="hidden lg:flex items-center space-x-8"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="hidden lg:flex items-center space-x-2"
           >
-            {/* Navigation Links */}
-            <div className="flex items-center space-x-6">
-              {navigationItems.map((item) => (
-                <Button 
+            {/* Navigation Pills Container */}
+            <div className="flex items-center space-x-1 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl p-2 border border-white/30 dark:border-gray-700/30 shadow-lg">
+              {navigationItems.map((item, index) => (
+                <motion.div
                   key={item.label}
-                  type="text" 
-                  size="large" 
-                  className="font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 px-4 h-12 rounded-xl"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
                 >
-                  {item.label}
-                </Button>
+                  <Button 
+                    type="text" 
+                    size="large" 
+                    className="nav-pill font-semibold text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 px-6 h-12 rounded-xl border-0 shadow-none"
+                  >
+                    {item.label}
+                  </Button>
+                </motion.div>
               ))}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center space-x-4">
+            {/* Action Buttons with Enhanced Design */}
+            <div className="flex items-center space-x-3 ml-6">
               <ThemeToggle />
-              <Button 
-                type="text" 
-                size="large" 
-                onClick={() => navigate('/login')}
-                className="font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 px-6 h-12 rounded-xl"
+              
+              {/* Sign In Button */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
               >
-                Sign In
-              </Button>
-              <Button 
-                type="primary" 
-                size="large"
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 border-0 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 px-8 h-12"
-                icon={<ArrowRightOutlined />}
-                onClick={() => navigate('/login')}
+                <Button 
+                  type="text" 
+                  size="large" 
+                  onClick={() => navigate('/login')}
+                  className="font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 px-6 h-12 rounded-xl"
+                >
+                  Sign In
+                </Button>
+              </motion.div>
+              
+              {/* Get Started Button with Glow Effect */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+                className="relative"
               >
-                Get Started
-              </Button>
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur-lg opacity-30 animate-pulse"></div>
+                <Button 
+                  type="primary" 
+                  size="large"
+                  className="relative bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 border-0 rounded-2xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 px-8 h-14 text-lg"
+                  icon={<RocketOutlined />}
+                  onClick={() => navigate('/login')}
+                >
+                  Get Started
+                </Button>
+              </motion.div>
             </div>
           </motion.div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button with Enhanced Design */}
           <div className="lg:hidden flex items-center space-x-3">
             <ThemeToggle />
-            <Button 
-              type="text"
-              size="large"
-              icon={<MenuOutlined />}
-              onClick={() => setMobileMenuVisible(true)}
-              className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 w-12 h-12 rounded-xl"
-            />
+            <motion.div
+              initial={{ opacity: 0, rotate: -90 }}
+              animate={{ opacity: 1, rotate: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <Button 
+                type="text"
+                size="large"
+                icon={<MenuOutlined />}
+                onClick={() => setMobileMenuVisible(true)}
+                className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 w-14 h-14 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border border-white/30 dark:border-gray-700/30 shadow-lg hover:shadow-xl"
+              />
+            </motion.div>
           </div>
         </div>
       </Header>
 
-      {/* Mobile Navigation Drawer */}
+      {/* Enhanced Mobile Navigation Drawer */}
       <Drawer
         title={
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <RobotOutlined className="text-white" />
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <RobotOutlined className="text-white text-xl" />
             </div>
-            <span className="font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              mirAI
-            </span>
+            <div>
+              <span className="font-black text-xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                mirAI
+              </span>
+              <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+                Interview Platform
+              </div>
+            </div>
           </div>
         }
         placement="right"
         onClose={() => setMobileMenuVisible(false)}
         open={mobileMenuVisible}
-        width={320}
-        className="lg:hidden"
-        closeIcon={<CloseOutlined />}
+        width={360}
+        className="lg:hidden mobile-drawer"
+        closeIcon={<CloseOutlined className="text-xl" />}
+        styles={{
+          header: {
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))',
+            borderBottom: '1px solid rgba(99, 102, 241, 0.2)',
+            padding: '24px'
+          },
+          body: {
+            padding: '32px 24px'
+          }
+        }}
       >
-        <div className="space-y-6">
-          {/* Navigation Links */}
-          <div className="space-y-4">
-            {navigationItems.map((item) => (
-              <Button 
+        <div className="space-y-8">
+          {/* Navigation Links with Enhanced Styling */}
+          <div className="space-y-3">
+            <Title level={5} className="text-gray-600 dark:text-gray-400 uppercase tracking-wider text-xs font-bold mb-4">
+              Navigation
+            </Title>
+            {navigationItems.map((item, index) => (
+              <motion.div
                 key={item.label}
-                type="text" 
-                size="large" 
-                block
-                className="text-left font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 h-14 rounded-xl"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                {item.label}
-              </Button>
+                <Button 
+                  type="text" 
+                  size="large" 
+                  block
+                  className="text-left font-semibold text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 h-16 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-transparent hover:shadow-lg"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-lg">{item.label}</span>
+                    <ArrowRightOutlined className="text-sm opacity-50" />
+                  </div>
+                </Button>
+              </motion.div>
             ))}
           </div>
 
-          <Divider />
+          <Divider className="border-gray-300 dark:border-gray-600" />
 
-          {/* Action Buttons */}
+          {/* Action Buttons with Enhanced Mobile Design */}
           <div className="space-y-4">
+            <Title level={5} className="text-gray-600 dark:text-gray-400 uppercase tracking-wider text-xs font-bold mb-4">
+              Account
+            </Title>
             <Button 
               type="text" 
               size="large" 
@@ -268,28 +346,55 @@ const Landing: React.FC = () => {
                 navigate('/login');
                 setMobileMenuVisible(false);
               }}
-              className="font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 h-14 rounded-xl"
+              className="font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 h-16 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
             >
-              Sign In
+              <div className="flex items-center justify-between w-full">
+                <span className="text-lg">Sign In</span>
+                <UserOutlined className="text-lg" />
+              </div>
             </Button>
-            <Button 
-              type="primary" 
-              size="large"
-              block
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 border-0 rounded-xl font-bold shadow-lg h-14"
-              icon={<ArrowRightOutlined />}
-              onClick={() => {
-                navigate('/login');
-                setMobileMenuVisible(false);
-              }}
-            >
-              Get Started
-            </Button>
+            
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur-lg opacity-20"></div>
+              <Button 
+                type="primary" 
+                size="large"
+                block
+                className="relative bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 border-0 rounded-2xl font-bold shadow-xl h-16 text-lg"
+                icon={<RocketOutlined />}
+                onClick={() => {
+                  navigate('/login');
+                  setMobileMenuVisible(false);
+                }}
+              >
+                Get Started Free
+              </Button>
+            </div>
+          </div>
+
+          {/* Mobile Footer */}
+          <div className="pt-8 border-t border-gray-200 dark:border-gray-700">
+            <div className="text-center space-y-3">
+              <div className="flex justify-center space-x-4">
+                <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-xl flex items-center justify-center cursor-pointer transition-colors duration-300">
+                  <GlobalOutlined className="text-gray-600 dark:text-gray-400" />
+                </div>
+                <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-xl flex items-center justify-center cursor-pointer transition-colors duration-300">
+                  <TeamOutlined className="text-gray-600 dark:text-gray-400" />
+                </div>
+                <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-xl flex items-center justify-center cursor-pointer transition-colors duration-300">
+                  <StarOutlined className="text-gray-600 dark:text-gray-400" />
+                </div>
+              </div>
+              <Paragraph className="text-gray-500 dark:text-gray-400 text-sm mb-0">
+                © 2024 mirAI. All rights reserved.
+              </Paragraph>
+            </div>
           </div>
         </div>
       </Drawer>
 
-      <Content className="pt-20">
+      <Content className="pt-24">
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-800 dark:to-indigo-900 overflow-hidden">
           {/* Background Pattern */}
