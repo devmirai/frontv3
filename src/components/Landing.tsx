@@ -11,7 +11,6 @@ import {
   TrophyOutlined,
   ThunderboltOutlined,
   PlayCircleOutlined,
-  ShieldCheckOutlined,
   GlobalOutlined,
   HeartOutlined,
   RocketOutlined
@@ -261,7 +260,7 @@ const Landing: React.FC = () => {
                         <span>Free 14-day trial</span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <ShieldCheckOutlined className="text-blue-500" />
+                        <CheckCircleOutlined className="text-blue-500" />
                         <span>No credit card required</span>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -567,7 +566,7 @@ const Landing: React.FC = () => {
                   <span>No setup fees</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <ShieldCheckOutlined />
+                  <CheckCircleOutlined />
                   <span>Cancel anytime</span>
                 </div>
               </div>
