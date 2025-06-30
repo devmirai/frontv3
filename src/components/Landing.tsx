@@ -19,12 +19,15 @@ import {
   CloseOutlined,
   SafetyOutlined,
   UserOutlined,
-  ShieldCheckOutlined,
   BarChartOutlined,
-  LightningBoltOutlined,
+  ThunderboltOutlined,
   AimOutlined,
   FireOutlined,
   CrownOutlined,
+  HomeOutlined,
+  InfoCircleOutlined,
+  PhoneOutlined,
+  DollarOutlined,
 } from "@ant-design/icons"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
@@ -89,7 +92,7 @@ const Landing: React.FC = () => {
       title: "Time Saved",
       value: 85,
       suffix: "%",
-      icon: <LightningBoltOutlined className="text-blue-600 text-3xl" />,
+      icon: <ThunderboltOutlined className="text-blue-600 text-3xl" />,
       description: "Reduction in hiring time",
     },
     {
@@ -150,10 +153,36 @@ const Landing: React.FC = () => {
   }
 
   const navigationItems = [
-    { label: "Features", href: "#features" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "About", href: "#about" },
-    { label: "Contact", href: "#contact" },
+    {
+      label: "Home",
+      href: "#home",
+      icon: <HomeOutlined className="text-lg" />,
+      description: "Back to top",
+    },
+    {
+      label: "Features",
+      href: "#features",
+      icon: <BulbOutlined className="text-lg" />,
+      description: "Explore our capabilities",
+    },
+    {
+      label: "Pricing",
+      href: "#pricing",
+      icon: <DollarOutlined className="text-lg" />,
+      description: "View pricing plans",
+    },
+    {
+      label: "About",
+      href: "#about",
+      icon: <InfoCircleOutlined className="text-lg" />,
+      description: "Learn about mirAI",
+    },
+    {
+      label: "Contact",
+      href: "#contact",
+      icon: <PhoneOutlined className="text-lg" />,
+      description: "Get in touch",
+    },
   ]
 
   return (
@@ -168,15 +197,13 @@ const Landing: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="flex items-center space-x-3">
+            <div className="sidebar-logo">
               <div className="logo-icon">
                 <RobotOutlined />
               </div>
-              <div className="flex flex-col">
+              <div className="logo-content">
                 <span className="logo-text">mirAI</span>
-                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
-                  Interview Platform
-                </span>
+                <span className="logo-subtitle">Interview Platform</span>
               </div>
             </div>
           </motion.div>
@@ -192,11 +219,12 @@ const Landing: React.FC = () => {
               <motion.a
                 key={item.label}
                 href={item.href}
-                className="nav-pill font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300"
+                className="nav-pill font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 flex items-center gap-2"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
               >
+                {item.icon}
                 {item.label}
               </motion.a>
             ))}
@@ -212,7 +240,8 @@ const Landing: React.FC = () => {
               >
                 <Button
                   type="text"
-                  className="font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 px-6 h-12 rounded-xl"
+                  className="action-button font-semibold"
+                  icon={<UserOutlined />}
                   onClick={() => navigate("/login")}
                 >
                   Sign In
@@ -238,7 +267,7 @@ const Landing: React.FC = () => {
               type="text"
               icon={<MenuOutlined />}
               onClick={() => setMobileMenuVisible(true)}
-              className="lg:hidden text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 w-12 h-12 rounded-xl"
+              className="lg:hidden action-button"
             />
           </div>
         </div>
@@ -247,17 +276,13 @@ const Landing: React.FC = () => {
       {/* Enhanced Mobile Navigation Drawer */}
       <Drawer
         title={
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <RobotOutlined className="text-white text-xl" />
+          <div className="sidebar-logo">
+            <div className="logo-icon">
+              <RobotOutlined />
             </div>
-            <div>
-              <span className="font-black text-xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                mirAI
-              </span>
-              <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
-                Interview Platform
-              </div>
+            <div className="logo-content">
+              <span className="logo-text">mirAI</span>
+              <span className="logo-subtitle">Interview Platform</span>
             </div>
           </div>
         }
@@ -265,79 +290,109 @@ const Landing: React.FC = () => {
         onClose={() => setMobileMenuVisible(false)}
         open={mobileMenuVisible}
         width={360}
-        className="lg:hidden mobile-drawer"
+        className="lg:hidden enhanced-drawer mobile-drawer"
         closeIcon={<CloseOutlined className="text-xl" />}
       >
-        <div className="space-y-8">
-          {/* Navigation Links */}
-          <div className="space-y-3">
-            <Title
-              level={5}
-              className="text-gray-600 dark:text-gray-400 uppercase tracking-wider text-xs font-bold mb-4"
-            >
-              Navigation
-            </Title>
-            {navigationItems.map((item, index) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-              >
-                <Button
-                  type="text"
-                  size="large"
-                  block
-                  className="text-left font-semibold text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 h-16 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-transparent hover:shadow-lg"
+        <div className="drawer-content">
+          {/* Enhanced Navigation Links */}
+          <div className="form-section">
+            <div className="section-title">Navigation</div>
+            <div className="space-y-2">
+              {navigationItems.map((item, index) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
                 >
-                  <div className="flex items-center justify-between w-full">
-                    <span className="text-lg">{item.label}</span>
-                    <ArrowRightOutlined className="text-sm opacity-50" />
+                  <div className="setting-item cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
+                    <div className="setting-info">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl flex items-center justify-center">
+                          {item.icon}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900 dark:text-white text-base">{item.label}</div>
+                          <div className="setting-description">{item.description}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <ArrowRightOutlined className="text-gray-400 text-sm" />
                   </div>
-                </Button>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
 
           <Divider className="border-gray-300 dark:border-gray-600" />
 
-          {/* Action Buttons */}
-          <div className="space-y-4">
-            <Title
-              level={5}
-              className="text-gray-600 dark:text-gray-400 uppercase tracking-wider text-xs font-bold mb-4"
-            >
-              Account
-            </Title>
-            <Button
-              type="text"
-              size="large"
-              block
-              onClick={() => {
-                navigate("/login")
-                setMobileMenuVisible(false)
-              }}
-              className="font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 h-16 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
-            >
-              <div className="flex items-center justify-between w-full">
-                <span className="text-lg">Sign In</span>
-                <UserOutlined className="text-lg" />
-              </div>
-            </Button>
+          {/* Enhanced Action Buttons */}
+          <div className="form-section">
+            <div className="section-title">Account</div>
+            <div className="space-y-3">
+              <Button
+                type="text"
+                size="large"
+                block
+                onClick={() => {
+                  navigate("/login")
+                  setMobileMenuVisible(false)
+                }}
+                className="action-button-large text-left"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-3">
+                    <UserOutlined className="text-lg" />
+                    <span className="text-lg font-semibold">Sign In</span>
+                  </div>
+                  <ArrowRightOutlined className="text-sm opacity-50" />
+                </div>
+              </Button>
 
-            <Button
-              type="primary"
-              size="large"
-              block
-              className="cta-button h-16"
-              icon={<RocketOutlined />}
-              onClick={() => {
-                navigate("/login")
-                setMobileMenuVisible(false)
-              }}
-            >
-              Get Started Free
-            </Button>
+              <Button
+                type="primary"
+                size="large"
+                block
+                className="btn-gradient action-button-large"
+                icon={<RocketOutlined />}
+                onClick={() => {
+                  navigate("/login")
+                  setMobileMenuVisible(false)
+                }}
+              >
+                Get Started Free
+              </Button>
+            </div>
+          </div>
+
+          {/* Enhanced Status Card */}
+          <div className="mirabot-status-card">
+            <div className="status-content">
+              <div className="status-avatar">
+                <RobotOutlined />
+                <div className="status-indicator"></div>
+              </div>
+              <div className="status-info">
+                <div className="status-title">mirAI Assistant</div>
+                <div className="status-description">
+                  AI-powered interview platform ready to transform your hiring process
+                </div>
+                <div className="status-stats">
+                  <div className="stat-item">
+                    <div className="stat-number">250+</div>
+                    <div className="stat-label">Companies</div>
+                  </div>
+                  <div className="stat-item">
+                    <div className="stat-number">12.5K+</div>
+                    <div className="stat-label">Interviews</div>
+                  </div>
+                  <div className="stat-item">
+                    <div className="stat-number">94%</div>
+                    <div className="stat-label">Accuracy</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </Drawer>
@@ -403,8 +458,6 @@ const Landing: React.FC = () => {
                       <div className="flex items-center space-x-3">
                         <GlobalOutlined className="text-purple-500 text-lg" />
                         <span className="font-semibold">Used by 250+ companies</span>
-
-                        <span className="font-semibold">Used by 250+ companies</span>
                       </div>
                     </div>
                   </motion.div>
@@ -454,7 +507,7 @@ const Landing: React.FC = () => {
                     >
                       <div className="flex items-center space-x-4">
                         <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                          <LightningBoltOutlined className="text-blue-600 text-xl" />
+                          <ThunderboltOutlined className="text-blue-600 text-xl" />
                         </div>
                         <div>
                           <div className="font-bold text-gray-900 dark:text-white text-lg">85% Faster</div>
@@ -512,9 +565,11 @@ const Landing: React.FC = () => {
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
                 >
-                  <Card className="stats-card">
-                    <div className="mb-6">
-                      <div className="mb-4">{stat.icon}</div>
+                  <Card className="enhanced-stats-card">
+                    <div className="stats-header">
+                      <div className="stats-icon text-indigo-600">{stat.icon}</div>
+                    </div>
+                    <div className="stats-content">
                       <Statistic
                         value={stat.value}
                         suffix={stat.suffix}
@@ -527,7 +582,7 @@ const Landing: React.FC = () => {
                         }}
                         className="mb-4"
                       />
-                      <Title level={4} className="text-gray-900 dark:text-white font-bold mb-3 text-xl">
+                      <Title level={4} className="stats-title">
                         {stat.title}
                       </Title>
                       <Paragraph className="text-gray-600 dark:text-gray-400 mb-0 leading-relaxed">
@@ -698,7 +753,7 @@ const Landing: React.FC = () => {
                   <span className="font-semibold">No setup fees</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <ShieldCheckOutlined className="text-xl" />
+                  <SafetyOutlined className="text-xl" />
                   <span className="font-semibold">Cancel anytime</span>
                 </div>
               </div>
@@ -713,13 +768,16 @@ const Landing: React.FC = () => {
           <Row gutter={[48, 48]}>
             <Col xs={24} md={8}>
               <div className="space-y-8">
-                <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl flex items-center justify-center shadow-lg">
-                    <RobotOutlined className="text-3xl text-white" />
+                <div className="sidebar-logo">
+                  <div className="logo-icon">
+                    <RobotOutlined />
                   </div>
-                  <Title level={2} className="mb-0 text-white font-black text-3xl">
-                    mirAI
-                  </Title>
+                  <div className="logo-content">
+                    <Title level={2} className="logo-text text-white mb-0">
+                      mirAI
+                    </Title>
+                    <div className="logo-subtitle text-gray-400">Interview Platform</div>
+                  </div>
                 </div>
                 <Paragraph className="text-gray-400 leading-relaxed text-lg">
                   AI-powered interview platform helping companies make better hiring decisions through intelligent
@@ -730,7 +788,10 @@ const Landing: React.FC = () => {
                   <div className="w-12 h-12 bg-gray-800 hover:bg-indigo-600 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110">
                     <GlobalOutlined className="text-white text-lg" />
                   </div>
-                  <div className="w-12 h-12 bg-gray-800 hover:bg-indigo-600 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110">
+                  <div
+                    className="w-12 h-12 bg-gray-800 hover:bg-indigo-600 rounded-xl flex items-center justify-
+center cursor-pointer transition-all duration-300 hover:scale-110"
+                  >
                     <TeamOutlined className="text-white text-lg" />
                   </div>
                   <div className="w-12 h-12 bg-gray-800 hover:bg-indigo-600 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110">

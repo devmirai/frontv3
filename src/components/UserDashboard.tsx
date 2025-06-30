@@ -15,7 +15,6 @@ import {
   Space,
   Avatar,
   Tag,
-  Badge,
   Empty,
   Dropdown,
   message,
@@ -26,6 +25,7 @@ import {
   DatePicker,
   Select,
   Drawer,
+  Divider,
 } from "antd"
 import {
   DashboardOutlined,
@@ -45,12 +45,10 @@ import {
   EyeOutlined,
   SendOutlined,
   ExclamationCircleOutlined,
-  InfoCircleOutlined,
-  BellOutlined,
-  EditOutlined,
   SaveOutlined,
-  CloseOutlined,
   LoadingOutlined,
+  BookOutlined,
+  HeartOutlined,
 } from "@ant-design/icons"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
@@ -63,7 +61,7 @@ import NotificationDropdown from "./NotificationDropdown"
 import dayjs from "dayjs"
 
 const { Header, Sider, Content } = Layout
-const { Title, Paragraph } = Typography
+const { Title, Paragraph, Text } = Typography
 const { Option } = Select
 
 const UserDashboard: React.FC = () => {
@@ -88,24 +86,86 @@ const UserDashboard: React.FC = () => {
       key: "dashboard",
       icon: <DashboardOutlined />,
       label: "Dashboard",
+      className: "sidebar-menu-item",
     },
     {
-      key: "applications",
-      icon: <FileTextOutlined />,
-      label: "My Applications",
-      onClick: () => setApplicationsModalVisible(true),
+      key: "divider-1",
+      type: "divider",
     },
     {
-      key: "profile",
-      icon: <UserOutlined />,
-      label: "Profile",
-      onClick: () => setProfileModalVisible(true),
+      key: "job-search",
+      label: "Job Search",
+      type: "group",
+      children: [
+        {
+          key: "applications",
+          icon: <FileTextOutlined />,
+          label: "My Applications",
+          className: "sidebar-menu-item",
+          onClick: () => setApplicationsModalVisible(true),
+        },
+        {
+          key: "browse-jobs",
+          icon: <SearchOutlined />,
+          label: "Browse Jobs",
+          className: "sidebar-menu-item",
+          onClick: () => setJobsModalVisible(true),
+        },
+        {
+          key: "saved-jobs",
+          icon: <HeartOutlined />,
+          label: "Saved Jobs",
+          className: "sidebar-menu-item",
+        },
+      ],
     },
     {
-      key: "settings",
-      icon: <SettingOutlined />,
-      label: "Settings",
-      onClick: () => setSettingsDrawerVisible(true),
+      key: "divider-2",
+      type: "divider",
+    },
+    {
+      key: "career",
+      label: "Career",
+      type: "group",
+      children: [
+        {
+          key: "interviews",
+          icon: <TrophyOutlined />,
+          label: "Interview History",
+          className: "sidebar-menu-item",
+        },
+        {
+          key: "skills",
+          icon: <BookOutlined />,
+          label: "Skills Assessment",
+          className: "sidebar-menu-item",
+        },
+      ],
+    },
+    {
+      key: "divider-3",
+      type: "divider",
+    },
+    {
+      key: "account",
+      label: "Account",
+      type: "group",
+      children: [
+        {
+          key: "profile",
+          icon: <UserOutlined />,
+          label: "Profile",
+          className: "sidebar-menu-item",
+          onClick: () => setProfileModalVisible(true),
+        },
+        {
+          key: "settings",
+          icon: <SettingOutlined />,
+          label: "Settings",
+          className: "sidebar-menu-item",
+          onClick: () => setSettingsDrawerVisible(true),
+        },
+      ],
     },
   ]
 
@@ -122,8 +182,8 @@ const UserDashboard: React.FC = () => {
       settingsForm.setFieldsValue({
         notifications: true,
         emailUpdates: true,
-        theme: 'auto',
-        language: 'en',
+        theme: "auto",
+        language: "en",
       })
     }
   }, [user])
@@ -289,10 +349,10 @@ const UserDashboard: React.FC = () => {
               onClick={async () => {
                 try {
                   message.loading("Starting your interview...", 1)
-                  
+
                   // Use the new specific endpoint to start the interview
                   await postulacionAPI.iniciarEntrevista(record.id!)
-                  
+
                   setTimeout(() => {
                     navigate(`/usuario/interview/${record.id}`)
                   }, 1000)
@@ -317,7 +377,11 @@ const UserDashboard: React.FC = () => {
             </Button>
           )}
           {record.estado === EstadoPostulacion.COMPLETADA && (
-            <Button size="small" icon={<EyeOutlined />} onClick={() => navigate(`/usuario/interview/${record.id}/results`)}>
+            <Button
+              size="small"
+              icon={<EyeOutlined />}
+              onClick={() => navigate(`/usuario/interview/${record.id}/results`)}
+            >
               View Results
             </Button>
           )}
@@ -394,7 +458,7 @@ const UserDashboard: React.FC = () => {
         usuario: { id: user.id },
         convocatoria: { id: selectedJob.id },
         estado: EstadoPostulacion.PENDIENTE,
-        fechaPostulacion: new Date().toISOString()
+        fechaPostulacion: new Date().toISOString(),
       })
 
       const newApplicationId = applicationResponse.data.id || applicationResponse.data
@@ -411,18 +475,17 @@ const UserDashboard: React.FC = () => {
 
       message.destroy()
       message.success("Application submitted and interview started!")
-      
+
       // Close modal and redirect
       setApplyModalVisible(false)
       setSelectedJob(null)
-      
+
       // Redirect to interview page
       navigate(`/usuario/interview/${newApplicationId}`)
-
     } catch (error: any) {
       console.error("Error in application process:", error)
       message.destroy()
-      
+
       if (error.response?.status === 409) {
         message.error("You have already applied to this position.")
       } else {
@@ -446,120 +509,170 @@ const UserDashboard: React.FC = () => {
   }
 
   const handleProfileSave = (values: any) => {
-    console.log('Profile values:', values)
-    message.success('Profile updated successfully!')
+    console.log("Profile values:", values)
+    message.success("Profile updated successfully!")
     setProfileModalVisible(false)
   }
 
   const handleSettingsSave = (values: any) => {
-    console.log('Settings values:', values)
-    message.success('Settings saved successfully!')
+    console.log("Settings values:", values)
+    message.success("Settings saved successfully!")
     setSettingsDrawerVisible(false)
   }
 
   return (
     <Layout className="main-layout min-h-screen">
-      {/* Sidebar */}
-      <Sider trigger={null} collapsible collapsed={collapsed} className="sidebar-layout" width={280}>
-        {/* Logo */}
-        <div className="logo-container">
-          <div className="logo-icon">
-            <RobotOutlined />
-          </div>
-          {!collapsed && <span className="logo-text">mirAI</span>}
+      {/* Enhanced Sidebar */}
+      <Sider
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
+        className="enhanced-sidebar"
+        width={280}
+        collapsedWidth={80}
+        style={{
+          background: "var(--sidebar-bg)",
+          borderRight: "1px solid var(--sidebar-border)",
+          boxShadow: "2px 0 8px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        {/* Enhanced Logo Section */}
+        <div className="sidebar-logo-container">
+          <motion.div className="sidebar-logo" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+            <div className="logo-icon">
+              <RobotOutlined />
+            </div>
+            {!collapsed && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.3 }}
+                className="logo-content"
+              >
+                <span className="logo-text">mirAI</span>
+                <span className="logo-subtitle">Career Portal</span>
+              </motion.div>
+            )}
+          </motion.div>
         </div>
 
-        {/* Navigation Menu */}
-        <Menu 
-          mode="inline" 
-          defaultSelectedKeys={["dashboard"]} 
-          items={menuItems} 
-          className="border-r-0 mt-4"
-          onClick={({ key, item }) => {
-            if (item?.props?.onClick) {
-              item.props.onClick()
-            }
-          }}
-        />
+        {/* Enhanced Navigation Menu */}
+        <div className="sidebar-menu-container">
+          <Menu
+            mode="inline"
+            defaultSelectedKeys={["dashboard"]}
+            items={menuItems}
+            className="enhanced-menu"
+            onClick={({ key, item }) => {
+              if (item?.props?.onClick) {
+                item.props.onClick()
+              }
+            }}
+            style={{
+              background: "transparent",
+              border: "none",
+            }}
+          />
+        </div>
 
-        {/* Mirabot Status */}
+        {/* Enhanced Status Card */}
         {!collapsed && (
-          <div className="p-6 mt-8">
-            <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-800">
-              <div className="text-center">
-                <div className="mirabot-avatar mx-auto mb-3" style={{ width: "60px", height: "60px" }}>
-                  <RobotOutlined className="text-2xl text-white" />
+          <motion.div
+            className="sidebar-status-card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Card className="mirabot-status-card">
+              <div className="status-content">
+                <div className="status-avatar">
+                  <RobotOutlined />
+                  <div className="status-indicator"></div>
                 </div>
-                <Title level={5} className="mb-2 text-indigo-800 dark:text-indigo-300">
-                  mirAI
-                </Title>
-                <Paragraph className="text-indigo-600 dark:text-indigo-400 text-sm mb-0">
-                  Ready to help you succeed!
-                </Paragraph>
+                <div className="status-info">
+                  <Title level={5} className="status-title">
+                    AI Assistant
+                  </Title>
+                  <Text className="status-description">Ready to help you succeed!</Text>
+                  <div className="status-stats">
+                    <div className="stat-item">
+                      <span className="stat-number">{myApplications.length}</span>
+                      <span className="stat-label">Applications</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-number">{availableJobs.length}</span>
+                      <span className="stat-label">Jobs</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </Card>
-          </div>
+          </motion.div>
         )}
+
+        {/* Collapse Toggle */}
+        <div className="sidebar-footer">
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            className="collapse-button"
+          />
+        </div>
       </Sider>
 
       <Layout>
         {/* Enhanced Header */}
-        <Header className="header-layout border-b bg-white dark:bg-gray-800 shadow-sm">
-          <div className="flex justify-between items-center h-full px-6 lg:px-8">
-            <div className="flex items-center space-x-4 lg:space-x-6">
-              <Button
-                type="text"
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={() => setCollapsed(!collapsed)}
-                className="text-lg hover:bg-gray-100 dark:hover:bg-gray-700 p-2"
-              />
-              <div className="hidden sm:block">
-                <Title level={4} className="mb-0">
+        <Header className="enhanced-header">
+          <div className="header-content">
+            <div className="header-left">
+              <div className="page-info">
+                <Title level={3} className="page-title">
                   My Dashboard
                 </Title>
-                <Paragraph className="text-gray-500 dark:text-gray-400 text-sm mb-0">
+                <Text className="page-subtitle">
                   Welcome back, {user?.name}! Track your applications and interviews.
-                </Paragraph>
+                </Text>
               </div>
             </div>
 
-            <Space size="middle" className="flex items-center">
-              <Button
-                icon={<SearchOutlined />}
-                className="border-gray-300 hover:border-indigo-400 dark:border-gray-600 dark:hover:border-indigo-400 hidden sm:inline-flex"
-                onClick={() => setJobsModalVisible(true)}
-              >
-                <span className="hidden md:inline">Search Jobs</span>
-              </Button>
-              <NotificationDropdown />
-              <ThemeToggle />
-              <Dropdown menu={userMenu} trigger={["click"]} placement="bottomRight">
-                <Avatar 
-                  src={user?.avatar} 
-                  size="large" 
-                  className="cursor-pointer border-2 border-indigo-200 hover:border-indigo-300 transition-colors" 
-                />
-              </Dropdown>
-            </Space>
+            <div className="header-right">
+              <Space size="middle" className="header-actions">
+                <Button
+                  icon={<SearchOutlined />}
+                  className="action-button"
+                  size="large"
+                  onClick={() => setJobsModalVisible(true)}
+                >
+                  Search Jobs
+                </Button>
+                <NotificationDropdown />
+                <ThemeToggle />
+                <Dropdown menu={userMenu} trigger={["click"]} placement="bottomRight">
+                  <Avatar src={user?.avatar} size="large" className="user-avatar" />
+                </Dropdown>
+              </Space>
+            </div>
           </div>
         </Header>
 
         {/* Main Content */}
-        <Content className="content-layout p-4 lg:p-6">
+        <Content className="enhanced-content">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="space-y-6 lg:space-y-8"
+            className="content-wrapper"
           >
             {/* Welcome Section */}
-            <Card className="border-0 shadow-sm bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20">
+            <Card className="welcome-card">
               <Row align="middle" gutter={[24, 24]}>
                 <Col xs={24} lg={16}>
-                  <Title level={3} className="mb-3">
+                  <Title level={2} className="welcome-title">
                     Hello, {user?.name}! 👋
                   </Title>
-                  <Paragraph className="text-gray-600 dark:text-gray-300 text-base lg:text-lg mb-4">
+                  <Paragraph className="welcome-description">
                     You have{" "}
                     <strong>
                       {myApplications.filter((a) => a.estado === EstadoPostulacion.EN_EVALUACION).length} interviews
@@ -570,6 +683,7 @@ const UserDashboard: React.FC = () => {
                     <Button
                       type="primary"
                       className="btn-gradient"
+                      size="large"
                       disabled={myApplications.filter((a) => a.estado === EstadoPostulacion.EN_EVALUACION).length === 0}
                       onClick={() => {
                         const inProgressApp = myApplications.find((a) => a.estado === EstadoPostulacion.EN_EVALUACION)
@@ -580,15 +694,17 @@ const UserDashboard: React.FC = () => {
                     >
                       Continue Interview
                     </Button>
-                    <Button onClick={() => setJobsModalVisible(true)}>Browse Jobs</Button>
+                    <Button size="large" onClick={() => setJobsModalVisible(true)}>
+                      Browse Jobs
+                    </Button>
                   </Space>
                 </Col>
                 <Col xs={24} lg={8}>
-                  <div className="text-center">
+                  <div className="welcome-illustration">
                     <img
                       src="https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop"
                       alt="AI Assistant"
-                      className="w-20 h-20 lg:w-24 lg:h-24 rounded-full shadow-lg mx-auto"
+                      className="illustration-image"
                     />
                   </div>
                 </Col>
@@ -596,7 +712,7 @@ const UserDashboard: React.FC = () => {
             </Card>
 
             {/* Stats Cards */}
-            <Row gutter={[16, 16]} className="lg:gutter-24">
+            <Row gutter={[24, 24]} className="stats-section">
               {stats.map((stat, index) => (
                 <Col xs={24} sm={12} lg={6} key={index}>
                   <motion.div
@@ -604,23 +720,25 @@ const UserDashboard: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                   >
-                    <Card className="stats-card h-full">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="text-2xl lg:text-3xl">{stat.icon}</div>
-                        <Tag color={stat.trend === "up" ? "success" : "default"} className="border-0 text-xs">
+                    <Card className="enhanced-stats-card">
+                      <div className="stats-header">
+                        <div className="stats-icon">{stat.icon}</div>
+                        <Tag color={stat.trend === "up" ? "success" : "default"} className="trend-tag">
                           {stat.change}
                         </Tag>
                       </div>
-                      <Statistic
-                        title={<span className="text-gray-600 dark:text-gray-400 font-medium text-sm">{stat.title}</span>}
-                        value={stat.value}
-                        valueStyle={{
-                          color: "var(--ant-color-text)",
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          lineHeight: 1.2,
-                        }}
-                      />
+                      <div className="stats-content">
+                        <Statistic
+                          title={<span className="stats-title">{stat.title}</span>}
+                          value={stat.value}
+                          valueStyle={{
+                            color: "var(--text-primary)",
+                            fontSize: "2rem",
+                            fontWeight: "bold",
+                            lineHeight: 1.2,
+                          }}
+                        />
+                      </div>
                     </Card>
                   </motion.div>
                 </Col>
@@ -630,28 +748,24 @@ const UserDashboard: React.FC = () => {
             {/* My Applications Table */}
             <Card
               title={
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                  <Title level={4} className="mb-0">
+                <div className="table-header">
+                  <Title level={4} className="table-title">
                     My Applications
                   </Title>
-                  <Button 
-                    type="link" 
-                    className="text-indigo-600 font-medium self-start sm:self-auto"
-                    onClick={() => setApplicationsModalVisible(true)}
-                  >
+                  <Button type="link" className="view-all-button" onClick={() => setApplicationsModalVisible(true)}>
                     View All
                   </Button>
                 </div>
               }
-              className="border-0 shadow-sm"
+              className="enhanced-table-card"
             >
-              <div className="overflow-x-auto">
+              <div className="table-container">
                 <Table
                   columns={applicationColumns}
                   dataSource={myApplications.slice(0, 5)}
                   loading={loading}
                   pagination={false}
-                  className="custom-table"
+                  className="enhanced-table"
                   scroll={{ x: 800 }}
                   rowKey="id"
                   size="middle"
@@ -662,23 +776,19 @@ const UserDashboard: React.FC = () => {
             {/* Available Jobs */}
             <Card
               title={
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                  <Title level={4} className="mb-0">
+                <div className="table-header">
+                  <Title level={4} className="table-title">
                     Available Job Opportunities
                   </Title>
-                  <Button 
-                    type="link" 
-                    className="text-indigo-600 font-medium self-start sm:self-auto"
-                    onClick={() => setJobsModalVisible(true)}
-                  >
+                  <Button type="link" className="view-all-button" onClick={() => setJobsModalVisible(true)}>
                     Browse All
                   </Button>
                 </div>
               }
-              className="border-0 shadow-sm"
+              className="enhanced-table-card"
             >
               {availableJobs.length > 0 ? (
-                <Row gutter={[16, 16]} className="lg:gutter-24">
+                <Row gutter={[24, 24]}>
                   {availableJobs.slice(0, 4).map((job) => {
                     const alreadyApplied = myApplications.some((app) => app.convocatoria?.id === job.id)
                     return (
@@ -689,37 +799,35 @@ const UserDashboard: React.FC = () => {
                           transition={{ duration: 0.3 }}
                           whileHover={{ y: -4 }}
                         >
-                          <Card className="hover-card border border-gray-200 dark:border-gray-600 transition-all duration-300 h-full">
-                            <div className="space-y-4">
-                              <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                  <Title level={5} className="mb-1 line-clamp-2">
+                          <Card className="job-card">
+                            <div className="job-content">
+                              <div className="job-header">
+                                <div className="job-info">
+                                  <Title level={5} className="job-title">
                                     {job.titulo}
                                   </Title>
-                                  <Paragraph className="text-gray-600 dark:text-gray-300 mb-2">
-                                    {job.empresa?.nombre}
-                                  </Paragraph>
-                                  <Tag color="blue">{job.puesto}</Tag>
+                                  <Text className="job-company">{job.empresa?.nombre}</Text>
+                                  <Tag color="blue" className="job-position">
+                                    {job.puesto}
+                                  </Tag>
                                 </div>
                               </div>
 
-                              <Paragraph className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-3">
+                              <Paragraph className="job-description">
                                 {job.descripcion.length > 150
                                   ? `${job.descripcion.substring(0, 150)}...`
                                   : job.descripcion}
                               </Paragraph>
 
-                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                              <div className="job-footer">
                                 <Space>
-                                  <ClockCircleOutlined className="text-gray-400" />
-                                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                                    Ends {dayjs(job.fechaCierre).format("MMM DD")}
-                                  </span>
+                                  <ClockCircleOutlined className="job-icon" />
+                                  <Text className="job-date">Ends {dayjs(job.fechaCierre).format("MMM DD")}</Text>
                                 </Space>
                                 <Button
                                   type="primary"
                                   size="small"
-                                  className="btn-gradient w-full sm:w-auto"
+                                  className="btn-gradient job-apply-button"
                                   icon={<SendOutlined />}
                                   disabled={alreadyApplied}
                                   onClick={() => openApplyModal(job)}
@@ -735,34 +843,43 @@ const UserDashboard: React.FC = () => {
                   })}
                 </Row>
               ) : (
-                <Empty description="No job opportunities available at the moment" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                <Empty
+                  description="No job opportunities available at the moment"
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
               )}
             </Card>
 
             {/* Performance Insights */}
-            <Row gutter={[16, 16]} className="lg:gutter-24">
+            <Row gutter={[24, 24]} className="insights-section">
               <Col xs={24} lg={12}>
                 <Card
                   title="Performance Insights"
-                  className="border-0 shadow-sm h-full"
-                  extra={<TrophyOutlined className="text-indigo-600" />}
+                  className="insights-card"
+                  extra={<TrophyOutlined className="card-icon" />}
                 >
-                  <div className="space-y-4">
-                    <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                      <Paragraph className="text-green-800 dark:text-green-300 mb-2 font-medium">
-                        🎯 Strong Areas
-                      </Paragraph>
-                      <Paragraph className="text-green-700 dark:text-green-400 mb-0 text-sm">
+                  <div className="insights-content">
+                    <div className="insight-item insight-strong">
+                      <div className="insight-header">
+                        <span className="insight-emoji">🎯</span>
+                        <Text strong className="insight-title">
+                          Strong Areas
+                        </Text>
+                      </div>
+                      <Text className="insight-description">
                         Technical skills and problem-solving approach show consistent improvement.
-                      </Paragraph>
+                      </Text>
                     </div>
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <Paragraph className="text-blue-800 dark:text-blue-300 mb-2 font-medium">
-                        📈 Improvement Areas
-                      </Paragraph>
-                      <Paragraph className="text-blue-700 dark:text-blue-400 mb-0 text-sm">
+                    <div className="insight-item insight-improvement">
+                      <div className="insight-header">
+                        <span className="insight-emoji">📈</span>
+                        <Text strong className="insight-title">
+                          Improvement Areas
+                        </Text>
+                      </div>
+                      <Text className="insight-description">
                         Focus on communication clarity and providing more detailed examples.
-                      </Paragraph>
+                      </Text>
                     </div>
                   </div>
                 </Card>
@@ -770,25 +887,31 @@ const UserDashboard: React.FC = () => {
               <Col xs={24} lg={12}>
                 <Card
                   title="AI Recommendations"
-                  className="border-0 shadow-sm h-full"
-                  extra={<RobotOutlined className="text-indigo-600" />}
+                  className="insights-card"
+                  extra={<RobotOutlined className="card-icon" />}
                 >
-                  <div className="space-y-4">
-                    <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-                      <Paragraph className="text-purple-800 dark:text-purple-300 mb-2 font-medium">
-                        💡 Skill Focus
-                      </Paragraph>
-                      <Paragraph className="text-purple-700 dark:text-purple-400 mb-0 text-sm">
+                  <div className="insights-content">
+                    <div className="insight-item insight-skill">
+                      <div className="insight-header">
+                        <span className="insight-emoji">💡</span>
+                        <Text strong className="insight-title">
+                          Skill Focus
+                        </Text>
+                      </div>
+                      <Text className="insight-description">
                         Based on your applications, consider strengthening your React and Node.js skills.
-                      </Paragraph>
+                      </Text>
                     </div>
-                    <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
-                      <Paragraph className="text-orange-800 dark:text-orange-300 mb-2 font-medium">
-                        🚀 Next Steps
-                      </Paragraph>
-                      <Paragraph className="text-orange-700 dark:text-orange-400 mb-0 text-sm">
+                    <div className="insight-item insight-next">
+                      <div className="insight-header">
+                        <span className="insight-emoji">🚀</span>
+                        <Text strong className="insight-title">
+                          Next Steps
+                        </Text>
+                      </div>
+                      <Text className="insight-description">
                         Apply to more senior positions to challenge yourself and grow your career.
-                      </Paragraph>
+                      </Text>
                     </div>
                   </div>
                 </Card>
@@ -801,8 +924,8 @@ const UserDashboard: React.FC = () => {
       {/* Apply to Job Modal */}
       <Modal
         title={
-          <div className="flex items-center space-x-3 p-2">
-            <SendOutlined className="text-indigo-600" />
+          <div className="modal-header">
+            <SendOutlined className="modal-icon" />
             <span>Apply for Position</span>
           </div>
         }
@@ -814,18 +937,13 @@ const UserDashboard: React.FC = () => {
           }
         }}
         footer={[
-          <Button 
-            key="cancel" 
-            onClick={() => setApplyModalVisible(false)}
-            disabled={applying}
-            className="mr-3"
-          >
+          <Button key="cancel" onClick={() => setApplyModalVisible(false)} disabled={applying} className="modal-button">
             Cancel
           </Button>,
           <Button
             key="apply"
             type="primary"
-            className="btn-gradient"
+            className="btn-gradient modal-button"
             loading={applying}
             onClick={handleApplyToJob}
             icon={applying ? <LoadingOutlined /> : <SendOutlined />}
@@ -834,53 +952,58 @@ const UserDashboard: React.FC = () => {
             {applying ? "Processing..." : "Apply & Start Interview"}
           </Button>,
         ]}
-        className="apply-modal"
+        className="enhanced-modal"
         closable={!applying}
         maskClosable={!applying}
       >
         {selectedJob && (
-          <div className="space-y-6 p-4">
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 p-6 rounded-lg border border-indigo-200 dark:border-indigo-800">
-              <Title level={4} className="mb-3 text-indigo-800 dark:text-indigo-300">
+          <div className="modal-content">
+            <div className="job-preview-card">
+              <Title level={4} className="job-preview-title">
                 {selectedJob.titulo}
               </Title>
-              <div className="space-y-2">
-                <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-0">
+              <div className="job-preview-details">
+                <Text className="job-preview-detail">
                   <strong>Position:</strong> {selectedJob.puesto}
-                </Paragraph>
-                <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-0">
+                </Text>
+                <Text className="job-preview-detail">
                   <strong>Company:</strong> {selectedJob.empresa?.nombre}
-                </Paragraph>
-                <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-0">
+                </Text>
+                <Text className="job-preview-detail">
                   <strong>Closing Date:</strong> {dayjs(selectedJob.fechaCierre).format("MMM DD, YYYY")}
-                </Paragraph>
+                </Text>
               </div>
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div className="flex items-center space-x-3 mb-3">
-                <RobotOutlined className="text-blue-600 text-xl" />
-                <span className="font-medium text-blue-800 dark:text-blue-300">What happens next?</span>
+            <div className="process-info-card">
+              <div className="process-header">
+                <RobotOutlined className="process-icon" />
+                <Text strong className="process-title">
+                  What happens next?
+                </Text>
               </div>
-              <Paragraph className="text-blue-700 dark:text-blue-400 mb-0">
-                After submitting your application, you'll be immediately redirected to start your AI-powered interview. 
+              <Text className="process-description">
+                After submitting your application, you'll be immediately redirected to start your AI-powered interview.
                 The interview is personalized based on the job requirements and typically takes 30-60 minutes.
-              </Paragraph>
+              </Text>
             </div>
 
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg border border-yellow-200 dark:border-yellow-800">
-              <div className="flex items-center space-x-3 mb-3">
-                <ExclamationCircleOutlined className="text-yellow-600 text-xl" />
-                <span className="font-medium text-yellow-800 dark:text-yellow-300">Important Note</span>
+            <div className="warning-info-card">
+              <div className="warning-header">
+                <ExclamationCircleOutlined className="warning-icon" />
+                <Text strong className="warning-title">
+                  Important Note
+                </Text>
               </div>
-              <Paragraph className="text-yellow-700 dark:text-yellow-400 mb-0">
-                You can only apply once per position. Make sure you're ready to start the interview immediately after applying.
-              </Paragraph>
+              <Text className="warning-description">
+                You can only apply once per position. Make sure you're ready to start the interview immediately after
+                applying.
+              </Text>
             </div>
 
-            <Paragraph className="text-gray-600 dark:text-gray-400 text-center">
+            <Text className="confirmation-text">
               Are you ready to apply for this position and begin your interview?
-            </Paragraph>
+            </Text>
           </div>
         )}
       </Modal>
@@ -888,21 +1011,21 @@ const UserDashboard: React.FC = () => {
       {/* Profile Modal */}
       <Modal
         title={
-          <div className="flex items-center gap-3 p-2">
-            <UserOutlined className="text-indigo-600" />
+          <div className="modal-header">
+            <UserOutlined className="modal-icon" />
             <span>My Profile</span>
           </div>
         }
         open={profileModalVisible}
         onCancel={() => setProfileModalVisible(false)}
         footer={[
-          <Button key="cancel" onClick={() => setProfileModalVisible(false)} className="mr-3">
+          <Button key="cancel" onClick={() => setProfileModalVisible(false)} className="modal-button">
             Cancel
           </Button>,
-          <Button 
-            key="save" 
-            type="primary" 
-            className="btn-gradient" 
+          <Button
+            key="save"
+            type="primary"
+            className="btn-gradient modal-button"
             icon={<SaveOutlined />}
             onClick={() => profileForm.submit()}
           >
@@ -910,23 +1033,18 @@ const UserDashboard: React.FC = () => {
           </Button>,
         ]}
         width={600}
-        className="profile-modal"
+        className="enhanced-modal"
       >
-        <div className="p-4">
-          <Form
-            form={profileForm}
-            layout="vertical"
-            onFinish={handleProfileSave}
-            className="space-y-4"
-          >
+        <div className="modal-content">
+          <Form form={profileForm} layout="vertical" onFinish={handleProfileSave} className="enhanced-form">
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
                   name="name"
                   label="Full Name"
-                  rules={[{ required: true, message: 'Please enter your name' }]}
+                  rules={[{ required: true, message: "Please enter your name" }]}
                 >
-                  <Input placeholder="Enter your full name" />
+                  <Input placeholder="Enter your full name" className="enhanced-input" />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -934,41 +1052,33 @@ const UserDashboard: React.FC = () => {
                   name="email"
                   label="Email"
                   rules={[
-                    { required: true, message: 'Please enter your email' },
-                    { type: 'email', message: 'Please enter a valid email' }
+                    { required: true, message: "Please enter your email" },
+                    { type: "email", message: "Please enter a valid email" },
                   ]}
                 >
-                  <Input placeholder="Enter your email" disabled />
+                  <Input placeholder="Enter your email" disabled className="enhanced-input" />
                 </Form.Item>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item
-                  name="phone"
-                  label="Phone Number"
-                >
-                  <Input placeholder="Enter your phone number" />
+                <Form.Item name="phone" label="Phone Number">
+                  <Input placeholder="Enter your phone number" className="enhanced-input" />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item
-                  name="birthDate"
-                  label="Birth Date"
-                >
-                  <DatePicker className="w-full" placeholder="Select birth date" />
+                <Form.Item name="birthDate" label="Birth Date">
+                  <DatePicker className="enhanced-input w-full" placeholder="Select birth date" />
                 </Form.Item>
               </Col>
             </Row>
-            <Form.Item
-              name="bio"
-              label="Bio"
-            >
-              <Input.TextArea 
-                rows={4} 
+            <Form.Item name="bio" label="Bio">
+              <Input.TextArea
+                rows={4}
                 placeholder="Tell us about yourself..."
                 maxLength={500}
                 showCount
+                className="enhanced-textarea"
               />
             </Form.Item>
           </Form>
@@ -978,8 +1088,8 @@ const UserDashboard: React.FC = () => {
       {/* My Applications Modal */}
       <Modal
         title={
-          <div className="flex items-center gap-3 p-2">
-            <FileTextOutlined className="text-indigo-600" />
+          <div className="modal-header">
+            <FileTextOutlined className="modal-icon" />
             <span>My Applications ({myApplications.length})</span>
           </div>
         }
@@ -991,10 +1101,10 @@ const UserDashboard: React.FC = () => {
           </Button>,
         ]}
         width={1000}
-        className="applications-modal"
+        className="enhanced-modal"
       >
-        <div className="p-4">
-          <div className="overflow-x-auto">
+        <div className="modal-content">
+          <div className="table-container">
             <Table
               columns={applicationColumns}
               dataSource={myApplications}
@@ -1005,7 +1115,7 @@ const UserDashboard: React.FC = () => {
                 showQuickJumper: true,
                 showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} applications`,
               }}
-              className="custom-table"
+              className="enhanced-table"
               scroll={{ x: 800 }}
               rowKey="id"
             />
@@ -1016,8 +1126,8 @@ const UserDashboard: React.FC = () => {
       {/* Browse Jobs Modal */}
       <Modal
         title={
-          <div className="flex items-center gap-3 p-2">
-            <SearchOutlined className="text-indigo-600" />
+          <div className="modal-header">
+            <SearchOutlined className="modal-icon" />
             <span>Browse Jobs ({availableJobs.length})</span>
           </div>
         }
@@ -1029,10 +1139,10 @@ const UserDashboard: React.FC = () => {
           </Button>,
         ]}
         width={1000}
-        className="jobs-modal"
+        className="enhanced-modal"
       >
-        <div className="p-4">
-          <div className="overflow-x-auto">
+        <div className="modal-content">
+          <div className="table-container">
             <Table
               columns={jobsColumns}
               dataSource={availableJobs}
@@ -1043,7 +1153,7 @@ const UserDashboard: React.FC = () => {
                 showQuickJumper: true,
                 showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} jobs`,
               }}
-              className="custom-table"
+              className="enhanced-table"
               scroll={{ x: 800 }}
               rowKey="id"
             />
@@ -1054,8 +1164,8 @@ const UserDashboard: React.FC = () => {
       {/* Settings Drawer */}
       <Drawer
         title={
-          <div className="flex items-center gap-3">
-            <SettingOutlined className="text-indigo-600" />
+          <div className="drawer-header">
+            <SettingOutlined className="drawer-icon" />
             <span>Settings</span>
           </div>
         }
@@ -1063,70 +1173,58 @@ const UserDashboard: React.FC = () => {
         onClose={() => setSettingsDrawerVisible(false)}
         open={settingsDrawerVisible}
         width={400}
-        className="settings-drawer"
+        className="enhanced-drawer"
         extra={
-          <Button 
-            type="primary" 
-            className="btn-gradient" 
-            icon={<SaveOutlined />}
-            onClick={() => settingsForm.submit()}
-          >
+          <Button type="primary" className="btn-gradient" icon={<SaveOutlined />} onClick={() => settingsForm.submit()}>
             Save
           </Button>
         }
       >
-        <div className="p-4">
-          <Form
-            form={settingsForm}
-            layout="vertical"
-            onFinish={handleSettingsSave}
-            className="space-y-6"
-          >
-            <div>
-              <Title level={5} className="mb-4">Notifications</Title>
-              <Form.Item
-                name="notifications"
-                valuePropName="checked"
-              >
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <div className="font-medium">Push Notifications</div>
-                    <div className="text-sm text-gray-500">Receive notifications about your applications</div>
+        <div className="drawer-content">
+          <Form form={settingsForm} layout="vertical" onFinish={handleSettingsSave} className="enhanced-form">
+            <div className="form-section">
+              <Title level={5} className="section-title">
+                Notifications
+              </Title>
+              <Form.Item name="notifications" valuePropName="checked">
+                <div className="setting-item">
+                  <div className="setting-info">
+                    <Text strong>Push Notifications</Text>
+                    <Text type="secondary" className="setting-description">
+                      Receive notifications about your applications
+                    </Text>
                   </div>
-                  <input type="checkbox" className="toggle" />
+                  <input type="checkbox" className="setting-toggle" />
                 </div>
               </Form.Item>
-              <Form.Item
-                name="emailUpdates"
-                valuePropName="checked"
-              >
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <div className="font-medium">Email Updates</div>
-                    <div className="text-sm text-gray-500">Get email updates about new job opportunities</div>
+              <Form.Item name="emailUpdates" valuePropName="checked">
+                <div className="setting-item">
+                  <div className="setting-info">
+                    <Text strong>Email Updates</Text>
+                    <Text type="secondary" className="setting-description">
+                      Get email updates about new job opportunities
+                    </Text>
                   </div>
-                  <input type="checkbox" className="toggle" />
+                  <input type="checkbox" className="setting-toggle" />
                 </div>
               </Form.Item>
             </div>
 
-            <div>
-              <Title level={5} className="mb-4">Preferences</Title>
-              <Form.Item
-                name="theme"
-                label="Theme"
-              >
-                <Select placeholder="Select theme">
+            <Divider />
+
+            <div className="form-section">
+              <Title level={5} className="section-title">
+                Preferences
+              </Title>
+              <Form.Item name="theme" label="Theme">
+                <Select placeholder="Select theme" className="enhanced-select">
                   <Option value="light">Light</Option>
                   <Option value="dark">Dark</Option>
                   <Option value="auto">Auto</Option>
                 </Select>
               </Form.Item>
-              <Form.Item
-                name="language"
-                label="Language"
-              >
-                <Select placeholder="Select language">
+              <Form.Item name="language" label="Language">
+                <Select placeholder="Select language" className="enhanced-select">
                   <Option value="en">English</Option>
                   <Option value="es">Spanish</Option>
                   <Option value="fr">French</Option>
@@ -1134,18 +1232,24 @@ const UserDashboard: React.FC = () => {
               </Form.Item>
             </div>
 
-            <div>
-              <Title level={5} className="mb-4">Privacy</Title>
-              <div className="space-y-3">
-                <div className="p-3 border rounded-lg">
-                  <div className="font-medium mb-1">Profile Visibility</div>
-                  <div className="text-sm text-gray-500 mb-2">Control who can see your profile</div>
-                  <Select defaultValue="public" className="w-full">
-                    <Option value="public">Public</Option>
-                    <Option value="private">Private</Option>
-                    <Option value="contacts">Contacts Only</Option>
-                  </Select>
+            <Divider />
+
+            <div className="form-section">
+              <Title level={5} className="section-title">
+                Privacy
+              </Title>
+              <div className="privacy-setting">
+                <div className="setting-info">
+                  <Text strong>Profile Visibility</Text>
+                  <Text type="secondary" className="setting-description">
+                    Control who can see your profile
+                  </Text>
                 </div>
+                <Select defaultValue="public" className="enhanced-select">
+                  <Option value="public">Public</Option>
+                  <Option value="private">Private</Option>
+                  <Option value="contacts">Contacts Only</Option>
+                </Select>
               </div>
             </div>
           </Form>

@@ -23,6 +23,7 @@ import {
   Input,
   Select,
   Drawer,
+  Divider,
 } from "antd"
 import {
   DashboardOutlined,
@@ -44,6 +45,7 @@ import {
   LogoutOutlined,
   ArrowUpOutlined,
   SaveOutlined,
+  BarChartOutlined,
 } from "@ant-design/icons"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
@@ -55,7 +57,7 @@ import NotificationDropdown from "./NotificationDropdown"
 import dayjs from "dayjs"
 
 const { Header, Sider, Content } = Layout
-const { Title, Paragraph } = Typography
+const { Title, Paragraph, Text } = Typography
 const { Option } = Select
 
 const CompanyDashboard: React.FC = () => {
@@ -75,28 +77,61 @@ const CompanyDashboard: React.FC = () => {
       key: "dashboard",
       icon: <DashboardOutlined />,
       label: "Dashboard",
+      className: "sidebar-menu-item",
     },
     {
-      key: "convocatorias",
-      icon: <FileTextOutlined />,
-      label: "Job Postings",
+      key: "divider-1",
+      type: "divider",
     },
     {
-      key: "candidates",
-      icon: <TeamOutlined />,
-      label: "Candidates",
+      key: "job-management",
+      label: "Job Management",
+      type: "group",
+      children: [
+        {
+          key: "convocatorias",
+          icon: <FileTextOutlined />,
+          label: "Job Postings",
+          className: "sidebar-menu-item",
+        },
+        {
+          key: "candidates",
+          icon: <TeamOutlined />,
+          label: "Candidates",
+          className: "sidebar-menu-item",
+        },
+        {
+          key: "analytics",
+          icon: <BarChartOutlined />,
+          label: "Analytics",
+          className: "sidebar-menu-item",
+        },
+      ],
     },
     {
-      key: "profile",
-      icon: <UserOutlined />,
-      label: "Profile",
-      onClick: () => setProfileModalVisible(true),
+      key: "divider-2",
+      type: "divider",
     },
     {
-      key: "settings",
-      icon: <SettingOutlined />,
-      label: "Settings",
-      onClick: () => setSettingsDrawerVisible(true),
+      key: "account",
+      label: "Account",
+      type: "group",
+      children: [
+        {
+          key: "profile",
+          icon: <UserOutlined />,
+          label: "Profile",
+          className: "sidebar-menu-item",
+          onClick: () => setProfileModalVisible(true),
+        },
+        {
+          key: "settings",
+          icon: <SettingOutlined />,
+          label: "Settings",
+          className: "sidebar-menu-item",
+          onClick: () => setSettingsDrawerVisible(true),
+        },
+      ],
     },
   ]
 
@@ -114,8 +149,8 @@ const CompanyDashboard: React.FC = () => {
       settingsForm.setFieldsValue({
         notifications: true,
         emailUpdates: true,
-        theme: 'auto',
-        language: 'en',
+        theme: "auto",
+        language: "en",
       })
     }
   }, [user])
@@ -155,7 +190,10 @@ const CompanyDashboard: React.FC = () => {
       color: "blue",
       change: `${convocatorias.length} total`,
       trend: "up",
-      percentage: convocatorias.length > 0 ? Math.round((convocatorias.filter((c) => c.activo).length / convocatorias.length) * 100) : 0,
+      percentage:
+        convocatorias.length > 0
+          ? Math.round((convocatorias.filter((c) => c.activo).length / convocatorias.length) * 100)
+          : 0,
     },
     {
       title: "Total Applications",
@@ -164,7 +202,10 @@ const CompanyDashboard: React.FC = () => {
       color: "green",
       change: `${postulaciones.filter((p) => p.estado === "COMPLETADA").length} completed`,
       trend: "up",
-      percentage: postulaciones.length > 0 ? Math.round((postulaciones.filter((p) => p.estado === "COMPLETADA").length / postulaciones.length) * 100) : 0,
+      percentage:
+        postulaciones.length > 0
+          ? Math.round((postulaciones.filter((p) => p.estado === "COMPLETADA").length / postulaciones.length) * 100)
+          : 0,
     },
     {
       title: "Pending Review",
@@ -173,7 +214,10 @@ const CompanyDashboard: React.FC = () => {
       color: "orange",
       change: "Need attention",
       trend: "neutral",
-      percentage: postulaciones.length > 0 ? Math.round((postulaciones.filter((p) => p.estado === "PENDIENTE").length / postulaciones.length) * 100) : 0,
+      percentage:
+        postulaciones.length > 0
+          ? Math.round((postulaciones.filter((p) => p.estado === "PENDIENTE").length / postulaciones.length) * 100)
+          : 0,
     },
     {
       title: "In Progress",
@@ -182,7 +226,10 @@ const CompanyDashboard: React.FC = () => {
       color: "purple",
       change: "Active interviews",
       trend: "up",
-      percentage: postulaciones.length > 0 ? Math.round((postulaciones.filter((p) => p.estado === "EN_EVALUACION").length / postulaciones.length) * 100) : 0,
+      percentage:
+        postulaciones.length > 0
+          ? Math.round((postulaciones.filter((p) => p.estado === "EN_EVALUACION").length / postulaciones.length) * 100)
+          : 0,
     },
   ]
 
@@ -278,7 +325,9 @@ const CompanyDashboard: React.FC = () => {
       key: "applications",
       render: (_: any, record: Convocatoria) => {
         const count = postulaciones.filter((p) => p.convocatoria?.id === record.id).length
-        const completed = postulaciones.filter((p) => p.convocatoria?.id === record.id && p.estado === "COMPLETADA").length
+        const completed = postulaciones.filter(
+          (p) => p.convocatoria?.id === record.id && p.estado === "COMPLETADA",
+        ).length
         return (
           <div>
             <span className="font-medium">{count}</span>
@@ -307,129 +356,174 @@ const CompanyDashboard: React.FC = () => {
   ]
 
   const handleProfileSave = (values: any) => {
-    console.log('Profile values:', values)
-    message.success('Profile updated successfully!')
+    console.log("Profile values:", values)
+    message.success("Profile updated successfully!")
     setProfileModalVisible(false)
   }
 
   const handleSettingsSave = (values: any) => {
-    console.log('Settings values:', values)
-    message.success('Settings saved successfully!')
+    console.log("Settings values:", values)
+    message.success("Settings saved successfully!")
     setSettingsDrawerVisible(false)
   }
 
   return (
     <Layout className="main-layout min-h-screen">
-      {/* Sidebar */}
-      <Sider trigger={null} collapsible collapsed={collapsed} className="sidebar-layout" width={280}>
-        {/* Logo */}
-        <div className="logo-container">
-          <div className="logo-icon">
-            <RobotOutlined />
-          </div>
-          {!collapsed && <span className="logo-text">mirAI</span>}
+      {/* Enhanced Sidebar */}
+      <Sider
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
+        className="enhanced-sidebar"
+        width={280}
+        collapsedWidth={80}
+        style={{
+          background: "var(--sidebar-bg)",
+          borderRight: "1px solid var(--sidebar-border)",
+          boxShadow: "2px 0 8px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        {/* Enhanced Logo Section */}
+        <div className="sidebar-logo-container">
+          <motion.div className="sidebar-logo" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+            <div className="logo-icon">
+              <RobotOutlined />
+            </div>
+            {!collapsed && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.3 }}
+                className="logo-content"
+              >
+                <span className="logo-text">mirAI</span>
+                <span className="logo-subtitle">Company Portal</span>
+              </motion.div>
+            )}
+          </motion.div>
         </div>
 
-        {/* Navigation Menu */}
-        <Menu 
-          mode="inline" 
-          defaultSelectedKeys={["dashboard"]} 
-          items={menuItems} 
-          className="border-r-0 mt-4"
-          onClick={({ key, item }) => {
-            if (item?.props?.onClick) {
-              item.props.onClick()
-            }
-          }}
-        />
+        {/* Enhanced Navigation Menu */}
+        <div className="sidebar-menu-container">
+          <Menu
+            mode="inline"
+            defaultSelectedKeys={["dashboard"]}
+            items={menuItems}
+            className="enhanced-menu"
+            onClick={({ key, item }) => {
+              if (item?.props?.onClick) {
+                item.props.onClick()
+              }
+            }}
+            style={{
+              background: "transparent",
+              border: "none",
+            }}
+          />
+        </div>
 
-        {/* Mirabot Status */}
+        {/* Enhanced Status Card */}
         {!collapsed && (
-          <div className="p-6 mt-8">
-            <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-800">
-              <div className="text-center">
-                <div className="mirabot-avatar mx-auto mb-3" style={{ width: "60px", height: "60px" }}>
-                  <RobotOutlined className="text-2xl text-white" />
+          <motion.div
+            className="sidebar-status-card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Card className="mirabot-status-card">
+              <div className="status-content">
+                <div className="status-avatar">
+                  <RobotOutlined />
+                  <div className="status-indicator"></div>
                 </div>
-                <Title level={5} className="mb-2 text-indigo-800 dark:text-indigo-300">
-                  mirAI
-                </Title>
-                <Paragraph className="text-indigo-600 dark:text-indigo-400 text-sm mb-0">
-                  Ready to help with interviews!
-                </Paragraph>
+                <div className="status-info">
+                  <Title level={5} className="status-title">
+                    AI Assistant
+                  </Title>
+                  <Text className="status-description">Ready to help with interviews</Text>
+                  <div className="status-stats">
+                    <div className="stat-item">
+                      <span className="stat-number">{postulaciones.length}</span>
+                      <span className="stat-label">Interviews</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-number">{convocatorias.length}</span>
+                      <span className="stat-label">Jobs</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </Card>
-          </div>
+          </motion.div>
         )}
+
+        {/* Collapse Toggle */}
+        <div className="sidebar-footer">
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            className="collapse-button"
+          />
+        </div>
       </Sider>
 
       <Layout>
         {/* Enhanced Header */}
-        <Header className="header-layout border-b bg-white dark:bg-gray-800 shadow-sm">
-          <div className="flex justify-between items-center h-full px-6 lg:px-8">
-            <div className="flex items-center space-x-4 lg:space-x-6">
-              <Button
-                type="text"
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={() => setCollapsed(!collapsed)}
-                className="text-lg hover:bg-gray-100 dark:hover:bg-gray-700 p-2"
-              />
-              <div className="hidden sm:block">
-                <Title level={4} className="mb-0">
+        <Header className="enhanced-header">
+          <div className="header-content">
+            <div className="header-left">
+              <div className="page-info">
+                <Title level={3} className="page-title">
                   Company Dashboard
                 </Title>
-                <Paragraph className="text-gray-500 dark:text-gray-400 text-sm mb-0">
+                <Text className="page-subtitle">
                   Welcome back, {user?.name}! Manage your job postings and candidates.
-                </Paragraph>
+                </Text>
               </div>
             </div>
 
-            <Space size="middle" className="flex items-center">
-              <Button
-                icon={<SearchOutlined />}
-                className="border-gray-300 hover:border-indigo-400 dark:border-gray-600 dark:hover:border-indigo-400 hidden sm:inline-flex"
-              >
-                <span className="hidden md:inline">Search</span>
-              </Button>
-              <NotificationDropdown />
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                className="btn-gradient hidden sm:inline-flex"
-                size="large"
-                onClick={() => navigate("/empresa/convocatoria/create")}
-              >
-                <span className="hidden md:inline">New Job Posting</span>
-                <span className="md:hidden">New Job</span>
-              </Button>
-              <ThemeToggle />
-              <Dropdown menu={userMenu} trigger={["click"]} placement="bottomRight">
-                <Avatar 
-                  src={user?.avatar} 
-                  size="large" 
-                  className="cursor-pointer border-2 border-indigo-200 hover:border-indigo-300 transition-colors" 
-                />
-              </Dropdown>
-            </Space>
+            <div className="header-right">
+              <Space size="middle" className="header-actions">
+                <Button icon={<SearchOutlined />} className="action-button" size="large">
+                  Search
+                </Button>
+                <NotificationDropdown />
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  className="btn-gradient"
+                  size="large"
+                  onClick={() => navigate("/empresa/convocatoria/create")}
+                >
+                  New Job Posting
+                </Button>
+                <ThemeToggle />
+                <Dropdown menu={userMenu} trigger={["click"]} placement="bottomRight">
+                  <Avatar src={user?.avatar} size="large" className="user-avatar" />
+                </Dropdown>
+              </Space>
+            </div>
           </div>
         </Header>
 
         {/* Main Content */}
-        <Content className="content-layout p-4 lg:p-6">
+        <Content className="enhanced-content">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="space-y-6 lg:space-y-8"
+            className="content-wrapper"
           >
             {/* Welcome Section */}
-            <Card className="border-0 shadow-sm bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20">
+            <Card className="welcome-card">
               <Row align="middle" gutter={[24, 24]}>
                 <Col xs={24} lg={16}>
-                  <Title level={3} className="mb-3">
+                  <Title level={2} className="welcome-title">
                     Welcome back, {user?.name}! 👋
                   </Title>
-                  <Paragraph className="text-gray-600 dark:text-gray-300 text-base lg:text-lg mb-4">
+                  <Paragraph className="welcome-description">
                     You have{" "}
                     <strong>{postulaciones.filter((p) => p.estado === "PENDIENTE").length} pending applications</strong>{" "}
                     to review and{" "}
@@ -440,19 +534,20 @@ const CompanyDashboard: React.FC = () => {
                     <Button
                       type="primary"
                       className="btn-gradient"
+                      size="large"
                       disabled={postulaciones.filter((p) => p.estado === "PENDIENTE").length === 0}
                     >
                       Review Applications
                     </Button>
-                    <Button>View Analytics</Button>
+                    <Button size="large">View Analytics</Button>
                   </Space>
                 </Col>
                 <Col xs={24} lg={8}>
-                  <div className="text-center">
+                  <div className="welcome-illustration">
                     <img
                       src="https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop"
                       alt="AI Assistant"
-                      className="w-20 h-20 lg:w-24 lg:h-24 rounded-full shadow-lg mx-auto"
+                      className="illustration-image"
                     />
                   </div>
                 </Col>
@@ -460,7 +555,7 @@ const CompanyDashboard: React.FC = () => {
             </Card>
 
             {/* Stats Cards */}
-            <Row gutter={[16, 16]} className="lg:gutter-24">
+            <Row gutter={[24, 24]} className="stats-section">
               {stats.map((stat, index) => (
                 <Col xs={24} sm={12} lg={6} key={index}>
                   <motion.div
@@ -468,35 +563,35 @@ const CompanyDashboard: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                   >
-                    <Card className="stats-card h-full">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="text-2xl lg:text-3xl">{stat.icon}</div>
-                        <div className="flex items-center gap-1">
-                          <ArrowUpOutlined className="text-green-500 text-sm" />
-                          <Tag color={stat.trend === "up" ? "success" : "default"} className="border-0 text-xs">
+                    <Card className="enhanced-stats-card">
+                      <div className="stats-header">
+                        <div className="stats-icon">{stat.icon}</div>
+                        <div className="stats-trend">
+                          <ArrowUpOutlined className="trend-icon" />
+                          <Tag color={stat.trend === "up" ? "success" : "default"} className="trend-tag">
                             {stat.change}
                           </Tag>
                         </div>
                       </div>
-                      <Statistic
-                        title={<span className="text-gray-600 dark:text-gray-400 font-medium text-sm">{stat.title}</span>}
-                        value={stat.value}
-                        valueStyle={{
-                          color: "var(--ant-color-text)",
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
-                          lineHeight: 1.2,
-                        }}
-                      />
-                      <div className="mt-3">
-                        <Progress
-                          percent={stat.percentage}
-                          size="small"
-                          strokeColor="#6366f1"
-                          showInfo={false}
+                      <div className="stats-content">
+                        <Statistic
+                          title={<span className="stats-title">{stat.title}</span>}
+                          value={stat.value}
+                          valueStyle={{
+                            color: "var(--text-primary)",
+                            fontSize: "2rem",
+                            fontWeight: "bold",
+                            lineHeight: 1.2,
+                          }}
                         />
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          {stat.percentage}% completion rate
+                        <div className="stats-progress">
+                          <Progress
+                            percent={stat.percentage}
+                            size="small"
+                            strokeColor="var(--primary-color)"
+                            showInfo={false}
+                          />
+                          <Text className="progress-text">{stat.percentage}% completion rate</Text>
                         </div>
                       </div>
                     </Card>
@@ -508,24 +603,24 @@ const CompanyDashboard: React.FC = () => {
             {/* Job Postings Table */}
             <Card
               title={
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                  <Title level={4} className="mb-0">
+                <div className="table-header">
+                  <Title level={4} className="table-title">
                     Your Job Postings
                   </Title>
-                  <Button type="link" className="text-indigo-600 font-medium self-start sm:self-auto">
+                  <Button type="link" className="view-all-button">
                     View All
                   </Button>
                 </div>
               }
-              className="border-0 shadow-sm"
+              className="enhanced-table-card"
             >
-              <div className="overflow-x-auto">
+              <div className="table-container">
                 <Table
                   columns={convocatoriaColumns}
                   dataSource={convocatorias}
                   loading={loading}
                   pagination={false}
-                  className="custom-table"
+                  className="enhanced-table"
                   scroll={{ x: 800 }}
                   rowKey="id"
                   size="middle"
@@ -534,65 +629,53 @@ const CompanyDashboard: React.FC = () => {
             </Card>
 
             {/* Quick Actions */}
-            <Row gutter={[16, 16]} className="lg:gutter-24">
+            <Row gutter={[24, 24]} className="actions-section">
               <Col xs={24} lg={12}>
-                <Card
-                  title="Quick Actions"
-                  className="border-0 shadow-sm h-full"
-                  extra={<RobotOutlined className="text-indigo-600" />}
-                >
-                  <Space direction="vertical" className="w-full" size="middle">
+                <Card title="Quick Actions" className="actions-card" extra={<RobotOutlined className="card-icon" />}>
+                  <Space direction="vertical" className="w-full" size="large">
                     <Button
                       type="primary"
                       block
                       size="large"
                       icon={<PlusOutlined />}
-                      className="btn-gradient h-12"
+                      className="btn-gradient action-button-large"
                       onClick={() => navigate("/empresa/convocatoria/create")}
                     >
                       Create New Job Posting
                     </Button>
-                    <Button
-                      block
-                      size="large"
-                      icon={<TeamOutlined />}
-                      className="h-12 border-2 border-gray-200 hover:border-indigo-400 dark:border-gray-600 dark:hover:border-indigo-400"
-                    >
+                    <Button block size="large" icon={<TeamOutlined />} className="action-button-large">
                       Manage Candidates
                     </Button>
-                    <Button
-                      block
-                      size="large"
-                      icon={<FileTextOutlined />}
-                      className="h-12 border-2 border-gray-200 hover:border-indigo-400 dark:border-gray-600 dark:hover:border-indigo-400"
-                    >
+                    <Button block size="large" icon={<BarChartOutlined />} className="action-button-large">
                       View Reports
                     </Button>
                   </Space>
                 </Card>
               </Col>
               <Col xs={24} lg={12}>
-                <Card
-                  title="AI Insights"
-                  className="border-0 shadow-sm h-full"
-                  extra={<RobotOutlined className="text-indigo-600" />}
-                >
-                  <div className="space-y-4">
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <Paragraph className="text-blue-800 dark:text-blue-300 mb-2 font-medium">
-                        💡 Trending Skills
-                      </Paragraph>
-                      <Paragraph className="text-blue-700 dark:text-blue-400 mb-0 text-sm">
+                <Card title="AI Insights" className="insights-card" extra={<RobotOutlined className="card-icon" />}>
+                  <div className="insights-content">
+                    <div className="insight-item insight-trending">
+                      <div className="insight-header">
+                        <span className="insight-emoji">💡</span>
+                        <Text strong className="insight-title">
+                          Trending Skills
+                        </Text>
+                      </div>
+                      <Text className="insight-description">
                         React and TypeScript are the most requested skills this month.
-                      </Paragraph>
+                      </Text>
                     </div>
-                    <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                      <Paragraph className="text-green-800 dark:text-green-300 mb-2 font-medium">
-                        📈 Performance Insight
-                      </Paragraph>
-                      <Paragraph className="text-green-700 dark:text-green-400 mb-0 text-sm">
+                    <div className="insight-item insight-performance">
+                      <div className="insight-header">
+                        <span className="insight-emoji">📈</span>
+                        <Text strong className="insight-title">
+                          Performance Insight
+                        </Text>
+                      </div>
+                      <Text className="insight-description">
                         Your interview completion rate increased by 15% this week.
-                      </Paragraph>
+                      </Text>
                     </div>
                   </div>
                 </Card>
@@ -605,21 +688,21 @@ const CompanyDashboard: React.FC = () => {
       {/* Profile Modal */}
       <Modal
         title={
-          <div className="flex items-center gap-3 p-2">
-            <UserOutlined className="text-indigo-600" />
+          <div className="modal-header">
+            <UserOutlined className="modal-icon" />
             <span>Company Profile</span>
           </div>
         }
         open={profileModalVisible}
         onCancel={() => setProfileModalVisible(false)}
         footer={[
-          <Button key="cancel" onClick={() => setProfileModalVisible(false)} className="mr-3">
+          <Button key="cancel" onClick={() => setProfileModalVisible(false)} className="modal-button">
             Cancel
           </Button>,
-          <Button 
-            key="save" 
-            type="primary" 
-            className="btn-gradient" 
+          <Button
+            key="save"
+            type="primary"
+            className="btn-gradient modal-button"
             icon={<SaveOutlined />}
             onClick={() => profileForm.submit()}
           >
@@ -627,23 +710,18 @@ const CompanyDashboard: React.FC = () => {
           </Button>,
         ]}
         width={600}
-        className="profile-modal"
+        className="enhanced-modal"
       >
-        <div className="p-4">
-          <Form
-            form={profileForm}
-            layout="vertical"
-            onFinish={handleProfileSave}
-            className="space-y-4"
-          >
+        <div className="modal-content">
+          <Form form={profileForm} layout="vertical" onFinish={handleProfileSave} className="enhanced-form">
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
                   name="name"
                   label="Company Name"
-                  rules={[{ required: true, message: 'Please enter company name' }]}
+                  rules={[{ required: true, message: "Please enter company name" }]}
                 >
-                  <Input placeholder="Enter company name" />
+                  <Input placeholder="Enter company name" className="enhanced-input" />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -651,41 +729,33 @@ const CompanyDashboard: React.FC = () => {
                   name="email"
                   label="Email"
                   rules={[
-                    { required: true, message: 'Please enter your email' },
-                    { type: 'email', message: 'Please enter a valid email' }
+                    { required: true, message: "Please enter your email" },
+                    { type: "email", message: "Please enter a valid email" },
                   ]}
                 >
-                  <Input placeholder="Enter your email" disabled />
+                  <Input placeholder="Enter your email" disabled className="enhanced-input" />
                 </Form.Item>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item
-                  name="phone"
-                  label="Phone Number"
-                >
-                  <Input placeholder="Enter phone number" />
+                <Form.Item name="phone" label="Phone Number">
+                  <Input placeholder="Enter phone number" className="enhanced-input" />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item
-                  name="address"
-                  label="Address"
-                >
-                  <Input placeholder="Enter company address" />
+                <Form.Item name="address" label="Address">
+                  <Input placeholder="Enter company address" className="enhanced-input" />
                 </Form.Item>
               </Col>
             </Row>
-            <Form.Item
-              name="description"
-              label="Company Description"
-            >
-              <Input.TextArea 
-                rows={4} 
+            <Form.Item name="description" label="Company Description">
+              <Input.TextArea
+                rows={4}
                 placeholder="Describe your company..."
                 maxLength={500}
                 showCount
+                className="enhanced-textarea"
               />
             </Form.Item>
           </Form>
@@ -695,8 +765,8 @@ const CompanyDashboard: React.FC = () => {
       {/* Settings Drawer */}
       <Drawer
         title={
-          <div className="flex items-center gap-3">
-            <SettingOutlined className="text-indigo-600" />
+          <div className="drawer-header">
+            <SettingOutlined className="drawer-icon" />
             <span>Settings</span>
           </div>
         }
@@ -704,70 +774,58 @@ const CompanyDashboard: React.FC = () => {
         onClose={() => setSettingsDrawerVisible(false)}
         open={settingsDrawerVisible}
         width={400}
-        className="settings-drawer"
+        className="enhanced-drawer"
         extra={
-          <Button 
-            type="primary" 
-            className="btn-gradient" 
-            icon={<SaveOutlined />}
-            onClick={() => settingsForm.submit()}
-          >
+          <Button type="primary" className="btn-gradient" icon={<SaveOutlined />} onClick={() => settingsForm.submit()}>
             Save
           </Button>
         }
       >
-        <div className="p-4">
-          <Form
-            form={settingsForm}
-            layout="vertical"
-            onFinish={handleSettingsSave}
-            className="space-y-6"
-          >
-            <div>
-              <Title level={5} className="mb-4">Notifications</Title>
-              <Form.Item
-                name="notifications"
-                valuePropName="checked"
-              >
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <div className="font-medium">Push Notifications</div>
-                    <div className="text-sm text-gray-500">Receive notifications about applications</div>
+        <div className="drawer-content">
+          <Form form={settingsForm} layout="vertical" onFinish={handleSettingsSave} className="enhanced-form">
+            <div className="form-section">
+              <Title level={5} className="section-title">
+                Notifications
+              </Title>
+              <Form.Item name="notifications" valuePropName="checked">
+                <div className="setting-item">
+                  <div className="setting-info">
+                    <Text strong>Push Notifications</Text>
+                    <Text type="secondary" className="setting-description">
+                      Receive notifications about applications
+                    </Text>
                   </div>
-                  <input type="checkbox" className="toggle" />
+                  <input type="checkbox" className="setting-toggle" />
                 </div>
               </Form.Item>
-              <Form.Item
-                name="emailUpdates"
-                valuePropName="checked"
-              >
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <div className="font-medium">Email Updates</div>
-                    <div className="text-sm text-gray-500">Get email updates about new candidates</div>
+              <Form.Item name="emailUpdates" valuePropName="checked">
+                <div className="setting-item">
+                  <div className="setting-info">
+                    <Text strong>Email Updates</Text>
+                    <Text type="secondary" className="setting-description">
+                      Get email updates about new candidates
+                    </Text>
                   </div>
-                  <input type="checkbox" className="toggle" />
+                  <input type="checkbox" className="setting-toggle" />
                 </div>
               </Form.Item>
             </div>
 
-            <div>
-              <Title level={5} className="mb-4">Preferences</Title>
-              <Form.Item
-                name="theme"
-                label="Theme"
-              >
-                <Select placeholder="Select theme">
+            <Divider />
+
+            <div className="form-section">
+              <Title level={5} className="section-title">
+                Preferences
+              </Title>
+              <Form.Item name="theme" label="Theme">
+                <Select placeholder="Select theme" className="enhanced-select">
                   <Option value="light">Light</Option>
                   <Option value="dark">Dark</Option>
                   <Option value="auto">Auto</Option>
                 </Select>
               </Form.Item>
-              <Form.Item
-                name="language"
-                label="Language"
-              >
-                <Select placeholder="Select language">
+              <Form.Item name="language" label="Language">
+                <Select placeholder="Select language" className="enhanced-select">
                   <Option value="en">English</Option>
                   <Option value="es">Spanish</Option>
                   <Option value="fr">French</Option>
@@ -775,18 +833,24 @@ const CompanyDashboard: React.FC = () => {
               </Form.Item>
             </div>
 
-            <div>
-              <Title level={5} className="mb-4">Company Settings</Title>
-              <div className="space-y-3">
-                <div className="p-3 border rounded-lg">
-                  <div className="font-medium mb-1">Auto-approve Applications</div>
-                  <div className="text-sm text-gray-500 mb-2">Automatically approve qualified candidates</div>
-                  <Select defaultValue="manual" className="w-full">
-                    <Option value="manual">Manual Review</Option>
-                    <Option value="auto">Auto Approve</Option>
-                    <Option value="conditional">Conditional</Option>
-                  </Select>
+            <Divider />
+
+            <div className="form-section">
+              <Title level={5} className="section-title">
+                Company Settings
+              </Title>
+              <div className="company-setting">
+                <div className="setting-info">
+                  <Text strong>Auto-approve Applications</Text>
+                  <Text type="secondary" className="setting-description">
+                    Automatically approve qualified candidates
+                  </Text>
                 </div>
+                <Select defaultValue="manual" className="enhanced-select">
+                  <Option value="manual">Manual Review</Option>
+                  <Option value="auto">Auto Approve</Option>
+                  <Option value="conditional">Conditional</Option>
+                </Select>
               </div>
             </div>
           </Form>

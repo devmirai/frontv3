@@ -22,7 +22,6 @@ import {
   Tabs,
   Avatar,
   Dropdown,
-  Badge,
   Menu,
 } from "antd"
 import {
@@ -43,11 +42,11 @@ import {
   WarningOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  BellOutlined,
   LogoutOutlined,
   PlusOutlined,
   BarChartOutlined,
-  ClockCircleOutlined,
+  SecurityScanOutlined,
+  DatabaseOutlined,
 } from "@ant-design/icons"
 import {
   LineChart,
@@ -76,7 +75,7 @@ import PrintReport from "./PrintReport"
 import dayjs from "dayjs"
 
 const { Header, Sider, Content } = Layout
-const { Title, Paragraph } = Typography
+const { Title, Paragraph, Text } = Typography
 const { RangePicker } = DatePicker
 const { TabPane } = Tabs
 
@@ -126,31 +125,82 @@ const AdminDashboard: React.FC = () => {
       key: "overview",
       icon: <DashboardOutlined />,
       label: "Overview",
+      className: "sidebar-menu-item",
     },
     {
-      key: "users",
-      icon: <UserOutlined />,
-      label: "Users",
+      key: "divider-1",
+      type: "divider",
     },
     {
-      key: "companies",
-      icon: <TeamOutlined />,
-      label: "Companies",
+      key: "user-management",
+      label: "User Management",
+      type: "group",
+      children: [
+        {
+          key: "users",
+          icon: <UserOutlined />,
+          label: "Users",
+          className: "sidebar-menu-item",
+        },
+        {
+          key: "companies",
+          icon: <TeamOutlined />,
+          label: "Companies",
+          className: "sidebar-menu-item",
+        },
+      ],
     },
     {
-      key: "interviews",
-      icon: <FileTextOutlined />,
-      label: "Interviews",
+      key: "divider-2",
+      type: "divider",
     },
     {
-      key: "analytics",
-      icon: <BarChartOutlined />,
-      label: "Analytics",
+      key: "platform",
+      label: "Platform",
+      type: "group",
+      children: [
+        {
+          key: "interviews",
+          icon: <FileTextOutlined />,
+          label: "Interviews",
+          className: "sidebar-menu-item",
+        },
+        {
+          key: "analytics",
+          icon: <BarChartOutlined />,
+          label: "Analytics",
+          className: "sidebar-menu-item",
+        },
+      ],
     },
     {
-      key: "settings",
-      icon: <SettingOutlined />,
-      label: "Settings",
+      key: "divider-3",
+      type: "divider",
+    },
+    {
+      key: "system",
+      label: "System",
+      type: "group",
+      children: [
+        {
+          key: "security",
+          icon: <SecurityScanOutlined />,
+          label: "Security",
+          className: "sidebar-menu-item",
+        },
+        {
+          key: "database",
+          icon: <DatabaseOutlined />,
+          label: "Database",
+          className: "sidebar-menu-item",
+        },
+        {
+          key: "settings",
+          icon: <SettingOutlined />,
+          label: "Settings",
+          className: "sidebar-menu-item",
+        },
+      ],
     },
   ]
 
@@ -407,34 +457,34 @@ const AdminDashboard: React.FC = () => {
   ]
 
   const renderOverview = () => (
-    <div className="space-y-6">
+    <div className="overview-content">
       {/* Enhanced Stats Cards */}
-      <Row gutter={[24, 24]}>
+      <Row gutter={[24, 24]} className="stats-section">
         <Col xs={24} sm={12} lg={6}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Card className="stats-card">
-              <div className="flex justify-between items-start mb-4">
-                <UserOutlined className="text-3xl text-blue-600" />
-                <div className="flex items-center gap-1">
-                  <CheckCircleOutlined className="text-green-500 text-sm" />
-                  <Tag color="success">+{stats.monthlyGrowth}%</Tag>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <Card className="enhanced-stats-card">
+              <div className="stats-header">
+                <UserOutlined className="stats-icon text-blue-600" />
+                <div className="stats-trend">
+                  <CheckCircleOutlined className="trend-icon" />
+                  <Tag color="success" className="trend-tag">
+                    +{stats.monthlyGrowth}%
+                  </Tag>
                 </div>
               </div>
-              <Statistic
-                title="Total Users"
-                value={stats.totalUsers}
-                valueStyle={{
-                  color: "var(--ant-color-text)",
-                  fontSize: "2rem",
-                  fontWeight: "bold",
-                }}
-              />
-              <Progress percent={85} size="small" strokeColor="#6366f1" showInfo={false} className="mt-3" />
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">85% active users</div>
+              <div className="stats-content">
+                <Statistic
+                  title="Total Users"
+                  value={stats.totalUsers}
+                  valueStyle={{
+                    color: "var(--text-primary)",
+                    fontSize: "2rem",
+                    fontWeight: "bold",
+                  }}
+                />
+                <Progress percent={85} size="small" strokeColor="#6366f1" showInfo={false} className="stats-progress" />
+                <Text className="progress-text">85% active users</Text>
+              </div>
             </Card>
           </motion.div>
         </Col>
@@ -444,22 +494,26 @@ const AdminDashboard: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <Card className="stats-card">
-              <div className="flex justify-between items-start mb-4">
-                <TeamOutlined className="text-3xl text-green-600" />
-                <Tag color="success">Active</Tag>
+            <Card className="enhanced-stats-card">
+              <div className="stats-header">
+                <TeamOutlined className="stats-icon text-green-600" />
+                <Tag color="success" className="trend-tag">
+                  Active
+                </Tag>
               </div>
-              <Statistic
-                title="Companies"
-                value={stats.totalCompanies}
-                valueStyle={{
-                  color: "var(--ant-color-text)",
-                  fontSize: "2rem",
-                  fontWeight: "bold",
-                }}
-              />
-              <Progress percent={92} size="small" strokeColor="#10b981" showInfo={false} className="mt-3" />
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">92% satisfaction rate</div>
+              <div className="stats-content">
+                <Statistic
+                  title="Companies"
+                  value={stats.totalCompanies}
+                  valueStyle={{
+                    color: "var(--text-primary)",
+                    fontSize: "2rem",
+                    fontWeight: "bold",
+                  }}
+                />
+                <Progress percent={92} size="small" strokeColor="#10b981" showInfo={false} className="stats-progress" />
+                <Text className="progress-text">92% satisfaction rate</Text>
+              </div>
             </Card>
           </motion.div>
         </Col>
@@ -469,22 +523,32 @@ const AdminDashboard: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Card className="stats-card">
-              <div className="flex justify-between items-start mb-4">
-                <FileTextOutlined className="text-3xl text-purple-600" />
-                <Tag color="processing">{stats.completionRate}% completed</Tag>
+            <Card className="enhanced-stats-card">
+              <div className="stats-header">
+                <FileTextOutlined className="stats-icon text-purple-600" />
+                <Tag color="processing" className="trend-tag">
+                  {stats.completionRate}% completed
+                </Tag>
               </div>
-              <Statistic
-                title="Total Interviews"
-                value={stats.totalInterviews}
-                valueStyle={{
-                  color: "var(--ant-color-text)",
-                  fontSize: "2rem",
-                  fontWeight: "bold",
-                }}
-              />
-              <Progress percent={stats.completionRate} size="small" strokeColor="#8b5cf6" showInfo={false} className="mt-3" />
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{stats.completedInterviews} completed</div>
+              <div className="stats-content">
+                <Statistic
+                  title="Total Interviews"
+                  value={stats.totalInterviews}
+                  valueStyle={{
+                    color: "var(--text-primary)",
+                    fontSize: "2rem",
+                    fontWeight: "bold",
+                  }}
+                />
+                <Progress
+                  percent={stats.completionRate}
+                  size="small"
+                  strokeColor="#8b5cf6"
+                  showInfo={false}
+                  className="stats-progress"
+                />
+                <Text className="progress-text">{stats.completedInterviews} completed</Text>
+              </div>
             </Card>
           </motion.div>
         </Col>
@@ -494,32 +558,46 @@ const AdminDashboard: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Card className="stats-card">
-              <div className="flex justify-between items-start mb-4">
-                <TrophyOutlined className="text-3xl text-orange-600" />
-                <Tag color="success">Excellent</Tag>
+            <Card className="enhanced-stats-card">
+              <div className="stats-header">
+                <TrophyOutlined className="stats-icon text-orange-600" />
+                <Tag color="success" className="trend-tag">
+                  Excellent
+                </Tag>
               </div>
-              <Statistic
-                title="Avg Score"
-                value={stats.avgScore}
-                suffix="%"
-                valueStyle={{
-                  color: "var(--ant-color-text)",
-                  fontSize: "2rem",
-                  fontWeight: "bold",
-                }}
-              />
-              <Progress percent={stats.avgScore} size="small" strokeColor="#f59e0b" showInfo={false} className="mt-3" />
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Platform average</div>
+              <div className="stats-content">
+                <Statistic
+                  title="Avg Score"
+                  value={stats.avgScore}
+                  suffix="%"
+                  valueStyle={{
+                    color: "var(--text-primary)",
+                    fontSize: "2rem",
+                    fontWeight: "bold",
+                  }}
+                />
+                <Progress
+                  percent={stats.avgScore}
+                  size="small"
+                  strokeColor="#f59e0b"
+                  showInfo={false}
+                  className="stats-progress"
+                />
+                <Text className="progress-text">Platform average</Text>
+              </div>
             </Card>
           </motion.div>
         </Col>
       </Row>
 
       {/* Enhanced Charts */}
-      <Row gutter={[24, 24]}>
+      <Row gutter={[24, 24]} className="charts-section">
         <Col xs={24} lg={16}>
-          <Card title="Platform Activity" extra={<Button icon={<ExportOutlined />}>Export</Button>}>
+          <Card
+            title="Platform Activity"
+            extra={<Button icon={<ExportOutlined />}>Export</Button>}
+            className="chart-card"
+          >
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -534,7 +612,7 @@ const AdminDashboard: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} lg={8}>
-          <Card title="Interview Status">
+          <Card title="Interview Status" className="chart-card">
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -559,32 +637,32 @@ const AdminDashboard: React.FC = () => {
       </Row>
 
       {/* Recent Activity */}
-      <Card title="Recent Activity">
-        <div className="space-y-4">
+      <Card title="Recent Activity" className="activity-card">
+        <div className="activity-list">
           {[
             {
               type: "user",
               message: "New user registered: John Doe",
               time: "2 minutes ago",
-              icon: <UserOutlined className="text-blue-600" />,
+              icon: <UserOutlined className="activity-icon text-blue-600" />,
             },
             {
               type: "interview",
               message: "Interview completed: Frontend Developer position",
               time: "5 minutes ago",
-              icon: <CheckCircleOutlined className="text-green-600" />,
+              icon: <CheckCircleOutlined className="activity-icon text-green-600" />,
             },
             {
               type: "company",
               message: "New company joined: TechCorp Inc.",
               time: "10 minutes ago",
-              icon: <TeamOutlined className="text-purple-600" />,
+              icon: <TeamOutlined className="activity-icon text-purple-600" />,
             },
             {
               type: "system",
               message: "System maintenance completed",
               time: "1 hour ago",
-              icon: <SettingOutlined className="text-gray-600" />,
+              icon: <SettingOutlined className="activity-icon text-gray-600" />,
             },
           ].map((activity, index) => (
             <motion.div
@@ -592,12 +670,12 @@ const AdminDashboard: React.FC = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="flex items-center space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all duration-300"
+              className="activity-item"
             >
-              <div className="text-xl">{activity.icon}</div>
-              <div className="flex-1">
-                <div className="font-medium">{activity.message}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">{activity.time}</div>
+              <div className="activity-icon-wrapper">{activity.icon}</div>
+              <div className="activity-content">
+                <Text className="activity-message">{activity.message}</Text>
+                <Text className="activity-time">{activity.time}</Text>
               </div>
             </motion.div>
           ))}
@@ -607,7 +685,7 @@ const AdminDashboard: React.FC = () => {
   )
 
   const renderAnalytics = () => (
-    <div className="space-y-6">
+    <div className="analytics-content">
       <Row gutter={[24, 24]}>
         <Col span={24}>
           <Card
@@ -618,6 +696,7 @@ const AdminDashboard: React.FC = () => {
                 <PrintReport data={stats} title="Platform Analytics Report" type="analytics" />
               </Space>
             }
+            className="analytics-card"
           >
             <Row gutter={[24, 24]}>
               <Col xs={24} lg={12}>
@@ -651,26 +730,26 @@ const AdminDashboard: React.FC = () => {
 
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={8}>
-          <Card title="Performance Metrics">
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between mb-2">
-                  <span>System Uptime</span>
-                  <span>99.9%</span>
+          <Card title="Performance Metrics" className="metrics-card">
+            <div className="metrics-list">
+              <div className="metric-item">
+                <div className="metric-header">
+                  <Text>System Uptime</Text>
+                  <Text strong>99.9%</Text>
                 </div>
                 <Progress percent={99.9} strokeColor="#10b981" />
               </div>
-              <div>
-                <div className="flex justify-between mb-2">
-                  <span>User Satisfaction</span>
-                  <span>94%</span>
+              <div className="metric-item">
+                <div className="metric-header">
+                  <Text>User Satisfaction</Text>
+                  <Text strong>94%</Text>
                 </div>
                 <Progress percent={94} strokeColor="#6366f1" />
               </div>
-              <div>
-                <div className="flex justify-between mb-2">
-                  <span>Interview Success Rate</span>
-                  <span>{stats.completionRate}%</span>
+              <div className="metric-item">
+                <div className="metric-header">
+                  <Text>Interview Success Rate</Text>
+                  <Text strong>{stats.completionRate}%</Text>
                 </div>
                 <Progress percent={stats.completionRate} strokeColor="#f59e0b" />
               </div>
@@ -678,7 +757,7 @@ const AdminDashboard: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} lg={16}>
-          <Card title="Top Performing Categories">
+          <Card title="Top Performing Categories" className="categories-card">
             <Table
               dataSource={[
                 { category: "Frontend Development", interviews: 45, avgScore: 87, completion: 92 },
@@ -700,6 +779,7 @@ const AdminDashboard: React.FC = () => {
               ]}
               pagination={false}
               size="small"
+              className="enhanced-table"
             />
           </Card>
         </Col>
@@ -709,80 +789,127 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <Layout className="min-h-screen">
-      {/* Sidebar */}
-      <Sider trigger={null} collapsible collapsed={collapsed} className="sidebar-layout" width={280}>
-        <div className="logo-container">
-          <div className="logo-icon">
-            <RobotOutlined />
-          </div>
-          {!collapsed && <span className="logo-text">mirAI Admin</span>}
+      {/* Enhanced Sidebar */}
+      <Sider
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
+        className="enhanced-sidebar admin-sidebar"
+        width={280}
+        collapsedWidth={80}
+        style={{
+          background: "var(--sidebar-bg)",
+          borderRight: "1px solid var(--sidebar-border)",
+          boxShadow: "2px 0 8px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        {/* Enhanced Logo Section */}
+        <div className="sidebar-logo-container">
+          <motion.div className="sidebar-logo" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+            <div className="logo-icon admin-logo">
+              <RobotOutlined />
+            </div>
+            {!collapsed && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.3 }}
+                className="logo-content"
+              >
+                <span className="logo-text">mirAI Admin</span>
+                <span className="logo-subtitle">System Control</span>
+              </motion.div>
+            )}
+          </motion.div>
         </div>
 
-        <Menu
-          mode="inline"
-          selectedKeys={[activeTab]}
-          items={menuItems}
-          className="border-r-0 mt-4"
-          onClick={({ key }) => setActiveTab(key)}
-        />
+        {/* Enhanced Navigation Menu */}
+        <div className="sidebar-menu-container">
+          <Menu
+            mode="inline"
+            selectedKeys={[activeTab]}
+            items={menuItems}
+            className="enhanced-menu admin-menu"
+            onClick={({ key }) => setActiveTab(key)}
+            style={{
+              background: "transparent",
+              border: "none",
+            }}
+          />
+        </div>
 
+        {/* Enhanced Admin Status Card */}
         {!collapsed && (
-          <div className="p-6 mt-8">
-            <Card className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border-red-200 dark:border-red-800">
-              <div className="text-center">
-                <div className="text-2xl mb-2">
-                  <WarningOutlined className="text-red-600" />
+          <motion.div
+            className="sidebar-status-card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Card className="admin-status-card">
+              <div className="status-content">
+                <div className="admin-status-header">
+                  <WarningOutlined className="admin-warning-icon" />
+                  <Title level={5} className="admin-status-title">
+                    Admin Access
+                  </Title>
                 </div>
-                <Title level={5} className="mb-2 text-red-800 dark:text-red-300">
-                  Admin Access
-                </Title>
-                <Paragraph className="text-red-600 dark:text-red-400 text-sm mb-0">
-                  You have full system privileges
-                </Paragraph>
+                <Text className="admin-status-description">You have full system privileges</Text>
+                <div className="admin-status-stats">
+                  <div className="admin-stat-item">
+                    <span className="admin-stat-number">{stats.totalUsers + stats.totalCompanies}</span>
+                    <span className="admin-stat-label">Total Users</span>
+                  </div>
+                  <div className="admin-stat-item">
+                    <span className="admin-stat-number">{stats.totalInterviews}</span>
+                    <span className="admin-stat-label">Interviews</span>
+                  </div>
+                </div>
               </div>
             </Card>
-          </div>
+          </motion.div>
         )}
+
+        {/* Collapse Toggle */}
+        <div className="sidebar-footer">
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            className="collapse-button"
+          />
+        </div>
       </Sider>
 
       <Layout>
-        {/* Header */}
-        <Header className="header-layout border-b">
-          <div className="flex justify-between items-center h-full">
-            <div className="flex items-center space-x-6">
-              <Button
-                type="text"
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={() => setCollapsed(!collapsed)}
-                className="text-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-              />
-              <div>
-                <Title level={4} className="mb-0">
+        {/* Enhanced Header */}
+        <Header className="enhanced-header admin-header">
+          <div className="header-content">
+            <div className="header-left">
+              <div className="page-info">
+                <Title level={3} className="page-title">
                   Admin Dashboard
                 </Title>
-                <Paragraph className="text-gray-500 dark:text-gray-400 text-sm mb-0">
-                  Platform management and analytics
-                </Paragraph>
+                <Text className="page-subtitle">Platform management and analytics</Text>
               </div>
             </div>
 
-            <Space size="large">
-              <Input.Search
-                placeholder="Search..."
-                style={{ width: 200 }}
-                className="border-gray-300 hover:border-indigo-400 dark:border-gray-600 dark:hover:border-indigo-400"
-              />
-              <NotificationDropdown />
-              <ThemeToggle />
-              <Dropdown menu={userMenu} trigger={["click"]}>
-                <Avatar src={user?.avatar} size="large" className="cursor-pointer border-2 border-red-200" />
-              </Dropdown>
-            </Space>
+            <div className="header-right">
+              <Space size="middle" className="header-actions">
+                <Input.Search placeholder="Search..." style={{ width: 200 }} className="admin-search" />
+                <NotificationDropdown />
+                <ThemeToggle />
+                <Dropdown menu={userMenu} trigger={["click"]}>
+                  <Avatar src={user?.avatar} size="large" className="admin-avatar" />
+                </Dropdown>
+              </Space>
+            </div>
           </div>
         </Header>
 
         {/* Main Content */}
-        <Content className="content-layout">
+        <Content className="enhanced-content admin-content">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <Tabs activeKey={activeTab} onChange={setActiveTab} className="admin-tabs">
               <TabPane tab="Overview" key="overview">
@@ -796,11 +923,12 @@ const AdminDashboard: React.FC = () => {
                     <Space>
                       <Input.Search placeholder="Search users..." />
                       <Button icon={<FilterOutlined />}>Filter</Button>
-                      <Button type="primary" icon={<PlusOutlined />}>
+                      <Button type="primary" icon={<PlusOutlined />} className="btn-gradient">
                         Add User
                       </Button>
                     </Space>
                   }
+                  className="enhanced-table-card"
                 >
                   <Table
                     columns={userColumns}
@@ -808,6 +936,7 @@ const AdminDashboard: React.FC = () => {
                     loading={loading}
                     rowKey="id"
                     pagination={{ pageSize: 10 }}
+                    className="enhanced-table"
                   />
                 </Card>
               </TabPane>
@@ -819,11 +948,12 @@ const AdminDashboard: React.FC = () => {
                     <Space>
                       <Input.Search placeholder="Search companies..." />
                       <Button icon={<FilterOutlined />}>Filter</Button>
-                      <Button type="primary" icon={<PlusOutlined />}>
+                      <Button type="primary" icon={<PlusOutlined />} className="btn-gradient">
                         Add Company
                       </Button>
                     </Space>
                   }
+                  className="enhanced-table-card"
                 >
                   <Table
                     columns={companyColumns}
@@ -831,6 +961,7 @@ const AdminDashboard: React.FC = () => {
                     loading={loading}
                     rowKey="id"
                     pagination={{ pageSize: 10 }}
+                    className="enhanced-table"
                   />
                 </Card>
               </TabPane>
@@ -849,6 +980,7 @@ const AdminDashboard: React.FC = () => {
                       <Button icon={<ExportOutlined />}>Export</Button>
                     </Space>
                   }
+                  className="enhanced-table-card"
                 >
                   <Table
                     columns={interviewColumns}
@@ -856,6 +988,7 @@ const AdminDashboard: React.FC = () => {
                     loading={loading}
                     rowKey="id"
                     pagination={{ pageSize: 10 }}
+                    className="enhanced-table"
                   />
                 </Card>
               </TabPane>
@@ -867,40 +1000,44 @@ const AdminDashboard: React.FC = () => {
               <TabPane tab="Settings" key="settings">
                 <Row gutter={[24, 24]}>
                   <Col xs={24} lg={12}>
-                    <Card title="System Settings">
-                      <Form layout="vertical">
+                    <Card title="System Settings" className="settings-card">
+                      <Form layout="vertical" className="enhanced-form">
                         <Form.Item label="Platform Name">
-                          <Input defaultValue="mirAI" />
+                          <Input defaultValue="mirAI" className="enhanced-input" />
                         </Form.Item>
                         <Form.Item label="Max Interview Duration (minutes)">
-                          <Input defaultValue="60" type="number" />
+                          <Input defaultValue="60" type="number" className="enhanced-input" />
                         </Form.Item>
                         <Form.Item label="Default AI Model">
-                          <Select defaultValue="gpt-4">
+                          <Select defaultValue="gpt-4" className="enhanced-select">
                             <Select.Option value="gpt-4">GPT-4</Select.Option>
                             <Select.Option value="gpt-3.5">GPT-3.5</Select.Option>
                           </Select>
                         </Form.Item>
-                        <Button type="primary">Save Settings</Button>
+                        <Button type="primary" className="btn-gradient">
+                          Save Settings
+                        </Button>
                       </Form>
                     </Card>
                   </Col>
                   <Col xs={24} lg={12}>
-                    <Card title="Email Settings">
-                      <Form layout="vertical">
+                    <Card title="Email Settings" className="settings-card">
+                      <Form layout="vertical" className="enhanced-form">
                         <Form.Item label="SMTP Server">
-                          <Input placeholder="smtp.gmail.com" />
+                          <Input placeholder="smtp.gmail.com" className="enhanced-input" />
                         </Form.Item>
                         <Form.Item label="SMTP Port">
-                          <Input defaultValue="587" type="number" />
+                          <Input defaultValue="587" type="number" className="enhanced-input" />
                         </Form.Item>
                         <Form.Item label="Email Templates">
-                          <Select defaultValue="default">
+                          <Select defaultValue="default" className="enhanced-select">
                             <Select.Option value="default">Default</Select.Option>
                             <Select.Option value="modern">Modern</Select.Option>
                           </Select>
                         </Form.Item>
-                        <Button type="primary">Save Settings</Button>
+                        <Button type="primary" className="btn-gradient">
+                          Save Settings
+                        </Button>
                       </Form>
                     </Card>
                   </Col>
