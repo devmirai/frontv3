@@ -285,14 +285,23 @@ const UserDashboard: React.FC = () => {
               size="small"
               icon={<PlayCircleOutlined />}
               className="btn-gradient"
-              onClick={() => {
-                message.loading("Preparing your interview...", 1)
-                setTimeout(() => {
-                  navigate(`/usuario/interview/${record.id}`)
-                }, 100)
+              onClick={async () => {
+                try {
+                  message.loading("Starting your interview...", 1)
+                  
+                  // Use the new specific endpoint to start the interview
+                  await postulacionAPI.iniciarEntrevista(record.id!)
+                  
+                  setTimeout(() => {
+                    navigate(`/usuario/interview/${record.id}`)
+                  }, 1000)
+                } catch (error: any) {
+                  console.error("Error starting interview:", error)
+                  message.error("Error starting interview. Please try again.")
+                }
               }}
             >
-              Iniciar Entrevista
+              Start Interview
             </Button>
           )}
           {record.estado === EstadoPostulacion.EN_EVALUACION && (
@@ -367,14 +376,54 @@ const UserDashboard: React.FC = () => {
 
     setApplying(true)
     try {
-      // Use the specific endpoint for updating status
-      await postulacionAPI.actualizarEstado(selectedJob.id!, EstadoPostulacion.PENDIENTE)
+      // Create a new application
+      const applicationResponse = await postulacionAPI.create({
+        usuario: { id: user.id },
+        convocatoria: { id: selectedJob.id },
+        estado: EstadoPostulacion.PENDIENTE,
+        fechaPostulacion: new Date().toISOString()
+      })
+
+      const newApplicationId = applicationResponse.data.id || applicationResponse.data
 
       message.success("Application submitted successfully!")
-      setApplyModalVisible(false)
-      setSelectedJob(null)
-      loadDashboardData()
+      
+      // Automatically start the interview
+      if (newApplicationId) {
+        try {
+          // Explicitly log the request to debug
+          console.log(`Starting interview for application ID: ${newApplicationId}`)
+          
+          // Make sure we're calling the correct endpoint
+          await postulacionAPI.iniciarEntrevista(newApplicationId)
+          
+          message.loading("Preparing your interview...", 1.5)
+          
+          setTimeout(() => {
+            setApplyModalVisible(false)
+            setSelectedJob(null)
+            
+            // Redirect to interview questions
+            navigate(`/usuario/interview/${newApplicationId}`)
+          }, 1500)
+          
+        } catch (interviewError) {
+          console.error("Error starting interview:", interviewError)
+          // Still close modal and refresh data even if interview start fails
+          setApplyModalVisible(false)
+          setSelectedJob(null)
+          loadDashboardData()
+          message.warning("Application submitted, but couldn't start interview automatically. Please try from your dashboard.")
+        }
+      } else {
+        // Fallback if we don't get the application ID
+        setApplyModalVisible(false)
+        setSelectedJob(null)
+        loadDashboardData()
+      }
+
     } catch (error: any) {
+      console.error("Error submitting application:", error)
       message.error(error.response?.data?.message || "Error submitting application")
     } finally {
       setApplying(false)
@@ -749,51 +798,64 @@ const UserDashboard: React.FC = () => {
       {/* Apply to Job Modal */}
       <Modal
         title={
-          <div className="flex items-center gap-3 p-2">
+          <div className="flex items-center space-x-3">
             <SendOutlined className="text-indigo-600" />
-            <span>Apply to Job</span>
+            <span>Apply for Position</span>
           </div>
         }
         open={applyModalVisible}
-        onCancel={() => setApplyModalVisible(false)}
+        onCancel={() => {
+          setApplyModalVisible(false)
+          setSelectedJob(null)
+        }}
         footer={[
-          <Button key="cancel" onClick={() => setApplyModalVisible(false)} className="mr-3">
+          <Button key="cancel" onClick={() => setApplyModalVisible(false)}>
             Cancel
           </Button>,
-          <Button key="apply" type="primary" className="btn-gradient" loading={applying} onClick={handleApplyToJob}>
-            Submit Application
+          <Button
+            key="apply"
+            type="primary"
+            className="btn-gradient"
+            loading={applying}
+            onClick={handleApplyToJob}
+            icon={<SendOutlined />}
+          >
+            {applying ? "Submitting..." : "Apply & Start Interview"}
           </Button>,
         ]}
-        width={600}
         className="apply-modal"
       >
         {selectedJob && (
-          <div className="space-y-6 p-4">
-            <div>
-              <Title level={4} className="mb-2">{selectedJob.titulo}</Title>
-              <Paragraph className="text-gray-600 dark:text-gray-300 mb-0">{selectedJob.empresa?.nombre}</Paragraph>
-            </div>
-
-            <div>
-              <Title level={5} className="mb-3">Job Description:</Title>
-              <Paragraph className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">{selectedJob.descripcion}</Paragraph>
-            </div>
-
-            <div>
-              <Title level={5} className="mb-3">Position:</Title>
-              <Tag color="blue" className="text-base px-3 py-1">{selectedJob.puesto}</Tag>
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800">
+              <Title level={4} className="mb-2 text-indigo-800 dark:text-indigo-300">
+                {selectedJob.titulo}
+              </Title>
+              <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-2">
+                <strong>Position:</strong> {selectedJob.puesto}
+              </Paragraph>
+              <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-2">
+                <strong>Company:</strong> {selectedJob.empresa?.nombre}
+              </Paragraph>
+              <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-0">
+                <strong>Closing Date:</strong> {dayjs(selectedJob.fechaCierre).format("MMM DD, YYYY")}
+              </Paragraph>
             </div>
 
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div className="flex items-center gap-2 mb-2">
-                <InfoCircleOutlined className="text-blue-600" />
-                <Paragraph className="text-blue-800 dark:text-blue-300 mb-0 font-medium">Important Note</Paragraph>
+              <div className="flex items-center space-x-2 mb-2">
+                <RobotOutlined className="text-blue-600" />
+                <span className="font-medium text-blue-800 dark:text-blue-300">What happens next?</span>
               </div>
-              <Paragraph className="text-blue-700 dark:text-blue-400 mb-0">
-                After submitting your application, you'll be able to start the AI-powered interview process immediately.
-                Make sure you're ready to begin!
+              <Paragraph className="text-blue-700 dark:text-blue-400 mb-0 text-sm">
+                After submitting your application, you'll be immediately redirected to start your AI-powered interview. 
+                The interview is personalized based on the job requirements and typically takes 30-60 minutes.
               </Paragraph>
             </div>
+
+            <Paragraph className="text-gray-600 dark:text-gray-400">
+              Are you ready to apply for this position and begin your interview?
+            </Paragraph>
           </div>
         )}
       </Modal>

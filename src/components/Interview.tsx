@@ -135,7 +135,7 @@ const Interview: React.FC = () => {
   const generateQuestions = async (postulacionData: Postulacion) => {
     try {
       setLoading(true)
-
+      
       message.loading({
         content: "Generating personalized interview questions...",
         duration: 0,
@@ -164,21 +164,12 @@ const Interview: React.FC = () => {
           key: "questionGeneration",
         })
 
+        // Use the new specific endpoint to start the interview
         if (postulacionData.estado === EstadoPostulacion.PENDIENTE && postulacionData.id) {
           try {
-            await postulacionAPI.update(postulacionData.id, {
-              id: postulacionData.id,
-              usuario: {
-                id: postulacionData.usuario?.id,
-              },
-              convocatoria: {
-                id: postulacionData.convocatoria?.id,
-              },
-              estado: EstadoPostulacion.EN_EVALUACION,
-              preguntasGeneradas: true,
-            })
+            await postulacionAPI.iniciarEntrevista(postulacionData.id)
           } catch (statusError) {
-            console.error("Error updating postulation status:", statusError)
+            console.error("Error starting interview:", statusError)
           }
         }
       } else {
@@ -267,18 +258,9 @@ const Interview: React.FC = () => {
     try {
       setInterviewCompleted(true)
 
+      // Use the new specific endpoint to complete the interview
       if (postulacion?.id) {
-        await postulacionAPI.update(postulacion.id, {
-          id: postulacion.id,
-          usuario: {
-            id: postulacion.usuario?.id,
-          },
-          convocatoria: {
-            id: postulacion.convocatoria?.id,
-          },
-          estado: EstadoPostulacion.COMPLETADA,
-          preguntasGeneradas: true,
-        })
+        await postulacionAPI.completarEntrevista(postulacion.id)
       }
 
       message.success("Interview completed successfully! Generating your results...")

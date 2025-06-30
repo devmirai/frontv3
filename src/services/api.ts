@@ -109,10 +109,18 @@ export const postulacionAPI = {
   update: (id: number, data: any) => api.put(`/postulaciones/${id}`, data),
   delete: (id: number) => api.delete(`/postulaciones/${id}`),
   
-  // Additional endpoints from your backend
+  // New specific endpoints for better legibility
+  iniciarEntrevista: (id: number) => 
+    api.patch(`/postulaciones/${id}/iniciar-entrevista`),
+  
+  completarEntrevista: (id: number) => 
+    api.patch(`/postulaciones/${id}/completar-entrevista`),
+  
+  // Company-only endpoint for changing status
   actualizarEstado: (id: number, estado: string) => 
     api.patch(`/postulaciones/${id}/estado`, { estado }),
   
+  // Existing endpoints
   getByEstado: (estado: string) => 
     api.get(`/postulaciones/estado/${estado}`),
     
