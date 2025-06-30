@@ -16,7 +16,7 @@ import {
   SunOutlined,
   CheckCircleOutlined,
   SafetyOutlined,
-  ZapOutlined,
+  ThunderboltOutlined,
   BarChartOutlined
 } from '@ant-design/icons';
 import { motion } from 'framer-motion';
@@ -538,7 +538,7 @@ const Login: React.FC = () => {
                   transition={{ duration: 0.8, delay: 0.7 }}
                 >
                   {[
-                    { icon: ZapOutlined, text: 'AI-powered personalized questions', color: 'from-yellow-500 to-orange-600' },
+                    { icon: ThunderboltOutlined, text: 'AI-powered personalized questions', color: 'from-yellow-500 to-orange-600' },
                     { icon: BarChartOutlined, text: 'Real-time intelligent evaluation', color: 'from-blue-500 to-indigo-600' },
                     { icon: CheckCircleOutlined, text: 'Comprehensive performance insights', color: 'from-green-500 to-emerald-600' }
                   ].map((feature, index) => (
