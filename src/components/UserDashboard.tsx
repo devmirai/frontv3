@@ -50,6 +50,7 @@ import {
   EditOutlined,
   SaveOutlined,
   CloseOutlined,
+  LoadingOutlined,
 } from "@ant-design/icons"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
@@ -376,6 +377,18 @@ const UserDashboard: React.FC = () => {
 
     setApplying(true)
     try {
+      // Check if user already applied to prevent duplicates
+      const existingApplication = myApplications.find((app) => app.convocatoria?.id === selectedJob.id)
+      if (existingApplication) {
+        message.warning("You have already applied to this position.")
+        setApplyModalVisible(false)
+        setSelectedJob(null)
+        setApplying(false)
+        return
+      }
+
+      message.loading("Creating your application...", 0)
+
       // Create a new application
       const applicationResponse = await postulacionAPI.create({
         usuario: { id: user.id },
@@ -386,45 +399,35 @@ const UserDashboard: React.FC = () => {
 
       const newApplicationId = applicationResponse.data.id || applicationResponse.data
 
-      message.success("Application submitted successfully!")
-      
-      // Automatically start the interview
-      if (newApplicationId) {
-        try {
-          // Explicitly log the request to debug
-          console.log(`Starting interview for application ID: ${newApplicationId}`)
-          
-          // Make sure we're calling the correct endpoint
-          await postulacionAPI.iniciarEntrevista(newApplicationId)
-          
-          message.loading("Preparing your interview...", 1.5)
-          
-          setTimeout(() => {
-            setApplyModalVisible(false)
-            setSelectedJob(null)
-            
-            // Redirect to interview questions
-            navigate(`/usuario/interview/${newApplicationId}`)
-          }, 1500)
-          
-        } catch (interviewError) {
-          console.error("Error starting interview:", interviewError)
-          // Still close modal and refresh data even if interview start fails
-          setApplyModalVisible(false)
-          setSelectedJob(null)
-          loadDashboardData()
-          message.warning("Application submitted, but couldn't start interview automatically. Please try from your dashboard.")
-        }
-      } else {
-        // Fallback if we don't get the application ID
-        setApplyModalVisible(false)
-        setSelectedJob(null)
-        loadDashboardData()
+      if (!newApplicationId) {
+        throw new Error("Failed to create application - no ID returned")
       }
 
+      message.destroy()
+      message.loading("Starting your interview...", 0)
+
+      // Start the interview using the specific endpoint
+      await postulacionAPI.iniciarEntrevista(newApplicationId)
+
+      message.destroy()
+      message.success("Application submitted and interview started!")
+      
+      // Close modal and redirect
+      setApplyModalVisible(false)
+      setSelectedJob(null)
+      
+      // Redirect to interview page
+      navigate(`/usuario/interview/${newApplicationId}`)
+
     } catch (error: any) {
-      console.error("Error submitting application:", error)
-      message.error(error.response?.data?.message || "Error submitting application")
+      console.error("Error in application process:", error)
+      message.destroy()
+      
+      if (error.response?.status === 409) {
+        message.error("You have already applied to this position.")
+      } else {
+        message.error(error.response?.data?.message || "Error processing your application. Please try again.")
+      }
     } finally {
       setApplying(false)
     }
@@ -798,18 +801,25 @@ const UserDashboard: React.FC = () => {
       {/* Apply to Job Modal */}
       <Modal
         title={
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 p-2">
             <SendOutlined className="text-indigo-600" />
             <span>Apply for Position</span>
           </div>
         }
         open={applyModalVisible}
         onCancel={() => {
-          setApplyModalVisible(false)
-          setSelectedJob(null)
+          if (!applying) {
+            setApplyModalVisible(false)
+            setSelectedJob(null)
+          }
         }}
         footer={[
-          <Button key="cancel" onClick={() => setApplyModalVisible(false)}>
+          <Button 
+            key="cancel" 
+            onClick={() => setApplyModalVisible(false)}
+            disabled={applying}
+            className="mr-3"
+          >
             Cancel
           </Button>,
           <Button
@@ -818,42 +828,57 @@ const UserDashboard: React.FC = () => {
             className="btn-gradient"
             loading={applying}
             onClick={handleApplyToJob}
-            icon={<SendOutlined />}
+            icon={applying ? <LoadingOutlined /> : <SendOutlined />}
+            disabled={applying}
           >
-            {applying ? "Submitting..." : "Apply & Start Interview"}
+            {applying ? "Processing..." : "Apply & Start Interview"}
           </Button>,
         ]}
         className="apply-modal"
+        closable={!applying}
+        maskClosable={!applying}
       >
         {selectedJob && (
-          <div className="space-y-6">
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800">
-              <Title level={4} className="mb-2 text-indigo-800 dark:text-indigo-300">
+          <div className="space-y-6 p-4">
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 p-6 rounded-lg border border-indigo-200 dark:border-indigo-800">
+              <Title level={4} className="mb-3 text-indigo-800 dark:text-indigo-300">
                 {selectedJob.titulo}
               </Title>
-              <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-2">
-                <strong>Position:</strong> {selectedJob.puesto}
-              </Paragraph>
-              <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-2">
-                <strong>Company:</strong> {selectedJob.empresa?.nombre}
-              </Paragraph>
-              <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-0">
-                <strong>Closing Date:</strong> {dayjs(selectedJob.fechaCierre).format("MMM DD, YYYY")}
-              </Paragraph>
+              <div className="space-y-2">
+                <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-0">
+                  <strong>Position:</strong> {selectedJob.puesto}
+                </Paragraph>
+                <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-0">
+                  <strong>Company:</strong> {selectedJob.empresa?.nombre}
+                </Paragraph>
+                <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-0">
+                  <strong>Closing Date:</strong> {dayjs(selectedJob.fechaCierre).format("MMM DD, YYYY")}
+                </Paragraph>
+              </div>
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div className="flex items-center space-x-2 mb-2">
-                <RobotOutlined className="text-blue-600" />
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center space-x-3 mb-3">
+                <RobotOutlined className="text-blue-600 text-xl" />
                 <span className="font-medium text-blue-800 dark:text-blue-300">What happens next?</span>
               </div>
-              <Paragraph className="text-blue-700 dark:text-blue-400 mb-0 text-sm">
+              <Paragraph className="text-blue-700 dark:text-blue-400 mb-0">
                 After submitting your application, you'll be immediately redirected to start your AI-powered interview. 
                 The interview is personalized based on the job requirements and typically takes 30-60 minutes.
               </Paragraph>
             </div>
 
-            <Paragraph className="text-gray-600 dark:text-gray-400">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg border border-yellow-200 dark:border-yellow-800">
+              <div className="flex items-center space-x-3 mb-3">
+                <ExclamationCircleOutlined className="text-yellow-600 text-xl" />
+                <span className="font-medium text-yellow-800 dark:text-yellow-300">Important Note</span>
+              </div>
+              <Paragraph className="text-yellow-700 dark:text-yellow-400 mb-0">
+                You can only apply once per position. Make sure you're ready to start the interview immediately after applying.
+              </Paragraph>
+            </div>
+
+            <Paragraph className="text-gray-600 dark:text-gray-400 text-center">
               Are you ready to apply for this position and begin your interview?
             </Paragraph>
           </div>
