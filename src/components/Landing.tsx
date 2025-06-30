@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { Layout, Button, Typography, Row, Col, Card, Space, Statistic, Divider, Drawer } from 'antd';
-import { 
-  RobotOutlined, 
-  BulbOutlined, 
-  ClockCircleOutlined, 
+"use client"
+
+import type React from "react"
+import { useState } from "react"
+import { Layout, Button, Typography, Row, Col, Card, Statistic, Divider, Drawer } from "antd"
+import {
+  RobotOutlined,
+  BulbOutlined,
+  ClockCircleOutlined,
   TeamOutlined,
   ArrowRightOutlined,
   CheckCircleOutlined,
@@ -17,114 +20,116 @@ import {
   MenuOutlined,
   CloseOutlined,
   SafetyOutlined,
-  BarChartOutlined,
   UserOutlined,
-  ShieldCheckOutlined,
-  LightningBoltOutlined,
-  ChartBarOutlined,
-  DownOutlined
-} from '@ant-design/icons';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../contexts/ThemeContext';
-import ThemeToggle from './ThemeToggle';
+} from "@ant-design/icons"
+import { motion } from "framer-motion"
+import { useNavigate } from "react-router-dom"
+import { useTheme } from "../contexts/ThemeContext"
+import ThemeToggle from "./ThemeToggle"
 
-const { Header, Content, Footer } = Layout;
-const { Title, Paragraph } = Typography;
+const { Header, Content, Footer } = Layout
+const { Title, Paragraph } = Typography
 
 const Landing: React.FC = () => {
-  const navigate = useNavigate();
-  const { isDarkMode } = useTheme();
-  const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
+  const navigate = useNavigate()
+  const { isDarkMode } = useTheme()
+  const [mobileMenuVisible, setMobileMenuVisible] = useState(false)
 
   const features = [
     {
       icon: <RobotOutlined className="text-5xl text-indigo-600" />,
-      title: 'AI-Powered Questions',
-      description: 'Generate personalized technical and behavioral questions tailored to each role and candidate profile with advanced machine learning algorithms.',
-      color: 'indigo'
+      title: "AI-Powered Questions",
+      description:
+        "Generate personalized technical and behavioral questions tailored to each role and candidate profile with advanced machine learning algorithms.",
+      color: "indigo",
     },
     {
       icon: <BulbOutlined className="text-5xl text-emerald-600" />,
-      title: 'Smart Evaluation',
-      description: 'Advanced AI analyzes responses in real-time and provides detailed feedback on candidate performance, skills assessment, and cultural fit.',
-      color: 'emerald'
+      title: "Smart Evaluation",
+      description:
+        "Advanced AI analyzes responses in real-time and provides detailed feedback on candidate performance, skills assessment, and cultural fit.",
+      color: "emerald",
     },
     {
       icon: <ClockCircleOutlined className="text-5xl text-blue-600" />,
-      title: 'Asynchronous Interviews',
-      description: 'Conduct interviews on your schedule. Candidates can complete assessments at their convenience, saving valuable time for everyone.',
-      color: 'blue'
+      title: "Asynchronous Interviews",
+      description:
+        "Conduct interviews on your schedule. Candidates can complete assessments at their convenience, saving valuable time for everyone.",
+      color: "blue",
     },
     {
       icon: <TeamOutlined className="text-5xl text-purple-600" />,
-      title: 'Recruiter Dashboard',
-      description: 'Comprehensive analytics and insights dashboard to make informed hiring decisions quickly and efficiently with data-driven recommendations.',
-      color: 'purple'
-    }
-  ];
+      title: "Recruiter Dashboard",
+      description:
+        "Comprehensive analytics and insights dashboard to make informed hiring decisions quickly and efficiently with data-driven recommendations.",
+      color: "purple",
+    },
+  ]
 
   const stats = [
-    { 
-      title: 'Interviews Conducted', 
-      value: 12500, 
-      suffix: '+', 
+    {
+      title: "Interviews Conducted",
+      value: 12500,
+      suffix: "+",
       icon: <CheckCircleOutlined className="text-green-600" />,
-      description: 'Successful interviews completed'
+      description: "Successful interviews completed",
     },
-    { 
-      title: 'Companies Trust Us', 
-      value: 250, 
-      suffix: '+', 
+    {
+      title: "Companies Trust Us",
+      value: 250,
+      suffix: "+",
       icon: <StarOutlined className="text-yellow-600" />,
-      description: 'Active enterprise clients'
+      description: "Active enterprise clients",
     },
-    { 
-      title: 'Time Saved', 
-      value: 85, 
-      suffix: '%', 
+    {
+      title: "Time Saved",
+      value: 85,
+      suffix: "%",
       icon: <ClockCircleOutlined className="text-blue-600" />,
-      description: 'Reduction in hiring time'
+      description: "Reduction in hiring time",
     },
-    { 
-      title: 'Accuracy Rate', 
-      value: 94, 
-      suffix: '%', 
+    {
+      title: "Accuracy Rate",
+      value: 94,
+      suffix: "%",
       icon: <TrophyOutlined className="text-purple-600" />,
-      description: 'Interview assessment accuracy'
-    }
-  ];
+      description: "Interview assessment accuracy",
+    },
+  ]
 
   const testimonials = [
     {
       name: "Sarah Johnson",
       role: "Head of Talent, TechCorp",
-      content: "mirAI transformed our hiring process. We've reduced time-to-hire by 60% while improving candidate quality significantly.",
-      avatar: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?w=100"
+      content:
+        "mirAI transformed our hiring process. We've reduced time-to-hire by 60% while improving candidate quality significantly.",
+      avatar: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?w=100",
     },
     {
       name: "Michael Chen",
       role: "CEO, StartupXYZ",
-      content: "The AI-powered insights help us identify the best candidates faster than ever before. This is truly game-changing technology.",
-      avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?w=100"
+      content:
+        "The AI-powered insights help us identify the best candidates faster than ever before. This is truly game-changing technology.",
+      avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?w=100",
     },
     {
       name: "Emily Rodriguez",
       role: "HR Director, GlobalTech",
-      content: "Our candidates love the modern interview experience, and we get detailed analytics to make better hiring decisions.",
-      avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?w=100"
-    }
-  ];
+      content:
+        "Our candidates love the modern interview experience, and we get detailed analytics to make better hiring decisions.",
+      avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?w=100",
+    },
+  ]
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
+        staggerChildren: 0.1,
+      },
+    },
+  }
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -132,22 +137,22 @@ const Landing: React.FC = () => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6
-      }
-    }
-  };
+        duration: 0.6,
+      },
+    },
+  }
 
   const navigationItems = [
-    { label: 'Features', href: '#features' },
-    { label: 'Pricing', href: '#pricing' },
-    { label: 'About', href: '#about' },
-    { label: 'Contact', href: '#contact' }
-  ];
+    { label: "Features", href: "#features" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "About", href: "#about" },
+    { label: "Contact", href: "#contact" },
+  ]
 
   return (
     <Layout className="main-layout">
-      {/* Redesigned Superior Navigation Bar */}
-      <Header className="fixed top-0 left-0 right-0 z-50 h-24 border-0 shadow-none bg-transparent">
+      {/* Simplified Superior Navigation Bar */}
+      <Header className="fixed top-0 left-0 right-0 z-50 h-20 border-0 shadow-none bg-transparent">
         {/* Glassmorphism Container */}
         <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border-b border-white/20 dark:border-gray-700/30">
           {/* Gradient Border */}
@@ -156,7 +161,7 @@ const Landing: React.FC = () => {
 
         <div className="relative z-10 flex justify-between items-center h-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Enhanced Logo Section */}
-          <motion.div 
+          <motion.div
             className="flex items-center space-x-4 flex-shrink-0"
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -165,14 +170,17 @@ const Landing: React.FC = () => {
             {/* Logo with Animated Glow */}
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl blur-lg opacity-30 animate-pulse"></div>
-              <div className="relative w-16 h-16 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-all duration-300">
-                <RobotOutlined className="text-2xl text-white" />
+              <div className="relative w-14 h-14 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-all duration-300">
+                <RobotOutlined className="text-xl text-white" />
               </div>
             </div>
-            
+
             {/* Brand Text with Gradient */}
             <div className="flex flex-col">
-              <Title level={2} className="mb-0 font-black text-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <Title
+                level={2}
+                className="mb-0 font-black text-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"
+              >
                 mirAI
               </Title>
               <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
@@ -181,7 +189,7 @@ const Landing: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Desktop Navigation with Floating Pills */}
+          {/* Desktop Navigation - Only Navigation Links */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -197,9 +205,9 @@ const Landing: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
                 >
-                  <Button 
-                    type="text" 
-                    size="large" 
+                  <Button
+                    type="text"
+                    size="large"
                     className="nav-pill font-semibold text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 px-6 h-12 rounded-xl border-0 shadow-none"
                   >
                     {item.label}
@@ -208,44 +216,9 @@ const Landing: React.FC = () => {
               ))}
             </div>
 
-            {/* Action Buttons with Enhanced Design */}
-            <div className="flex items-center space-x-3 ml-6">
+            {/* Only Theme Toggle */}
+            <div className="flex items-center ml-6">
               <ThemeToggle />
-              
-              {/* Sign In Button */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-              >
-                <Button 
-                  type="text" 
-                  size="large" 
-                  onClick={() => navigate('/login')}
-                  className="font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 px-6 h-12 rounded-xl"
-                >
-                  Sign In
-                </Button>
-              </motion.div>
-              
-              {/* Get Started Button with Glow Effect */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.7 }}
-                className="relative"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur-lg opacity-30 animate-pulse"></div>
-                <Button 
-                  type="primary" 
-                  size="large"
-                  className="relative bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 border-0 rounded-2xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 px-8 h-14 text-lg"
-                  icon={<RocketOutlined />}
-                  onClick={() => navigate('/login')}
-                >
-                  Get Started
-                </Button>
-              </motion.div>
             </div>
           </motion.div>
 
@@ -257,12 +230,12 @@ const Landing: React.FC = () => {
               animate={{ opacity: 1, rotate: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
             >
-              <Button 
+              <Button
                 type="text"
                 size="large"
                 icon={<MenuOutlined />}
                 onClick={() => setMobileMenuVisible(true)}
-                className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 w-14 h-14 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border border-white/30 dark:border-gray-700/30 shadow-lg hover:shadow-xl"
+                className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 w-12 h-12 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border border-white/30 dark:border-gray-700/30 shadow-lg hover:shadow-xl"
               />
             </motion.div>
           </div>
@@ -294,19 +267,22 @@ const Landing: React.FC = () => {
         closeIcon={<CloseOutlined className="text-xl" />}
         styles={{
           header: {
-            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))',
-            borderBottom: '1px solid rgba(99, 102, 241, 0.2)',
-            padding: '24px'
+            background: "linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))",
+            borderBottom: "1px solid rgba(99, 102, 241, 0.2)",
+            padding: "24px",
           },
           body: {
-            padding: '32px 24px'
-          }
+            padding: "32px 24px",
+          },
         }}
       >
         <div className="space-y-8">
           {/* Navigation Links with Enhanced Styling */}
           <div className="space-y-3">
-            <Title level={5} className="text-gray-600 dark:text-gray-400 uppercase tracking-wider text-xs font-bold mb-4">
+            <Title
+              level={5}
+              className="text-gray-600 dark:text-gray-400 uppercase tracking-wider text-xs font-bold mb-4"
+            >
               Navigation
             </Title>
             {navigationItems.map((item, index) => (
@@ -316,9 +292,9 @@ const Landing: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                <Button 
-                  type="text" 
-                  size="large" 
+                <Button
+                  type="text"
+                  size="large"
                   block
                   className="text-left font-semibold text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 h-16 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-transparent hover:shadow-lg"
                 >
@@ -335,16 +311,19 @@ const Landing: React.FC = () => {
 
           {/* Action Buttons with Enhanced Mobile Design */}
           <div className="space-y-4">
-            <Title level={5} className="text-gray-600 dark:text-gray-400 uppercase tracking-wider text-xs font-bold mb-4">
+            <Title
+              level={5}
+              className="text-gray-600 dark:text-gray-400 uppercase tracking-wider text-xs font-bold mb-4"
+            >
               Account
             </Title>
-            <Button 
-              type="text" 
-              size="large" 
+            <Button
+              type="text"
+              size="large"
               block
               onClick={() => {
-                navigate('/login');
-                setMobileMenuVisible(false);
+                navigate("/login")
+                setMobileMenuVisible(false)
               }}
               className="font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 h-16 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
             >
@@ -353,18 +332,18 @@ const Landing: React.FC = () => {
                 <UserOutlined className="text-lg" />
               </div>
             </Button>
-            
+
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur-lg opacity-20"></div>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 size="large"
                 block
                 className="relative bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 border-0 rounded-2xl font-bold shadow-xl h-16 text-lg"
                 icon={<RocketOutlined />}
                 onClick={() => {
-                  navigate('/login');
-                  setMobileMenuVisible(false);
+                  navigate("/login")
+                  setMobileMenuVisible(false)
                 }}
               >
                 Get Started Free
@@ -394,15 +373,18 @@ const Landing: React.FC = () => {
         </div>
       </Drawer>
 
-      <Content className="pt-24">
-        {/* Hero Section */}
+      <Content className="pt-20">
+        {/* Hero Section with Action Buttons Moved Here */}
         <section className="relative min-h-screen flex items-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-800 dark:to-indigo-900 overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-30">
-            <div className="absolute inset-0" style={{
-              backgroundImage: `radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), 
-                               radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)`
-            }} />
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), 
+                               radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)`,
+              }}
+            />
           </div>
 
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -416,7 +398,7 @@ const Landing: React.FC = () => {
                 >
                   <motion.div variants={itemVariants}>
                     <Title className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight text-gray-900 dark:text-white mb-6">
-                      The Future of{' '}
+                      The Future of{" "}
                       <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                         AI Interviews
                       </span>
@@ -425,28 +407,38 @@ const Landing: React.FC = () => {
 
                   <motion.div variants={itemVariants}>
                     <Paragraph className="text-lg sm:text-xl lg:text-2xl text-gray-600 dark:text-gray-300 leading-relaxed font-medium max-w-2xl mx-auto lg:mx-0">
-                      mirAI revolutionizes hiring with intelligent interview assistance. Generate personalized questions, 
-                      evaluate candidates with AI precision, and make better hiring decisions faster than ever before.
+                      mirAI revolutionizes hiring with intelligent interview assistance. Generate personalized
+                      questions, evaluate candidates with AI precision, and make better hiring decisions faster than
+                      ever before.
                     </Paragraph>
                   </motion.div>
 
+                  {/* Action Buttons Moved to Hero Section */}
                   <motion.div variants={itemVariants}>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                      <Button 
-                        type="primary" 
-                        size="large" 
+                      <Button
+                        type="primary"
+                        size="large"
                         className="h-16 px-10 text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 border-0 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-1"
                         icon={<RocketOutlined />}
-                        onClick={() => navigate('/login')}
+                        onClick={() => navigate("/login")}
                       >
                         Start Free Trial
                       </Button>
-                      <Button 
-                        size="large" 
+                      <Button
+                        size="large"
                         className="h-16 px-10 text-lg font-bold border-2 border-indigo-200 hover:border-indigo-400 dark:border-indigo-700 dark:hover:border-indigo-500 rounded-2xl transition-all duration-300 transform hover:-translate-y-1"
                         icon={<PlayCircleOutlined />}
                       >
                         Watch Demo
+                      </Button>
+                      <Button
+                        size="large"
+                        className="h-16 px-10 text-lg font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 rounded-2xl border border-gray-300 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500"
+                        icon={<UserOutlined />}
+                        onClick={() => navigate("/login")}
+                      >
+                        Sign In
                       </Button>
                     </div>
                   </motion.div>
@@ -480,7 +472,7 @@ const Landing: React.FC = () => {
                   <div className="relative max-w-lg mx-auto">
                     {/* Main Image */}
                     <div className="relative z-10">
-                      <img 
+                      <img
                         src="https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop"
                         alt="AI Interview Assistant"
                         className="w-full rounded-3xl shadow-2xl"
@@ -488,7 +480,7 @@ const Landing: React.FC = () => {
                     </div>
 
                     {/* Floating Cards */}
-                    <motion.div 
+                    <motion.div
                       className="absolute -top-4 -left-4 sm:-top-6 sm:-left-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -505,7 +497,7 @@ const Landing: React.FC = () => {
                       </div>
                     </motion.div>
 
-                    <motion.div 
+                    <motion.div
                       className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700"
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -522,7 +514,7 @@ const Landing: React.FC = () => {
                       </div>
                     </motion.div>
 
-                    <motion.div 
+                    <motion.div
                       className="absolute top-1/2 -left-8 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 hidden sm:block"
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -557,7 +549,8 @@ const Landing: React.FC = () => {
                 Trusted by Industry Leaders
               </Title>
               <Paragraph className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Join thousands of companies that have transformed their hiring process with mirAI's intelligent interview platform.
+                Join thousands of companies that have transformed their hiring process with mirAI's intelligent
+                interview platform.
               </Paragraph>
             </motion.div>
 
@@ -576,11 +569,11 @@ const Landing: React.FC = () => {
                         <Statistic
                           value={stat.value}
                           suffix={stat.suffix}
-                          valueStyle={{ 
-                            color: isDarkMode ? '#f1f5f9' : '#1f2937', 
-                            fontSize: window.innerWidth < 640 ? '2.5rem' : '3.5rem', 
-                            fontWeight: '900',
-                            lineHeight: 1
+                          valueStyle={{
+                            color: isDarkMode ? "#f1f5f9" : "#1f2937",
+                            fontSize: window.innerWidth < 640 ? "2.5rem" : "3.5rem",
+                            fontWeight: "900",
+                            lineHeight: 1,
                           }}
                           className="mb-2"
                         />
@@ -610,10 +603,14 @@ const Landing: React.FC = () => {
               className="text-center mb-20"
             >
               <Title level={2} className="text-4xl lg:text-5xl font-black text-gray-900 dark:text-white mb-6">
-                Why Choose <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">mirAI</span>?
+                Why Choose{" "}
+                <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  mirAI
+                </span>
+                ?
               </Title>
               <Paragraph className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Our AI-powered platform streamlines the entire interview process with intelligent automation, 
+                Our AI-powered platform streamlines the entire interview process with intelligent automation,
                 comprehensive analytics, and seamless candidate experience.
               </Paragraph>
             </motion.div>
@@ -677,8 +674,8 @@ const Landing: React.FC = () => {
                     <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl">
                       <div className="text-center">
                         <div className="mb-4">
-                          <img 
-                            src={testimonial.avatar}
+                          <img
+                            src={testimonial.avatar || "/placeholder.svg"}
                             alt={testimonial.name}
                             className="w-16 h-16 rounded-full mx-auto mb-4 shadow-lg"
                           />
@@ -712,10 +709,13 @@ const Landing: React.FC = () => {
         <section className="py-20 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 relative overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-20">
-            <div className="absolute inset-0" style={{
-              backgroundImage: `radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.2) 0%, transparent 50%), 
-                               radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 50%)`
-            }} />
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.2) 0%, transparent 50%), 
+                               radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 50%)`,
+              }}
+            />
           </div>
 
           <div className="relative z-10 max-w-5xl mx-auto text-center px-4 sm:px-6 lg:px-8">
@@ -732,28 +732,28 @@ const Landing: React.FC = () => {
                 Ready to Transform Your Hiring Process?
               </Title>
               <Paragraph className="text-xl lg:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
-                Join hundreds of companies already using mirAI to find the best talent faster. 
-                Start your free trial today and experience the future of AI-powered interviews.
+                Join hundreds of companies already using mirAI to find the best talent faster. Start your free trial
+                today and experience the future of AI-powered interviews.
               </Paragraph>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  type="primary" 
-                  size="large" 
+                <Button
+                  type="primary"
+                  size="large"
                   className="h-16 px-12 text-lg font-bold bg-white text-indigo-600 border-white hover:bg-gray-50 hover:text-indigo-700 rounded-2xl shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
                   icon={<RocketOutlined />}
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate("/login")}
                 >
                   Start Your Free Trial
                 </Button>
-                <Button 
-                  size="large" 
+                <Button
+                  size="large"
                   className="h-16 px-12 text-lg font-bold text-white border-2 border-white hover:bg-white hover:text-indigo-600 rounded-2xl transition-all duration-300 transform hover:-translate-y-1"
                   ghost
                 >
                   Contact Sales
                 </Button>
               </div>
-              
+
               <div className="mt-12 flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-white/80">
                 <div className="flex items-center space-x-2">
                   <CheckCircleOutlined />
@@ -788,8 +788,8 @@ const Landing: React.FC = () => {
                   </Title>
                 </div>
                 <Paragraph className="text-gray-400 leading-relaxed">
-                  AI-powered interview platform helping companies make better hiring decisions 
-                  through intelligent automation and data-driven insights.
+                  AI-powered interview platform helping companies make better hiring decisions through intelligent
+                  automation and data-driven insights.
                 </Paragraph>
                 <div className="flex space-x-4">
                   {/* Social Media Icons */}
@@ -808,11 +808,16 @@ const Landing: React.FC = () => {
             <Col xs={24} md={16}>
               <Row gutter={[24, 24]}>
                 <Col xs={12} sm={6}>
-                  <Title level={5} className="text-white mb-6 font-bold">Product</Title>
+                  <Title level={5} className="text-white mb-6 font-bold">
+                    Product
+                  </Title>
                   <ul className="space-y-3">
-                    {['Features', 'Pricing', 'API Documentation', 'Integrations', 'Security'].map((item) => (
+                    {["Features", "Pricing", "API Documentation", "Integrations", "Security"].map((item) => (
                       <li key={item}>
-                        <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 font-medium text-sm">
+                        <a
+                          href="#"
+                          className="text-gray-400 hover:text-white transition-colors duration-300 font-medium text-sm"
+                        >
                           {item}
                         </a>
                       </li>
@@ -820,11 +825,16 @@ const Landing: React.FC = () => {
                   </ul>
                 </Col>
                 <Col xs={12} sm={6}>
-                  <Title level={5} className="text-white mb-6 font-bold">Company</Title>
+                  <Title level={5} className="text-white mb-6 font-bold">
+                    Company
+                  </Title>
                   <ul className="space-y-3">
-                    {['About Us', 'Blog', 'Careers', 'Press', 'Partners'].map((item) => (
+                    {["About Us", "Blog", "Careers", "Press", "Partners"].map((item) => (
                       <li key={item}>
-                        <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 font-medium text-sm">
+                        <a
+                          href="#"
+                          className="text-gray-400 hover:text-white transition-colors duration-300 font-medium text-sm"
+                        >
                           {item}
                         </a>
                       </li>
@@ -832,11 +842,16 @@ const Landing: React.FC = () => {
                   </ul>
                 </Col>
                 <Col xs={12} sm={6}>
-                  <Title level={5} className="text-white mb-6 font-bold">Support</Title>
+                  <Title level={5} className="text-white mb-6 font-bold">
+                    Support
+                  </Title>
                   <ul className="space-y-3">
-                    {['Help Center', 'Contact Support', 'Status Page', 'Community', 'Training'].map((item) => (
+                    {["Help Center", "Contact Support", "Status Page", "Community", "Training"].map((item) => (
                       <li key={item}>
-                        <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 font-medium text-sm">
+                        <a
+                          href="#"
+                          className="text-gray-400 hover:text-white transition-colors duration-300 font-medium text-sm"
+                        >
                           {item}
                         </a>
                       </li>
@@ -844,11 +859,16 @@ const Landing: React.FC = () => {
                   </ul>
                 </Col>
                 <Col xs={12} sm={6}>
-                  <Title level={5} className="text-white mb-6 font-bold">Legal</Title>
+                  <Title level={5} className="text-white mb-6 font-bold">
+                    Legal
+                  </Title>
                   <ul className="space-y-3">
-                    {['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'GDPR', 'Compliance'].map((item) => (
+                    {["Privacy Policy", "Terms of Service", "Cookie Policy", "GDPR", "Compliance"].map((item) => (
                       <li key={item}>
-                        <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 font-medium text-sm">
+                        <a
+                          href="#"
+                          className="text-gray-400 hover:text-white transition-colors duration-300 font-medium text-sm"
+                        >
                           {item}
                         </a>
                       </li>
@@ -858,9 +878,9 @@ const Landing: React.FC = () => {
               </Row>
             </Col>
           </Row>
-          
+
           <Divider className="border-gray-700 my-12" />
-          
+
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <Paragraph className="text-gray-400 mb-0 text-sm">
               © 2024 mirAI Interview Platform. All rights reserved.
@@ -874,7 +894,7 @@ const Landing: React.FC = () => {
         </div>
       </Footer>
     </Layout>
-  );
-};
+  )
+}
 
-export default Landing;
+export default Landing
