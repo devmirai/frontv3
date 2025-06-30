@@ -17,7 +17,12 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
   --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.25);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.3);
+  --shadow-3xl: 0 35px 60px rgba(0, 0, 0, 0.35);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -26,6 +31,9 @@ body {
   color: #1f2937;
   line-height: 1.6;
   transition: var(--transition);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .dark body {
@@ -35,6 +43,121 @@ body {
 
 .app {
   min-height: 100vh;
+}
+
+/* Enhanced Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.font-black {
+  font-weight: 900 !important;
+}
+
+/* Enhanced Spacing System */
+.space-y-1 > * + * { margin-top: 0.25rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+.space-y-6 > * + * { margin-top: 1.5rem; }
+.space-y-8 > * + * { margin-top: 2rem; }
+.space-y-12 > * + * { margin-top: 3rem; }
+.space-y-16 > * + * { margin-top: 4rem; }
+.space-y-20 > * + * { margin-top: 5rem; }
+
+.space-x-1 > * + * { margin-left: 0.25rem; }
+.space-x-2 > * + * { margin-left: 0.5rem; }
+.space-x-3 > * + * { margin-left: 0.75rem; }
+.space-x-4 > * + * { margin-left: 1rem; }
+.space-x-6 > * + * { margin-left: 1.5rem; }
+.space-x-8 > * + * { margin-left: 2rem; }
+
+/* Login Page Specific Styles */
+.login-tabs .ant-tabs-tab {
+  padding: 12px 24px !important;
+  margin: 0 8px !important;
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 2px solid transparent !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  background: rgba(99, 102, 241, 0.05) !important;
+}
+
+.login-tabs .ant-tabs-tab:hover {
+  background: rgba(99, 102, 241, 0.1) !important;
+  color: #6366f1 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
+}
+
+.login-tabs .ant-tabs-tab-active {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  color: white !important;
+  border-color: transparent !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3) !important;
+}
+
+.login-tabs .ant-tabs-tab-active:hover {
+  background: linear-gradient(135deg, #5855eb, #7c3aed) !important;
+  color: white !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 25px rgba(99, 102, 241, 0.4) !important;
+}
+
+.login-tabs .ant-tabs-ink-bar {
+  display: none !important;
+}
+
+.login-tabs .ant-tabs-content-holder {
+  padding-top: 24px !important;
+}
+
+.login-tabs .ant-tabs-nav {
+  margin-bottom: 0 !important;
+}
+
+/* Enhanced Input Styles for Login */
+.ant-input:focus,
+.ant-input-focused {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+.ant-input-password:focus,
+.ant-input-password-focused {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+.ant-select:focus .ant-select-selector,
+.ant-select-focused .ant-select-selector {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Enhanced Button Hover Effects */
+.ant-btn:hover {
+  transform: translateY(-1px) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-btn:active {
+  transform: translateY(0) !important;
+}
+
+/* Custom Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Enhanced Dark Mode Styles */
@@ -217,92 +340,6 @@ body {
 
 .dark .ant-drawer-title {
   color: #f1f5f9 !important;
-}
-
-/* Login Page Specific Styles */
-.login-tabs .ant-tabs-tab {
-  padding: 12px 24px !important;
-  margin: 0 8px !important;
-  border-radius: 12px !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  border: 2px solid transparent !important;
-  font-weight: 600 !important;
-  font-size: 16px !important;
-  background: rgba(99, 102, 241, 0.05) !important;
-}
-
-.login-tabs .ant-tabs-tab:hover {
-  background: rgba(99, 102, 241, 0.1) !important;
-  color: #6366f1 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
-}
-
-.login-tabs .ant-tabs-tab-active {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
-  color: white !important;
-  border-color: transparent !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3) !important;
-}
-
-.login-tabs .ant-tabs-tab-active:hover {
-  background: linear-gradient(135deg, #5855eb, #7c3aed) !important;
-  color: white !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 12px 25px rgba(99, 102, 241, 0.4) !important;
-}
-
-.login-tabs .ant-tabs-ink-bar {
-  display: none !important;
-}
-
-.login-tabs .ant-tabs-content-holder {
-  padding-top: 24px !important;
-}
-
-.login-tabs .ant-tabs-nav {
-  margin-bottom: 0 !important;
-}
-
-/* Enhanced Input Styles for Login */
-.ant-input:focus,
-.ant-input-focused {
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
-  transform: translateY(-1px) !important;
-}
-
-.ant-input-password:focus,
-.ant-input-password-focused {
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
-  transform: translateY(-1px) !important;
-}
-
-.ant-select:focus .ant-select-selector,
-.ant-select-focused .ant-select-selector {
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* Enhanced Button Hover Effects */
-.ant-btn:hover {
-  transform: translateY(-1px) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.ant-btn:active {
-  transform: translateY(0) !important;
-}
-
-/* Custom Gradient Text */
-.gradient-text {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 /* Theme Toggle Button */
