@@ -15,7 +15,7 @@ import {
   MoonOutlined, 
   SunOutlined,
   CheckCircleOutlined,
-  ShieldCheckOutlined,
+  SafetyOutlined,
   ZapOutlined,
   BarChartOutlined
 } from '@ant-design/icons';
@@ -162,7 +162,7 @@ const Login: React.FC = () => {
           {/* Security Statement */}
           <div className="security-statement">
             <div className="security-statement-text">
-              <ShieldCheckOutlined />
+              <SafetyOutlined />
               <span>We use secure encryption to protect your data</span>
             </div>
           </div>
@@ -446,7 +446,7 @@ const Login: React.FC = () => {
           {/* Security Statement */}
           <div className="security-statement">
             <div className="security-statement-text">
-              <ShieldCheckOutlined />
+              <SafetyOutlined />
               <span>Your data is encrypted and secure with us</span>
             </div>
           </div>
