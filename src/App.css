@@ -1678,3 +1678,25 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Add these styles to improve form validation indicators */
+.ant-form-item-has-success .ant-input {
+  border-color: #10b981 !important;
+}
+
+.ant-form-item-has-success .ant-input-password {
+  border-color: #10b981 !important;
+}
+
+.ant-form-item-has-error .ant-form-item-explain-error {
+  font-size: 14px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.ant-form-item-has-error .ant-form-item-explain-error:before {
+  content: '•';
+  margin-right: 6px;
+  color: #ef4444;
+}

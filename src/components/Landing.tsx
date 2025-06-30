@@ -152,92 +152,59 @@ const Landing: React.FC = () => {
   return (
     <Layout className="main-layout">
       {/* Simplified Superior Navigation Bar */}
-      <Header className="fixed top-0 left-0 right-0 z-50 h-20 border-0 shadow-none bg-transparent">
-        {/* Glassmorphism Container */}
-        <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border-b border-white/20 dark:border-gray-700/30">
-          {/* Gradient Border */}
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent"></div>
-        </div>
-
-        <div className="relative z-10 flex justify-between items-center h-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Enhanced Logo Section */}
-          <motion.div
-            className="flex items-center space-x-4 flex-shrink-0"
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            {/* Logo with Animated Glow */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl blur-lg opacity-30 animate-pulse"></div>
-              <div className="relative w-14 h-14 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-all duration-300">
-                <RobotOutlined className="text-xl text-white" />
+      <Header className="fixed top-0 left-0 right-0 z-50 h-20 shadow-sm bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex justify-between items-center h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Logo Section */}
+          <div className="flex items-center">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <RobotOutlined className="text-lg text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-xl text-gray-900 dark:text-white">mirAI</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">Interview Platform</span>
               </div>
             </div>
+          </div>
 
-            {/* Brand Text with Gradient */}
-            <div className="flex flex-col">
-              <Title
-                level={2}
-                className="mb-0 font-black text-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-8">
+            {navigationItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="font-medium text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
               >
-                mirAI
-              </Title>
-              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
-                Interview Platform
-              </span>
-            </div>
-          </motion.div>
+                {item.label}
+              </a>
+            ))}
+          </div>
 
-          {/* Desktop Navigation - Only Navigation Links */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="hidden lg:flex items-center space-x-2"
-          >
-            {/* Navigation Pills Container */}
-            <div className="flex items-center space-x-1 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl p-2 border border-white/30 dark:border-gray-700/30 shadow-lg">
-              {navigationItems.map((item, index) => (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                >
-                  <Button
-                    type="text"
-                    size="large"
-                    className="nav-pill font-semibold text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 px-6 h-12 rounded-xl border-0 shadow-none"
-                  >
-                    {item.label}
-                  </Button>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Only Theme Toggle */}
-            <div className="flex items-center ml-6">
-              <ThemeToggle />
-            </div>
-          </motion.div>
-
-          {/* Mobile Menu Button with Enhanced Design */}
-          <div className="lg:hidden flex items-center space-x-3">
-            <ThemeToggle />
-            <motion.div
-              initial={{ opacity: 0, rotate: -90 }}
-              animate={{ opacity: 1, rotate: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-            >
+          {/* Action Buttons & Theme Toggle */}
+          <div className="flex items-center space-x-4">
+            <div className="hidden md:block">
               <Button
-                type="text"
-                size="large"
-                icon={<MenuOutlined />}
-                onClick={() => setMobileMenuVisible(true)}
-                className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 w-12 h-12 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border border-white/30 dark:border-gray-700/30 shadow-lg hover:shadow-xl"
-              />
-            </motion.div>
+                type="link"
+                className="font-medium text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+                onClick={() => navigate("/login")}
+              >
+                Sign In
+              </Button>
+              <Button
+                type="primary"
+                className="ml-2 bg-gradient-to-r from-indigo-600 to-purple-600 border-0 hover:from-indigo-700 hover:to-purple-700"
+                onClick={() => navigate("/login")}
+              >
+                Start Free Trial
+              </Button>
+            </div>
+            <ThemeToggle />
+            <Button
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={() => setMobileMenuVisible(true)}
+              className="lg:hidden text-gray-700 dark:text-gray-300"
+            />
           </div>
         </div>
       </Header>
