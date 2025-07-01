@@ -14,6 +14,9 @@ import {
   SafetyOutlined,
   SunOutlined,
   MoonOutlined,
+  TrophyOutlined,
+  TeamOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
@@ -104,18 +107,33 @@ const Login: React.FC = () => {
     visible: {
       opacity: 1,
       transition: {
-        duration: 0.6,
-        staggerChildren: 0.1,
+        duration: 0.8,
+        staggerChildren: 0.15,
       },
     },
   }
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5 },
+      transition: {
+        duration: 0.6,
+        ease: [0.4, 0, 0.2, 1],
+      },
+    },
+  }
+
+  const floatingVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.8,
+        ease: [0.4, 0, 0.2, 1],
+      },
     },
   }
 
@@ -164,31 +182,33 @@ const Login: React.FC = () => {
                     {/* Floating Cards */}
                     <motion.div
                       className="login-hero-floating-card"
-                      style={{ top: "20%", right: "-10%" }}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.8, delay: 0.8 }}
+                      style={{ top: "15%", right: "-8%" }}
+                      variants={floatingVariants}
+                      initial="hidden"
+                      animate="visible"
+                      transition={{ delay: 0.8 }}
                     >
                       <div className="login-hero-floating-card-content">
                         <div className="login-hero-floating-card-icon">
-                          <SafetyOutlined />
+                          <TrophyOutlined />
                         </div>
-                        <p className="login-hero-floating-card-text">94% Accuracy Rate</p>
+                        <p className="login-hero-floating-card-text">98% Success Rate</p>
                       </div>
                     </motion.div>
 
                     <motion.div
                       className="login-hero-floating-card"
-                      style={{ bottom: "20%", left: "-10%" }}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.8, delay: 1.0 }}
+                      style={{ bottom: "15%", left: "-8%" }}
+                      variants={floatingVariants}
+                      initial="hidden"
+                      animate="visible"
+                      transition={{ delay: 1.0 }}
                     >
                       <div className="login-hero-floating-card-content">
                         <div className="login-hero-floating-card-icon">
-                          <BankOutlined />
+                          <TeamOutlined />
                         </div>
-                        <p className="login-hero-floating-card-text">250+ Companies</p>
+                        <p className="login-hero-floating-card-text">500+ Companies</p>
                       </div>
                     </motion.div>
                   </div>
@@ -206,6 +226,24 @@ const Login: React.FC = () => {
                     Join thousands of companies using mirAI to conduct smarter interviews, evaluate candidates with AI
                     precision, and make better hiring decisions faster than ever before.
                   </Paragraph>
+                </motion.div>
+
+                {/* Stats Section */}
+                <motion.div variants={itemVariants}>
+                  <div className="login-hero-stats">
+                    <div className="login-hero-stat">
+                      <span className="login-hero-stat-number">10K+</span>
+                      <span className="login-hero-stat-label">Interviews</span>
+                    </div>
+                    <div className="login-hero-stat">
+                      <span className="login-hero-stat-number">500+</span>
+                      <span className="login-hero-stat-label">Companies</span>
+                    </div>
+                    <div className="login-hero-stat">
+                      <span className="login-hero-stat-number">98%</span>
+                      <span className="login-hero-stat-label">Accuracy</span>
+                    </div>
+                  </div>
                 </motion.div>
               </motion.div>
             </Col>
@@ -238,10 +276,13 @@ const Login: React.FC = () => {
                               >
                                 {error && (
                                   <Alert
-                                    message={error}
+                                    message="Authentication Error"
+                                    description={error}
                                     type="error"
                                     showIcon
                                     className="login-alert login-alert-error"
+                                    closable
+                                    onClose={() => setError("")}
                                   />
                                 )}
 
@@ -249,7 +290,7 @@ const Login: React.FC = () => {
                                   name="login"
                                   onFinish={handleLogin}
                                   layout="vertical"
-                                  className="login-form"
+                                  className={`login-form ${loading ? "login-form-loading" : ""}`}
                                   size="large"
                                 >
                                   <Form.Item
@@ -265,6 +306,7 @@ const Login: React.FC = () => {
                                       prefix={<MailOutlined className="login-input-prefix" />}
                                       placeholder="Enter your email address"
                                       className="login-input"
+                                      autoComplete="email"
                                     />
                                   </Form.Item>
 
@@ -278,6 +320,7 @@ const Login: React.FC = () => {
                                       prefix={<LockOutlined className="login-input-prefix" />}
                                       placeholder="Enter your password"
                                       className="login-password"
+                                      autoComplete="current-password"
                                     />
                                   </Form.Item>
 
@@ -333,10 +376,13 @@ const Login: React.FC = () => {
                               >
                                 {error && (
                                   <Alert
-                                    message={error}
+                                    message="Registration Error"
+                                    description={error}
                                     type="error"
                                     showIcon
                                     className="login-alert login-alert-error"
+                                    closable
+                                    onClose={() => setError("")}
                                   />
                                 )}
 
@@ -344,7 +390,7 @@ const Login: React.FC = () => {
                                   name="register"
                                   onFinish={handleRegister}
                                   layout="vertical"
-                                  className="login-form"
+                                  className={`login-form ${loading ? "login-form-loading" : ""}`}
                                   size="large"
                                 >
                                   <Form.Item
@@ -357,6 +403,7 @@ const Login: React.FC = () => {
                                       prefix={<UserOutlined className="login-input-prefix" />}
                                       placeholder="Enter your full name"
                                       className="login-input"
+                                      autoComplete="name"
                                     />
                                   </Form.Item>
 
@@ -373,6 +420,7 @@ const Login: React.FC = () => {
                                       prefix={<MailOutlined className="login-input-prefix" />}
                                       placeholder="Enter your email address"
                                       className="login-input"
+                                      autoComplete="email"
                                     />
                                   </Form.Item>
 
@@ -383,7 +431,11 @@ const Login: React.FC = () => {
                                         label={<span className="login-form-label">Password</span>}
                                         rules={[
                                           { required: true, message: "Please enter password" },
-                                          { min: 6, message: "Password must be at least 6 characters" },
+                                          { min: 8, message: "Password must be at least 8 characters" },
+                                          {
+                                            pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                                            message: "Password must contain uppercase, lowercase and number",
+                                          },
                                         ]}
                                         className="login-form-item"
                                       >
@@ -391,6 +443,7 @@ const Login: React.FC = () => {
                                           prefix={<LockOutlined className="login-input-prefix" />}
                                           placeholder="Create password"
                                           className="login-password"
+                                          autoComplete="new-password"
                                         />
                                       </Form.Item>
                                     </Col>
@@ -398,13 +451,25 @@ const Login: React.FC = () => {
                                       <Form.Item
                                         name="confirmPassword"
                                         label={<span className="login-form-label">Confirm Password</span>}
-                                        rules={[{ required: true, message: "Please confirm password" }]}
+                                        dependencies={["password"]}
+                                        rules={[
+                                          { required: true, message: "Please confirm password" },
+                                          ({ getFieldValue }) => ({
+                                            validator(_, value) {
+                                              if (!value || getFieldValue("password") === value) {
+                                                return Promise.resolve()
+                                              }
+                                              return Promise.reject(new Error("Passwords do not match!"))
+                                            },
+                                          }),
+                                        ]}
                                         className="login-form-item"
                                       >
                                         <Input.Password
                                           prefix={<LockOutlined className="login-input-prefix" />}
                                           placeholder="Confirm password"
                                           className="login-password"
+                                          autoComplete="new-password"
                                         />
                                       </Form.Item>
                                     </Col>
@@ -415,13 +480,20 @@ const Login: React.FC = () => {
                                       <Form.Item
                                         name="phone"
                                         label={<span className="login-form-label">Phone Number</span>}
-                                        rules={[{ required: true, message: "Please enter phone number" }]}
+                                        rules={[
+                                          { required: true, message: "Please enter phone number" },
+                                          {
+                                            pattern: /^\+?[\d\s\-$$$$]+$/,
+                                            message: "Please enter a valid phone number",
+                                          },
+                                        ]}
                                         className="login-form-item"
                                       >
                                         <Input
                                           prefix={<PhoneOutlined className="login-input-prefix" />}
                                           placeholder="Enter phone number"
                                           className="login-input"
+                                          autoComplete="tel"
                                         />
                                       </Form.Item>
                                     </Col>
@@ -453,6 +525,7 @@ const Login: React.FC = () => {
                                       prefix={<BankOutlined className="login-input-prefix" />}
                                       placeholder="Enter your company name"
                                       className="login-input"
+                                      autoComplete="organization"
                                     />
                                   </Form.Item>
 
@@ -470,7 +543,7 @@ const Login: React.FC = () => {
                                 </Form>
 
                                 <div className="login-security">
-                                  <SafetyOutlined className="login-security-icon" />
+                                  <CheckCircleOutlined className="login-security-icon" />
                                   <span className="login-security-text">
                                     By signing up, you agree to our Terms of Service and Privacy Policy
                                   </span>
