@@ -64,7 +64,8 @@ authAxios.interceptors.response.use(
 // Auth API using the auth instance
 export const authAPI = {
   login: (credentials: { email: string; password: string }) => 
-    authAxios.post('/auth/login', credentials),
+    // Use the exact URL provided
+    axios.post('http://localhost:8081/auth/login', credentials),
   // You might add more auth-related endpoints here
 };
 

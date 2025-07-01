@@ -111,25 +111,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'SET_LOADING', payload: false });
   }, []);
 
-  const login = async (credentials: LoginCredentials): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     dispatch({ type: 'LOGIN_START' });
-
+    
     try {
-      const response = await authAPI.login(credentials);
+      // Call the API with the credentials
+      const response = await authAPI.login({ email, password });
       
+      // Get the JWT token from the response - updated to use 'jwt' key
       const jwtToken = response.data.jwt;
-
+      
       if (!jwtToken) {
         throw new Error('No token received from server');
       }
-
-      // Decode the JWT to extract user data
+      
+      // Use the decoded token and response data to create the user object
       const decodedToken: any = jwtDecode(jwtToken);
-      console.log('Decoded JWT:', decodedToken);
-
-      // Create user object from JWT data using userId instead of sub
+      
+      // Create user object from JWT data
       const user: User = {
-        id: decodedToken.userId, // Using userId from JWT instead of email
+        id: decodedToken.userId,
         email: decodedToken.sub, // sub contains the email
         name: `${decodedToken.nombre} ${decodedToken.apellidoPaterno} ${decodedToken.apellidoMaterno}`,
         role: decodedToken.role === 'ROLE_USUARIO' ? Rol.USUARIO : Rol.EMPRESA,
@@ -137,15 +138,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         apellidoPaterno: decodedToken.apellidoPaterno,
         apellidoMaterno: decodedToken.apellidoMaterno,
         nacimiento: decodedToken.nacimiento,
-        // Remove hardcoded avatar and other non-JWT fields
       };
 
       // Store in localStorage
       localStorage.setItem('mirai_token', jwtToken);
       localStorage.setItem('mirai_user', JSON.stringify(user));
-
-      console.log('Token stored:', jwtToken);
-      console.log('User data:', user);
 
       dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token: jwtToken } });
       message.success(`Welcome back, ${user.name}!`);
