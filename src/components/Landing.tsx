@@ -188,8 +188,8 @@ const Landing: React.FC = () => {
   return (
     <Layout className="main-layout">
       {/* Enhanced Navigation Header */}
-      <Header className="header-layout">
-        <div className="container flex justify-between items-center h-full">
+z      <Header className="header-layout bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+        <div className="container mx-auto flex justify-between items-center h-full px-4">
           {/* Logo Section */}
           <motion.div
             className="flex items-center"
@@ -197,13 +197,13 @@ const Landing: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="sidebar-logo">
+            <div className="flex items-center gap-3">
               <div className="logo-icon">
                 <RobotOutlined />
               </div>
-              <div className="logo-content">
+              <div>
                 <span className="logo-text">mirAI</span>
-                <span className="logo-subtitle">Interview Platform</span>
+                <span className="block text-xs text-gray-500 dark:text-gray-400">Interview Platform</span>
               </div>
             </div>
           </motion.div>
@@ -219,20 +219,19 @@ const Landing: React.FC = () => {
               <motion.a
                 key={item.label}
                 href={item.href}
-                className="nav-pill font-semibold text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 flex items-center gap-2"
+                className="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
               >
-                {item.icon}
                 {item.label}
               </motion.a>
             ))}
           </motion.div>
 
           {/* Action Buttons & Theme Toggle */}
-          <div className="flex items-center space-x-4">
-            <div className="hidden md:flex items-center space-x-3">
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-3">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -240,8 +239,7 @@ const Landing: React.FC = () => {
               >
                 <Button
                   type="text"
-                  className="action-button font-semibold"
-                  icon={<UserOutlined />}
+                  className="font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
                   onClick={() => navigate("/login")}
                 >
                   Sign In
@@ -254,21 +252,22 @@ const Landing: React.FC = () => {
               >
                 <Button
                   type="primary"
-                  className="cta-button"
-                  icon={<RocketOutlined />}
+                  className="btn-gradient"
                   onClick={() => navigate("/login")}
                 >
                   Start Free Trial
                 </Button>
               </motion.div>
             </div>
-            <ThemeToggle />
-            <Button
-              type="text"
-              icon={<MenuOutlined />}
-              onClick={() => setMobileMenuVisible(true)}
-              className="lg:hidden action-button"
-            />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Button
+                type="text"
+                icon={<MenuOutlined />}
+                onClick={() => setMobileMenuVisible(true)}
+                className="lg:hidden flex items-center justify-center ml-2"
+              />
+            </div>
           </div>
         </div>
       </Header>
