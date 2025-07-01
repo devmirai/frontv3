@@ -22,7 +22,6 @@ import {
   BarChartOutlined,
   ThunderboltOutlined,
   AimOutlined,
-  FireOutlined,
   CrownOutlined,
   HomeOutlined,
   InfoCircleOutlined,
@@ -33,6 +32,7 @@ import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import { useTheme } from "../contexts/ThemeContext"
 import ThemeToggle from "./ThemeToggle"
+import "../styles/landing.css"
 
 const { Header, Content, Footer } = Layout
 const { Title, Paragraph } = Typography
@@ -156,31 +156,31 @@ const Landing: React.FC = () => {
     {
       label: "Home",
       href: "#home",
-      icon: <HomeOutlined className="text-lg" />,
+      icon: <HomeOutlined />,
       description: "Back to top",
     },
     {
       label: "Features",
       href: "#features",
-      icon: <BulbOutlined className="text-lg" />,
+      icon: <BulbOutlined />,
       description: "Explore our capabilities",
     },
     {
       label: "Pricing",
       href: "#pricing",
-      icon: <DollarOutlined className="text-lg" />,
+      icon: <DollarOutlined />,
       description: "View pricing plans",
     },
     {
       label: "About",
       href: "#about",
-      icon: <InfoCircleOutlined className="text-lg" />,
+      icon: <InfoCircleOutlined />,
       description: "Learn about mirAI",
     },
     {
       label: "Contact",
       href: "#contact",
-      icon: <PhoneOutlined className="text-lg" />,
+      icon: <PhoneOutlined />,
       description: "Get in touch",
     },
   ]
@@ -188,29 +188,24 @@ const Landing: React.FC = () => {
   return (
     <Layout className="main-layout">
       {/* Enhanced Navigation Header */}
-z      <Header className="header-layout bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-        <div className="container mx-auto flex justify-between items-center h-full px-4">
+      <Header className="landing-header">
+        <div className="landing-header-content">
           {/* Logo Section */}
-          <motion.div
-            className="flex items-center"
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="logo-icon">
+          <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+            <div className="landing-logo">
+              <div className="landing-logo-icon">
                 <RobotOutlined />
               </div>
-              <div>
-                <span className="logo-text">mirAI</span>
-                <span className="block text-xs text-gray-500 dark:text-gray-400">Interview Platform</span>
+              <div className="landing-logo-content">
+                <span className="landing-logo-text">mirAI</span>
+                <span className="landing-logo-subtitle">Interview Platform</span>
               </div>
             </div>
           </motion.div>
 
           {/* Desktop Navigation */}
           <motion.div
-            className="hidden lg:flex items-center space-x-8"
+            className="landing-nav"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -219,55 +214,51 @@ z      <Header className="header-layout bg-white dark:bg-gray-900 border-b borde
               <motion.a
                 key={item.label}
                 href={item.href}
-                className="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+                className="landing-nav-item"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
               >
+                <span className="landing-nav-item-icon">{item.icon}</span>
                 {item.label}
               </motion.a>
             ))}
           </motion.div>
 
           {/* Action Buttons & Theme Toggle */}
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-3">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-              >
-                <Button
-                  type="text"
-                  className="font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-                  onClick={() => navigate("/login")}
-                >
-                  Sign In
-                </Button>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.7 }}
-              >
-                <Button
-                  type="primary"
-                  className="btn-gradient"
-                  onClick={() => navigate("/login")}
-                >
-                  Start Free Trial
-                </Button>
-              </motion.div>
-            </div>
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
+          <div className="landing-header-actions">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
               <Button
-                type="text"
-                icon={<MenuOutlined />}
-                onClick={() => setMobileMenuVisible(true)}
-                className="lg:hidden flex items-center justify-center ml-2"
-              />
-            </div>
+                className="landing-action-button landing-signin-button"
+                icon={<UserOutlined />}
+                onClick={() => navigate("/login")}
+              >
+                Sign In
+              </Button>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+            >
+              <Button
+                className="landing-action-button landing-cta-button"
+                icon={<RocketOutlined />}
+                onClick={() => navigate("/login")}
+              >
+                Start Free Trial
+              </Button>
+            </motion.div>
+            <ThemeToggle />
+            <Button
+              icon={<MenuOutlined />}
+              onClick={() => setMobileMenuVisible(true)}
+              className="landing-menu-button"
+            />
           </div>
         </div>
       </Header>
@@ -275,13 +266,13 @@ z      <Header className="header-layout bg-white dark:bg-gray-900 border-b borde
       {/* Enhanced Mobile Navigation Drawer */}
       <Drawer
         title={
-          <div className="sidebar-logo">
-            <div className="logo-icon">
+          <div className="landing-logo">
+            <div className="landing-logo-icon">
               <RobotOutlined />
             </div>
-            <div className="logo-content">
-              <span className="logo-text">mirAI</span>
-              <span className="logo-subtitle">Interview Platform</span>
+            <div className="landing-logo-content">
+              <span className="landing-logo-text">mirAI</span>
+              <span className="landing-logo-subtitle">Interview Platform</span>
             </div>
           </div>
         }
@@ -289,14 +280,14 @@ z      <Header className="header-layout bg-white dark:bg-gray-900 border-b borde
         onClose={() => setMobileMenuVisible(false)}
         open={mobileMenuVisible}
         width={360}
-        className="lg:hidden enhanced-drawer mobile-drawer"
-        closeIcon={<CloseOutlined className="text-xl" />}
+        className="landing-drawer"
+        closeIcon={<CloseOutlined />}
       >
-        <div className="drawer-content">
+        <div className="landing-drawer-content">
           {/* Enhanced Navigation Links */}
-          <div className="form-section">
-            <div className="section-title">Navigation</div>
-            <div className="space-y-2">
+          <div className="landing-nav-section">
+            <div className="landing-section-title">Navigation</div>
+            <div className="landing-nav-items">
               {navigationItems.map((item, index) => (
                 <motion.div
                   key={item.label}
@@ -304,55 +295,45 @@ z      <Header className="header-layout bg-white dark:bg-gray-900 border-b borde
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                 >
-                  <div className="setting-item cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
-                    <div className="setting-info">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl flex items-center justify-center">
-                          {item.icon}
-                        </div>
-                        <div>
-                          <div className="font-semibold text-gray-900 dark:text-white text-base">{item.label}</div>
-                          <div className="setting-description">{item.description}</div>
-                        </div>
+                  <div className="landing-mobile-nav-item">
+                    <div className="landing-mobile-nav-content">
+                      <div className="landing-mobile-nav-icon">{item.icon}</div>
+                      <div className="landing-mobile-nav-info">
+                        <div className="landing-mobile-nav-title">{item.label}</div>
+                        <div className="landing-mobile-nav-desc">{item.description}</div>
                       </div>
                     </div>
-                    <ArrowRightOutlined className="text-gray-400 text-sm" />
+                    <ArrowRightOutlined className="landing-mobile-nav-arrow" />
                   </div>
                 </motion.div>
               ))}
             </div>
           </div>
 
-          <Divider className="border-gray-300 dark:border-gray-600" />
+          <Divider />
 
           {/* Enhanced Action Buttons */}
-          <div className="form-section">
-            <div className="section-title">Account</div>
-            <div className="space-y-3">
+          <div className="landing-nav-section">
+            <div className="landing-section-title">Account</div>
+            <div className="landing-mobile-actions">
               <Button
-                type="text"
-                size="large"
-                block
+                className="landing-mobile-signin"
                 onClick={() => {
                   navigate("/login")
                   setMobileMenuVisible(false)
                 }}
-                className="action-button-large text-left"
               >
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-3">
-                    <UserOutlined className="text-lg" />
-                    <span className="text-lg font-semibold">Sign In</span>
+                    <UserOutlined />
+                    <span>Sign In</span>
                   </div>
                   <ArrowRightOutlined className="text-sm opacity-50" />
                 </div>
               </Button>
 
               <Button
-                type="primary"
-                size="large"
-                block
-                className="btn-gradient action-button-large"
+                className="landing-mobile-cta"
                 icon={<RocketOutlined />}
                 onClick={() => {
                   navigate("/login")
@@ -365,29 +346,29 @@ z      <Header className="header-layout bg-white dark:bg-gray-900 border-b borde
           </div>
 
           {/* Enhanced Status Card */}
-          <div className="mirabot-status-card">
-            <div className="status-content">
-              <div className="status-avatar">
+          <div className="landing-status-card">
+            <div className="landing-status-content">
+              <div className="landing-status-avatar">
                 <RobotOutlined />
-                <div className="status-indicator"></div>
+                <div className="landing-status-indicator"></div>
               </div>
-              <div className="status-info">
-                <div className="status-title">mirAI Assistant</div>
-                <div className="status-description">
+              <div className="landing-status-info">
+                <div className="landing-status-title">mirAI Assistant</div>
+                <div className="landing-status-desc">
                   AI-powered interview platform ready to transform your hiring process
                 </div>
-                <div className="status-stats">
-                  <div className="stat-item">
-                    <div className="stat-number">250+</div>
-                    <div className="stat-label">Companies</div>
+                <div className="landing-status-stats">
+                  <div className="landing-stat-item">
+                    <div className="landing-stat-number">250+</div>
+                    <div className="landing-stat-label">Companies</div>
                   </div>
-                  <div className="stat-item">
-                    <div className="stat-number">12.5K+</div>
-                    <div className="stat-label">Interviews</div>
+                  <div className="landing-stat-item">
+                    <div className="landing-stat-number">12.5K+</div>
+                    <div className="landing-stat-label">Interviews</div>
                   </div>
-                  <div className="stat-item">
-                    <div className="stat-number">94%</div>
-                    <div className="stat-label">Accuracy</div>
+                  <div className="landing-stat-item">
+                    <div className="landing-stat-number">94%</div>
+                    <div className="landing-stat-label">Accuracy</div>
                   </div>
                 </div>
               </div>
@@ -396,10 +377,10 @@ z      <Header className="header-layout bg-white dark:bg-gray-900 border-b borde
         </div>
       </Drawer>
 
-      <Content className="pt-20">
+      <Content>
         {/* Enhanced Hero Section */}
-        <section className="hero-section">
-          <div className="container">
+        <section className="landing-hero">
+          <div className="container landing-hero-content">
             <Row gutter={[48, 48]} align="middle">
               <Col xs={24} lg={12}>
                 <motion.div
@@ -506,7 +487,7 @@ z      <Header className="header-layout bg-white dark:bg-gray-900 border-b borde
                     >
                       <div className="flex items-center space-x-4">
                         <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                          <ThunderboltOutlined className="text-blue-600 text-xl" />
+                          <ClockCircleOutlined className="text-blue-600 text-xl" />
                         </div>
                         <div>
                           <div className="font-bold text-gray-900 dark:text-white text-lg">85% Faster</div>
@@ -516,16 +497,18 @@ z      <Header className="header-layout bg-white dark:bg-gray-900 border-b borde
                     </motion.div>
 
                     <motion.div
-                      className="floating-card absolute top-1/2 -left-10 hidden sm:block"
-                      initial={{ opacity: 0, x: 20 }}
+                      className="floating-card absolute top-1/2 -left-8 transform -translate-y-1/2"
+                      initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.8, delay: 1.2 }}
                     >
                       <div className="flex items-center space-x-4">
-                        <RobotOutlined className="text-indigo-600 text-2xl" />
+                        <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
+                          <TeamOutlined className="text-purple-600 text-xl" />
+                        </div>
                         <div>
-                          <div className="font-bold text-gray-900 dark:text-white">AI-Powered</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Smart Questions</div>
+                          <div className="font-bold text-gray-900 dark:text-white text-lg">12.5K+</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Interviews</div>
                         </div>
                       </div>
                     </motion.div>
@@ -537,113 +520,57 @@ z      <Header className="header-layout bg-white dark:bg-gray-900 border-b borde
         </section>
 
         {/* Enhanced Stats Section */}
-        <section className="section-padding bg-white dark:bg-gray-900">
+        <section className="py-24 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
           <div className="container">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="text-center mb-20"
+              className="text-center mb-16"
             >
-              <Title level={2} className="text-5xl lg:text-6xl font-black text-gray-900 dark:text-white mb-8">
+              <Title level={2} className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6">
                 Trusted by Industry Leaders
               </Title>
-              <Paragraph className="text-2xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto leading-relaxed">
-                Join thousands of companies that have transformed their hiring process with mirAI's intelligent
-                interview platform and cutting-edge AI technology.
+              <Paragraph className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                Join thousands of companies that have transformed their hiring process with mirAI
               </Paragraph>
             </motion.div>
 
-            <div className="stats-grid">
+            <Row gutter={[32, 32]}>
               {stats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <Card className="enhanced-stats-card">
-                    <div className="stats-header">
-                      <div className="stats-icon text-indigo-600">{stat.icon}</div>
-                    </div>
-                    <div className="stats-content">
+                <Col xs={12} sm={12} lg={6} key={index}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <Card className="text-center h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
+                      <div className="mb-4">{stat.icon}</div>
                       <Statistic
+                        title={<span className="text-lg font-bold text-gray-900 dark:text-white">{stat.title}</span>}
                         value={stat.value}
                         suffix={stat.suffix}
                         valueStyle={{
-                          color: isDarkMode ? "#f1f5f9" : "#1f2937",
-                          fontSize: "clamp(2.5rem, 4vw, 4rem)",
+                          color: isDarkMode ? "#ffffff" : "#1f2937",
+                          fontSize: "2.5rem",
                           fontWeight: "900",
-                          lineHeight: 1,
-                          fontFamily: "Poppins, sans-serif",
                         }}
-                        className="mb-4"
                       />
-                      <Title level={4} className="stats-title">
-                        {stat.title}
-                      </Title>
-                      <Paragraph className="text-gray-600 dark:text-gray-400 mb-0 leading-relaxed">
+                      <Paragraph className="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-0">
                         {stat.description}
                       </Paragraph>
-                    </div>
-                  </Card>
-                </motion.div>
+                    </Card>
+                  </motion.div>
+                </Col>
               ))}
-            </div>
+            </Row>
           </div>
         </section>
 
         {/* Enhanced Features Section */}
-        <section id="features" className="section-padding bg-gray-50 dark:bg-gray-800">
-          <div className="container">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="text-center mb-24"
-            >
-              <Title level={2} className="text-5xl lg:text-6xl font-black text-gray-900 dark:text-white mb-8">
-                Why Choose <span className="gradient-text">mirAI</span>?
-              </Title>
-              <Paragraph className="text-2xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto leading-relaxed">
-                Our AI-powered platform streamlines the entire interview process with intelligent automation,
-                comprehensive analytics, and seamless candidate experience that delivers results.
-              </Paragraph>
-            </motion.div>
-
-            <div className="features-grid">
-              {features.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <Card className="feature-card group">
-                    <div className="text-center">
-                      <div className="mb-8 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                        {feature.icon}
-                      </div>
-                      <Title level={3} className="mb-6 text-gray-900 dark:text-white font-bold text-2xl">
-                        {feature.title}
-                      </Title>
-                      <Paragraph className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">
-                        {feature.description}
-                      </Paragraph>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Enhanced Testimonials Section */}
-        <section className="section-padding bg-white dark:bg-gray-900">
+        <section className="py-24 bg-gray-50 dark:bg-gray-800">
           <div className="container">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -652,50 +579,90 @@ z      <Header className="header-layout bg-white dark:bg-gray-900 border-b borde
               viewport={{ once: true }}
               className="text-center mb-20"
             >
-              <Title level={2} className="text-5xl lg:text-6xl font-black text-gray-900 dark:text-white mb-8">
-                What Our Clients Say
+              <Title level={2} className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6">
+                Powerful Features for Modern Hiring
               </Title>
-              <Paragraph className="text-2xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto leading-relaxed">
-                Discover how companies worldwide are transforming their hiring process with mirAI and achieving
-                unprecedented results in talent acquisition.
+              <Paragraph className="text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto">
+                Our AI-powered platform provides everything you need to conduct efficient, fair, and insightful
+                interviews that help you find the perfect candidates.
+              </Paragraph>
+            </motion.div>
+
+            <Row gutter={[32, 32]}>
+              {features.map((feature, index) => (
+                <Col xs={24} sm={12} lg={6} key={index}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="h-full"
+                  >
+                    <Card className="h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 bg-white dark:bg-gray-900 group">
+                      <div className="text-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        {feature.icon}
+                      </div>
+                      <Title level={4} className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+                        {feature.title}
+                      </Title>
+                      <Paragraph className="text-gray-600 dark:text-gray-300 text-center leading-relaxed">
+                        {feature.description}
+                      </Paragraph>
+                    </Card>
+                  </motion.div>
+                </Col>
+              ))}
+            </Row>
+          </div>
+        </section>
+
+        {/* Enhanced Testimonials Section */}
+        <section className="py-24 bg-white dark:bg-gray-900">
+          <div className="container">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center mb-20"
+            >
+              <Title level={2} className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6">
+                What Our Customers Say
+              </Title>
+              <Paragraph className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                Don't just take our word for it. Here's what industry leaders are saying about mirAI.
               </Paragraph>
             </motion.div>
 
             <Row gutter={[32, 32]}>
               {testimonials.map((testimonial, index) => (
-                <Col xs={24} lg={8} key={index}>
+                <Col xs={24} md={8} key={index}>
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.2 }}
                     viewport={{ once: true }}
                   >
-                    <Card className="testimonial-card">
-                      <div className="text-center">
-                        <div className="mb-6">
-                          <img
-                            src={testimonial.avatar || "/placeholder.svg"}
-                            alt={testimonial.name}
-                            className="w-20 h-20 rounded-full mx-auto mb-4 shadow-lg object-cover"
-                          />
-                          <div className="flex justify-center mb-4">
-                            {[...Array(testimonial.rating)].map((_, i) => (
-                              <StarOutlined key={i} className="text-yellow-400 text-xl mx-1" />
-                            ))}
-                          </div>
-                        </div>
-                        <Paragraph className="text-gray-700 dark:text-gray-300 italic text-xl mb-8 leading-relaxed font-medium">
-                          "{testimonial.content}"
-                        </Paragraph>
+                    <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
+                      <div className="flex items-center mb-6">
+                        <img
+                          src={testimonial.avatar || "/placeholder.svg"}
+                          alt={testimonial.name}
+                          className="w-16 h-16 rounded-full object-cover mr-4 border-4 border-indigo-100 dark:border-indigo-900"
+                        />
                         <div>
-                          <Title level={4} className="text-gray-900 dark:text-white mb-2 text-xl">
-                            {testimonial.name}
-                          </Title>
-                          <Paragraph className="text-gray-600 dark:text-gray-400 mb-0 font-medium">
-                            {testimonial.role}
-                          </Paragraph>
+                          <div className="font-bold text-lg text-gray-900 dark:text-white">{testimonial.name}</div>
+                          <div className="text-gray-600 dark:text-gray-400 text-sm">{testimonial.role}</div>
                         </div>
                       </div>
+                      <div className="flex mb-4">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <StarOutlined key={i} className="text-yellow-400 text-lg" />
+                        ))}
+                      </div>
+                      <Paragraph className="text-gray-700 dark:text-gray-300 italic leading-relaxed">
+                        "{testimonial.content}"
+                      </Paragraph>
                     </Card>
                   </motion.div>
                 </Col>
@@ -705,56 +672,44 @@ z      <Header className="header-layout bg-white dark:bg-gray-900 border-b borde
         </section>
 
         {/* Enhanced CTA Section */}
-        <section className="cta-section section-padding">
-          <div className="container text-center relative z-10">
+        <section className="py-24 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 relative overflow-hidden">
+          <div className="absolute inset-0 bg-black opacity-10"></div>
+          <div className="container relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
+              className="text-center"
             >
-              <div className="mb-12">
-                <FireOutlined className="text-9xl text-white mb-8 animate-pulse" />
-              </div>
-              <Title level={1} className="text-5xl lg:text-7xl font-black text-white mb-10 leading-tight">
-                Ready to Transform Your Hiring Process?
+              <Title level={2} className="text-4xl sm:text-5xl font-black text-white mb-6">
+                Ready to Transform Your Hiring?
               </Title>
-              <Paragraph className="text-2xl lg:text-3xl text-white/90 mb-16 max-w-4xl mx-auto leading-relaxed font-medium">
-                Join hundreds of companies already using mirAI to find the best talent faster. Start your free trial
-                today and experience the future of AI-powered interviews.
+              <Paragraph className="text-xl text-indigo-100 max-w-3xl mx-auto mb-12">
+                Join thousands of companies using mirAI to make better hiring decisions. Start your free trial today and
+                experience the future of interviews.
               </Paragraph>
-              <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
+              <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <Button
                   type="primary"
                   size="large"
-                  className="h-20 px-16 text-2xl font-bold bg-white text-indigo-600 border-white hover:bg-gray-50 hover:text-indigo-700 rounded-3xl shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105"
+                  className="h-16 px-12 text-xl font-bold bg-white text-indigo-600 border-0 hover:bg-gray-100 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
                   icon={<RocketOutlined />}
                   onClick={() => navigate("/login")}
                 >
-                  Start Your Free Trial
+                  Start Free Trial
                 </Button>
                 <Button
                   size="large"
-                  className="h-20 px-16 text-2xl font-bold text-white border-2 border-white hover:bg-white hover:text-indigo-600 rounded-3xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105"
-                  ghost
+                  className="h-16 px-12 text-xl font-bold border-2 border-white text-white hover:bg-white hover:text-indigo-600 rounded-2xl transition-all duration-300 transform hover:-translate-y-1"
+                  icon={<PhoneOutlined />}
                 >
-                  Contact Sales
+                  Schedule Demo
                 </Button>
               </div>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-12 text-white/80 text-lg">
-                <div className="flex items-center space-x-3">
-                  <CheckCircleOutlined className="text-xl" />
-                  <span className="font-semibold">14-day free trial</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <HeartOutlined className="text-xl" />
-                  <span className="font-semibold">No setup fees</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <SafetyOutlined className="text-xl" />
-                  <span className="font-semibold">Cancel anytime</span>
-                </div>
+              <div className="mt-8 text-indigo-200 text-sm">
+                <CheckCircleOutlined className="mr-2" />
+                No credit card required • 14-day free trial • Cancel anytime
               </div>
             </motion.div>
           </div>
@@ -762,127 +717,121 @@ z      <Header className="header-layout bg-white dark:bg-gray-900 border-b borde
       </Content>
 
       {/* Enhanced Footer */}
-      <Footer className="bg-gray-900 dark:bg-black text-white section-padding">
+      <Footer className="bg-gray-900 dark:bg-black text-white py-16">
         <div className="container">
           <Row gutter={[48, 48]}>
-            <Col xs={24} md={8}>
-              <div className="space-y-8">
-                <div className="sidebar-logo">
-                  <div className="logo-icon">
-                    <RobotOutlined />
-                  </div>
-                  <div className="logo-content">
-                    <Title level={2} className="logo-text text-white mb-0">
-                      mirAI
-                    </Title>
-                    <div className="logo-subtitle text-gray-400">Interview Platform</div>
-                  </div>
+            <Col xs={24} sm={12} lg={8}>
+              <div className="landing-logo mb-6">
+                <div className="landing-logo-icon">
+                  <RobotOutlined />
                 </div>
-                <Paragraph className="text-gray-400 leading-relaxed text-lg">
-                  AI-powered interview platform helping companies make better hiring decisions through intelligent
-                  automation and data-driven insights that transform recruitment.
-                </Paragraph>
-                <div className="flex space-x-4">
-                  {/* Social Media Icons */}
-                  <div className="w-12 h-12 bg-gray-800 hover:bg-indigo-600 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110">
-                    <GlobalOutlined className="text-white text-lg" />
-                  </div>
-                  <div
-                    className="w-12 h-12 bg-gray-800 hover:bg-indigo-600 rounded-xl flex items-center justify-
-center cursor-pointer transition-all duration-300 hover:scale-110"
-                  >
-                    <TeamOutlined className="text-white text-lg" />
-                  </div>
-                  <div className="w-12 h-12 bg-gray-800 hover:bg-indigo-600 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110">
-                    <StarOutlined className="text-white text-lg" />
-                  </div>
+                <div className="landing-logo-content">
+                  <span className="landing-logo-text text-white">mirAI</span>
+                  <span className="landing-logo-subtitle">Interview Platform</span>
+                </div>
+              </div>
+              <Paragraph className="text-gray-400 mb-6 leading-relaxed">
+                The future of AI-powered interviews. Transform your hiring process with intelligent automation and
+                data-driven insights.
+              </Paragraph>
+              <div className="flex space-x-4">
+                <Button
+                  type="text"
+                  icon={<HeartOutlined />}
+                  className="text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 rounded-lg"
+                >
+                  Made with ❤️
+                </Button>
+              </div>
+            </Col>
+            <Col xs={12} sm={6} lg={4}>
+              <Title level={5} className="text-white mb-6">
+                Product
+              </Title>
+              <div className="space-y-3">
+                <div>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    Features
+                  </a>
+                </div>
+                <div>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    Pricing
+                  </a>
+                </div>
+                <div>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    API
+                  </a>
+                </div>
+                <div>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    Integrations
+                  </a>
                 </div>
               </div>
             </Col>
-            <Col xs={24} md={16}>
-              <Row gutter={[32, 32]}>
-                <Col xs={12} sm={6}>
-                  <Title level={4} className="text-white mb-8 font-bold text-xl">
-                    Product
-                  </Title>
-                  <ul className="space-y-4">
-                    {["Features", "Pricing", "API Documentation", "Integrations", "Security"].map((item) => (
-                      <li key={item}>
-                        <a
-                          href="#"
-                          className="text-gray-400 hover:text-white transition-colors duration-300 font-medium text-base hover:underline"
-                        >
-                          {item}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </Col>
-                <Col xs={12} sm={6}>
-                  <Title level={4} className="text-white mb-8 font-bold text-xl">
-                    Company
-                  </Title>
-                  <ul className="space-y-4">
-                    {["About Us", "Blog", "Careers", "Press", "Partners"].map((item) => (
-                      <li key={item}>
-                        <a
-                          href="#"
-                          className="text-gray-400 hover:text-white transition-colors duration-300 font-medium text-base hover:underline"
-                        >
-                          {item}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </Col>
-                <Col xs={12} sm={6}>
-                  <Title level={4} className="text-white mb-8 font-bold text-xl">
-                    Support
-                  </Title>
-                  <ul className="space-y-4">
-                    {["Help Center", "Contact Support", "Status Page", "Community", "Training"].map((item) => (
-                      <li key={item}>
-                        <a
-                          href="#"
-                          className="text-gray-400 hover:text-white transition-colors duration-300 font-medium text-base hover:underline"
-                        >
-                          {item}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </Col>
-                <Col xs={12} sm={6}>
-                  <Title level={4} className="text-white mb-8 font-bold text-xl">
-                    Legal
-                  </Title>
-                  <ul className="space-y-4">
-                    {["Privacy Policy", "Terms of Service", "Cookie Policy", "GDPR", "Compliance"].map((item) => (
-                      <li key={item}>
-                        <a
-                          href="#"
-                          className="text-gray-400 hover:text-white transition-colors duration-300 font-medium text-base hover:underline"
-                        >
-                          {item}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </Col>
-              </Row>
+            <Col xs={12} sm={6} lg={4}>
+              <Title level={5} className="text-white mb-6">
+                Company
+              </Title>
+              <div className="space-y-3">
+                <div>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    About
+                  </a>
+                </div>
+                <div>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    Blog
+                  </a>
+                </div>
+                <div>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    Careers
+                  </a>
+                </div>
+                <div>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    Contact
+                  </a>
+                </div>
+              </div>
+            </Col>
+            <Col xs={24} sm={12} lg={8}>
+              <Title level={5} className="text-white mb-6">
+                Stay Updated
+              </Title>
+              <Paragraph className="text-gray-400 mb-4">
+                Get the latest updates on new features and industry insights.
+              </Paragraph>
+              <div className="flex space-x-3">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
+                />
+                <Button type="primary" className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 border-0 rounded-lg">
+                  Subscribe
+                </Button>
+              </div>
             </Col>
           </Row>
-
-          <Divider className="border-gray-700 my-16" />
-
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
-            <Paragraph className="text-gray-400 mb-0 text-base">
-              © 2024 mirAI Interview Platform. All rights reserved.
-            </Paragraph>
-            <div className="flex items-center space-x-8 text-gray-400 text-base">
-              <span>Made with</span>
-              <HeartOutlined className="text-red-500 text-lg" />
-              <span>for better hiring</span>
+          <Divider className="border-gray-700 my-12" />
+          <div className="flex flex-col sm:flex-row justify-between items-center">
+            <div className="text-gray-400 text-sm mb-4 sm:mb-0">
+              © 2024 mirAI. All rights reserved. Built with ❤️ for better hiring.
+            </div>
+            <div className="flex space-x-6 text-sm">
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                Privacy Policy
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                Terms of Service
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                Cookie Policy
+              </a>
             </div>
           </div>
         </div>
