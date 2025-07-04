@@ -78,6 +78,7 @@ const UserDashboard: React.FC = () => {
   const [jobsModalVisible, setJobsModalVisible] = useState(false)
   const [profileForm] = Form.useForm()
   const [settingsForm] = Form.useForm()
+  const [startingInterview, setStartingInterview] = useState<number | null>(null)
   const navigate = useNavigate()
   const { user, logout } = useAuth()
 
@@ -281,6 +282,32 @@ const UserDashboard: React.FC = () => {
     ],
   }
 
+  // Fixed interview start function - single request flow
+  const handleStartInterview = async (postulacionId: number) => {
+    if (startingInterview === postulacionId) return // Prevent double clicks
+    
+    setStartingInterview(postulacionId)
+    
+    try {
+      message.loading("Starting your interview...", 0)
+
+      // Single request to start interview - this will update status and generate questions
+      await postulacionAPI.iniciarEntrevista(postulacionId)
+
+      message.destroy()
+      message.success("Interview started successfully!")
+
+      // Navigate to interview page
+      navigate(`/usuario/interview/${postulacionId}`)
+    } catch (error: any) {
+      console.error("Error starting interview:", error)
+      message.destroy()
+      message.error("Error starting interview. Please try again.")
+    } finally {
+      setStartingInterview(null)
+    }
+  }
+
   const applicationColumns = [
     {
       title: "Job",
@@ -344,23 +371,10 @@ const UserDashboard: React.FC = () => {
             <Button
               type="primary"
               size="small"
-              icon={<PlayCircleOutlined />}
+              icon={startingInterview === record.id ? <LoadingOutlined /> : <PlayCircleOutlined />}
               className="btn-gradient"
-              onClick={async () => {
-                try {
-                  message.loading("Starting your interview...", 1)
-
-                  // Use the new specific endpoint to start the interview
-                  await postulacionAPI.iniciarEntrevista(record.id!)
-
-                  setTimeout(() => {
-                    navigate(`/usuario/interview/${record.id}`)
-                  }, 1000)
-                } catch (error: any) {
-                  console.error("Error starting interview:", error)
-                  message.error("Error starting interview. Please try again.")
-                }
-              }}
+              loading={startingInterview === record.id}
+              onClick={() => handleStartInterview(record.id!)}
             >
               Start Interview
             </Button>
@@ -468,20 +482,21 @@ const UserDashboard: React.FC = () => {
       }
 
       message.destroy()
-      message.loading("Starting your interview...", 0)
+      message.success("Application submitted successfully!")
 
-      // Start the interview using the specific endpoint
-      await postulacionAPI.iniciarEntrevista(newApplicationId)
-
-      message.destroy()
-      message.success("Application submitted and interview started!")
-
-      // Close modal and redirect
+      // Close modal and refresh data
       setApplyModalVisible(false)
       setSelectedJob(null)
+      await loadDashboardData()
 
-      // Redirect to interview page
-      navigate(`/usuario/interview/${newApplicationId}`)
+      // Ask if user wants to start interview immediately
+      Modal.confirm({
+        title: "Start Interview Now?",
+        content: "Would you like to start your interview immediately?",
+        okText: "Start Interview",
+        cancelText: "Later",
+        onOk: () => handleStartInterview(newApplicationId),
+      })
     } catch (error: any) {
       console.error("Error in application process:", error)
       message.destroy()
@@ -638,7 +653,7 @@ const UserDashboard: React.FC = () => {
             </div>
 
             <div className="header-right">
-              <Space size="middle" className="header-actions">
+              <Space size="large" className="header-actions">
                 <Button
                   icon={<SearchOutlined />}
                   className="action-button"
@@ -949,7 +964,7 @@ const UserDashboard: React.FC = () => {
             icon={applying ? <LoadingOutlined /> : <SendOutlined />}
             disabled={applying}
           >
-            {applying ? "Processing..." : "Apply & Start Interview"}
+            {applying ? "Processing..." : "Apply Now"}
           </Button>,
         ]}
         className="enhanced-modal"
@@ -983,7 +998,7 @@ const UserDashboard: React.FC = () => {
                 </Text>
               </div>
               <Text className="process-description">
-                After submitting your application, you'll be immediately redirected to start your AI-powered interview.
+                After submitting your application, you'll be able to start your AI-powered interview immediately or later.
                 The interview is personalized based on the job requirements and typically takes 30-60 minutes.
               </Text>
             </div>
@@ -996,13 +1011,12 @@ const UserDashboard: React.FC = () => {
                 </Text>
               </div>
               <Text className="warning-description">
-                You can only apply once per position. Make sure you're ready to start the interview immediately after
-                applying.
+                You can only apply once per position. Make sure you're ready to start the interview process.
               </Text>
             </div>
 
             <Text className="confirmation-text">
-              Are you ready to apply for this position and begin your interview?
+              Are you ready to apply for this position?
             </Text>
           </div>
         )}
