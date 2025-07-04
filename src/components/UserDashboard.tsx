@@ -450,6 +450,7 @@ const UserDashboard: React.FC = () => {
     },
   ]
 
+  // Fixed Apply to Job function - creates application then starts interview
   const handleApplyToJob = async () => {
     if (!selectedJob || !user?.id) return
 

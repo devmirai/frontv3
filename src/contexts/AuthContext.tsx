@@ -111,29 +111,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'SET_LOADING', payload: false });
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (credentials: LoginCredentials): Promise<boolean> => {
     dispatch({ type: 'LOGIN_START' });
     
     try {
       // Call the API with the credentials
-      const response = await authAPI.login({ email, password });
+      const response = await authAPI.login(credentials);
       
-      // Get the JWT token from the response - updated to use 'jwt' key
+      // Get the JWT token from the response
       const jwtToken = response.data.jwt;
       
       if (!jwtToken) {
         throw new Error('No token received from server');
       }
       
-      // Use the decoded token and response data to create the user object
+      // Decode the JWT token to get user information
       const decodedToken: any = jwtDecode(jwtToken);
       
+      // Map role from JWT format to our enum
+      let userRole: Rol;
+      switch (decodedToken.role) {
+        case 'ROLE_USUARIO':
+          userRole = Rol.USUARIO;
+          break;
+        case 'ROLE_EMPRESA':
+          userRole = Rol.EMPRESA;
+          break;
+        case 'ROLE_ADMIN':
+          userRole = Rol.ADMIN;
+          break;
+        default:
+          userRole = Rol.USUARIO; // fallback
+      }
+
       // Create user object from JWT data
       const user: User = {
         id: decodedToken.userId,
         email: decodedToken.sub, // sub contains the email
-        name: `${decodedToken.nombre} ${decodedToken.apellidoPaterno} ${decodedToken.apellidoMaterno}`,
-        role: decodedToken.role === 'ROLE_USUARIO' ? Rol.USUARIO : Rol.EMPRESA,
+        name: `${decodedToken.nombre} ${decodedToken.apellidoPaterno} ${decodedToken.apellidoMaterno || ''}`.trim(),
+        role: userRole,
         telefono: decodedToken.telefono,
         apellidoPaterno: decodedToken.apellidoPaterno,
         apellidoMaterno: decodedToken.apellidoMaterno,
