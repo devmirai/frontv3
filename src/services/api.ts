@@ -1,6 +1,5 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 
-// API Base URL - Update this to match your backend
 const API_BASE_URL = 'http://localhost:8081/api';
 const AUTH_BASE_URL = 'http://localhost:8081';
 
@@ -11,7 +10,6 @@ const api = axios.create({
   },
 });
 
-// Create a separate instance for auth endpoints
 const authAxios = axios.create({
   baseURL: AUTH_BASE_URL,
   headers: {
@@ -19,12 +17,10 @@ const authAxios = axios.create({
   },
 });
 
-// Request interceptor to add auth token if available - Applied to both instances
-// Using InternalAxiosRequestConfig instead of AxiosRequestConfig for Axios v1.x
+
 const addAuthToken = (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
   const token = localStorage.getItem('mirai_token');
   if (token) {
-    // In Axios v1.x, headers is already guaranteed to exist
     config.headers.Authorization = `Bearer ${token}`;
     console.log('Adding token to request:', config.url);
   }
@@ -41,7 +37,6 @@ authAxios.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for error handling
 const handleErrors = (error: any) => {
   if (error.response?.status === 401) {
     localStorage.removeItem('mirai_token');
@@ -61,15 +56,11 @@ authAxios.interceptors.response.use(
   handleErrors
 );
 
-// Auth API using the auth instance
 export const authAPI = {
   login: (credentials: { email: string; password: string }) => 
-    // Use the exact URL provided
     axios.post('http://localhost:8081/auth/login', credentials),
-  // You might add more auth-related endpoints here
 };
 
-// Usuario API
 export const usuarioAPI = {
   create: (data: any) => api.post('/usuario', data),
   getAll: () => api.get('/usuario'),
@@ -79,7 +70,6 @@ export const usuarioAPI = {
   delete: (id: number) => api.delete(`/usuario/${id}`),
 };
 
-// Empresa API
 export const empresaAPI = {
   create: (data: any) => api.post('/empresa', data),
   getAll: () => api.get('/empresa'),
@@ -89,7 +79,6 @@ export const empresaAPI = {
   delete: (id: number) => api.delete(`/empresa/${id}`),
 };
 
-// Convocatoria API
 export const convocatoriaAPI = {
   create: (data: any) => api.post('/convocatorias', data),
   getAll: () => api.get('/convocatorias'),
@@ -100,7 +89,6 @@ export const convocatoriaAPI = {
   delete: (id: number) => api.delete(`/convocatorias/${id}`),
 };
 
-// Postulacion API
 export const postulacionAPI = {
   create: (data: any) => api.post('/postulaciones', data),
   getAll: () => api.get('/postulaciones'),
@@ -110,20 +98,20 @@ export const postulacionAPI = {
   update: (id: number, data: any) => api.put(`/postulaciones/${id}`, data),
   delete: (id: number) => api.delete(`/postulaciones/${id}`),
   
-  // New specific endpoints for better legibility
   iniciarEntrevista: (id: number) => 
     api.patch(`/postulaciones/${id}/iniciar-entrevista`),
   
   completarEntrevista: (id: number) => 
     api.patch(`/postulaciones/${id}/completar-entrevista`),
   
-  // Company-only endpoint for changing status
   actualizarEstado: (id: number, estado: string) => 
-    api.patch(`/postulaciones/${id}/estado`, { estado }),
+    api.patch(`/api/postulaciones/${id}/estado`, { estado }),
+    
+  marcarPreguntasGeneradas: (id: number, generadas: boolean) => 
+    api.patch(`/postulaciones/${id}/marcar-preguntas-generadas`, { generadas }),
   
-  // Existing endpoints
   getByEstado: (estado: string) => 
-    api.get(`/postulaciones/estado/${estado}`),
+    api.get(`/api/postulaciones/estado/${estado}`),
     
   getByUsuarioYEstado: (usuarioId: number, estado: string) => 
     api.get(`/postulaciones/usuario/${usuarioId}/estado/${estado}`),
@@ -132,7 +120,6 @@ export const postulacionAPI = {
     api.get(`/postulaciones/convocatoria/${convocatoriaId}/estado/${estado}`),
 };
 
-// Pregunta API
 export const preguntaAPI = {
   generar: (data: { idPostulacion: number }) => api.post('/preguntas/generar', data),
   getAll: () => api.get('/preguntas'),
@@ -140,7 +127,6 @@ export const preguntaAPI = {
   getByPostulacion: (postulacionId: number) => api.get(`/preguntas/postulacion/${postulacionId}`),
 };
 
-// Evaluacion API - Updated to match your backend endpoints
 export const evaluacionAPI = {
   evaluar: (data: { 
     preguntaId: number; 

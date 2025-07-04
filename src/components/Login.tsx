@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 import { useState } from "react"
 import { Form, Input, Button, Card, Typography, Alert, Row, Col, Divider } from "antd"
@@ -23,8 +21,7 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { useTheme } from "../contexts/ThemeContext"
 import "../styles/login.css"
-import axios from "axios"
-import { jwtDecode } from "jwt-decode"
+import { Rol } from "../types/api" // Add this import
 
 const { Title, Paragraph } = Typography
 
@@ -55,43 +52,33 @@ const Login: React.FC = () => {
     setError("")
 
     try {
-      // Make direct API call to auth endpoint
-      const response = await axios.post('http://localhost:8081/auth/login', {
+      // Use the login function from AuthContext instead of direct axios call
+      const success = await login({
         email: values.email,
         password: values.password
       })
 
-      // Extract JWT token from response
-      const jwtToken = response.data.jwt
-      
-      if (!jwtToken) {
-        setError("Authentication failed: No token received")
-        setLoading(false)
-        return
+      if (success) {
+        // Get the user data from localStorage to ensure we have the latest data
+        const userDataStr = localStorage.getItem('mirai_user');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          
+          // Navigate based on user role
+          if (userData.role === Rol.ADMIN) {
+            navigate('/admin/dashboard');
+          } else if (userData.role === Rol.EMPRESA) {
+            navigate('/empresa/dashboard');
+          } else {
+            navigate('/usuario/dashboard');
+          }
+        } else {
+          // Fallback navigation
+          navigate('/dashboard');
+        }
+      } else {
+        setError("Authentication failed. Please check your credentials and try again.")
       }
-      
-      // Decode the JWT token to get user information
-      const decodedToken = jwtDecode(jwtToken)
-      
-      // Create user object from JWT data
-      const user = {
-        id: decodedToken.userId,
-        email: decodedToken.sub,
-        name: `${decodedToken.nombre} ${decodedToken.apellidoPaterno} ${decodedToken.apellidoMaterno}`,
-        role: decodedToken.role === 'ROLE_USUARIO' ? 'USUARIO' : 'EMPRESA',
-        telefono: decodedToken.telefono,
-        apellidoPaterno: decodedToken.apellidoPaterno,
-        apellidoMaterno: decodedToken.apellidoMaterno,
-        nacimiento: decodedToken.nacimiento,
-      }
-
-      // Store token and user data in localStorage
-      localStorage.setItem('mirai_token', jwtToken)
-      localStorage.setItem('mirai_user', JSON.stringify(user))
-
-      // Update auth context and navigate to dashboard
-      navigate("/dashboard")
-      
     } catch (err) {
       console.error("Login error:", err)
       setError("Login failed. Please check your credentials and try again.")
@@ -145,15 +132,31 @@ const Login: React.FC = () => {
   }
 
   const floatingVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
+    hidden: { opacity: 0, scale: 0.8, y: 20 },
     visible: {
       opacity: 1,
       scale: 1,
+      y: 0,
       transition: {
         duration: 0.8,
         ease: [0.4, 0, 0.2, 1],
       },
     },
+    hover: {
+      scale: 1.05,
+      y: -5,
+      boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+      transition: { duration: 0.3 }
+    },
+    floating: {
+      y: [0, -8, 0],
+      transition: {
+        duration: 3,
+        repeat: Infinity,
+        repeatType: "reverse",
+        ease: "easeInOut"
+      }
+    }
   }
 
   return (
@@ -204,7 +207,8 @@ const Login: React.FC = () => {
                       style={{ top: "15%", right: "-8%" }}
                       variants={floatingVariants}
                       initial="hidden"
-                      animate="visible"
+                      animate={["visible", "floating"]}
+                      whileHover="hover"
                       transition={{ delay: 0.8 }}
                     >
                       <div className="login-hero-floating-card-content">
@@ -220,7 +224,8 @@ const Login: React.FC = () => {
                       style={{ bottom: "15%", left: "-8%" }}
                       variants={floatingVariants}
                       initial="hidden"
-                      animate="visible"
+                      animate={["visible", "floating"]}
+                      whileHover="hover"
                       transition={{ delay: 1.0 }}
                     >
                       <div className="login-hero-floating-card-content">

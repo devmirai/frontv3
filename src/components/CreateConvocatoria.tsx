@@ -192,6 +192,7 @@ const CreateConvocatoria: React.FC = () => {
                             placeholder="Ej: Desarrollador Full Stack Senior"
                             size="large"
                             className="rounded-lg"
+                            autoComplete="on"
                           />
                         </Form.Item>
                       </Col>
@@ -210,6 +211,7 @@ const CreateConvocatoria: React.FC = () => {
                         rows={4}
                         placeholder="Describe las responsabilidades principales, el ambiente de trabajo y lo que hace atractivo este puesto..."
                         className="rounded-lg"
+                        autoComplete="on"
                       />
                     </Form.Item>
 
@@ -226,6 +228,7 @@ const CreateConvocatoria: React.FC = () => {
                         rows={6}
                         placeholder="Detalle las tecnologías, experiencia requerida, habilidades técnicas, conocimientos específicos, años de experiencia, metodologías, herramientas, etc..."
                         className="rounded-lg"
+                        autoComplete="on"
                       />
                     </Form.Item>
                   </div>

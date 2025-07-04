@@ -652,12 +652,46 @@
   font-weight: 600 !important;
 }
 
+.job-description-container {
+  border-left: 3px solid var(--gray-200);
+  padding-left: 12px;
+  margin: 8px 0;
+}
+
+.dark .job-description-container {
+  border-left-color: var(--gray-600);
+}
+
 .job-description {
   font-size: 13px !important;
   line-height: 1.5 !important;
   color: var(--text-secondary) !important;
-  margin: 0 !important;
-  flex: 1;
+  display: block;
+  width: 100%;
+  height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.job-description-container {
+  border-left: 3px solid var(--gray-200);
+  padding-left: 12px;
+  margin: 8px 0;
+}
+
+.dark .job-description-container {
+  border-left-color: var(--gray-600);
+}
+
+.job-description {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  color: var(--text-secondary) !important;
+  display: block;
+  width: 100%;
+  height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .job-footer {

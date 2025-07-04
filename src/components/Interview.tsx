@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Layout,
   Card,
@@ -81,6 +81,9 @@ const Interview: React.FC = () => {
   const { id } = useParams()
   const { user } = useAuth()
 
+  // Add a ref to track if we've initiated question generation
+  const questionGenerationInitiated = useRef(false);
+
   useEffect(() => {
     loadInterviewData()
   }, [id])
@@ -133,6 +136,15 @@ const Interview: React.FC = () => {
   }
 
   const generateQuestions = async (postulacionData: Postulacion) => {
+    // If we've already initiated question generation in this session, skip
+    if (questionGenerationInitiated.current) {
+      console.log("Question generation already initiated, skipping")
+      return
+    }
+    
+    // Mark that we've initiated question generation
+    questionGenerationInitiated.current = true;
+    
     try {
       setLoading(true)
       
@@ -146,6 +158,43 @@ const Interview: React.FC = () => {
         throw new Error("Postulation ID is missing")
       }
 
+      // Check if questions already exist for this postulation
+      try {
+        const existingResponse = await preguntaAPI.getByPostulacion(postulacionData.id)
+        const existingQuestionsData = existingResponse.data || []
+        
+        if (existingQuestionsData.length > 0) {
+          console.log("Using existing questions", existingQuestionsData)
+          
+          // Map existing questions to ensure they have the expected structure
+          const existingQuestions = existingQuestionsData.map(q => ({
+            id: q.id,
+            texto: q.textoPregunta || q.pregunta || q.texto || q.question || "Question not available",
+            tipo: q.tipoLegible || q.tipo || q.type || "Technical",
+            dificultad: q.dificultad || 5,
+            postulacion: postulacionData,
+          }))
+          
+          setQuestions(existingQuestions)
+          setAnswers(new Array(existingQuestions.length).fill(""))
+          setCurrentQuestion(0)
+          
+          message.success({
+            content: "Interview questions loaded!",
+            key: "questionGeneration",
+          })
+          return
+        }
+      } catch (error) {
+        console.log("No existing questions found, will generate new ones")
+      }
+
+      // Mark questions as being generated BEFORE generating them
+      // This prevents race conditions with parallel API calls
+      await postulacionAPI.marcarPreguntasGeneradas(postulacionData.id, true)
+
+      // Only generate new questions if none exist
+      console.log(`Generating new questions for postulation ${postulacionData.id}`)
       const response = await preguntaAPI.generar({ idPostulacion: postulacionData.id })
 
       if (response.data && response.data.success && Array.isArray(response.data.questions)) {
@@ -159,19 +208,12 @@ const Interview: React.FC = () => {
 
         setQuestions(generatedQuestions)
         setAnswers(new Array(generatedQuestions.length).fill(""))
+        setCurrentQuestion(0)
+        
         message.success({
           content: response.data.mensaje || "Interview questions ready!",
           key: "questionGeneration",
         })
-
-        // Use the new specific endpoint to start the interview
-        if (postulacionData.estado === EstadoPostulacion.PENDIENTE && postulacionData.id) {
-          try {
-            await postulacionAPI.iniciarEntrevista(postulacionData.id)
-          } catch (statusError) {
-            console.error("Error starting interview:", statusError)
-          }
-        }
       } else {
         throw new Error("Invalid response format from question generation API")
       }
@@ -179,7 +221,7 @@ const Interview: React.FC = () => {
       console.error("Error generating questions:", error)
       message.error({
         content:
-          "Error generating interview questions: " +
+          "Error generating questions: " +
           (error.response?.data?.message || error.message || "Please try again."),
         key: "questionGeneration",
         duration: 5,
@@ -263,16 +305,20 @@ const Interview: React.FC = () => {
         await postulacionAPI.completarEntrevista(postulacion.id)
       }
 
-      message.success("Interview completed successfully! Generating your results...")
-      setTimeout(() => {
-        navigate(`/usuario/interview/${id}/results`)
-      }, 2000)
+      message.success("Interview completed successfully! Redirecting to results...", 2)
+      
+      // Ensure we have the correct ID for navigation
+      const resultId = id || postulacion?.id
+      
+      // Navigate immediately rather than waiting
+      navigate(`/usuario/interview/${resultId}/results`, { replace: true })
     } catch (error) {
       console.error("Error completing interview:", error)
-      message.error("Error completing interview. Your answers were saved, but status update failed.")
-      setTimeout(() => {
-        navigate(`/usuario/interview/${id}/results`)
-      }, 3000)
+      message.error("Error completing interview. Your answers were saved.", 2)
+      
+      // Still navigate even if there's an error
+      const resultId = id || postulacion?.id
+      navigate(`/usuario/interview/${resultId}/results`, { replace: true })
     }
   }
 

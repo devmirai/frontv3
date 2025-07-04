@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
-
+/* Import dashboard styles */
+@import './styles/dashboard.css';
 * {
   margin: 0;
   padding: 0;
@@ -174,8 +175,7 @@ p {
   }
 }
 
-/* Import dashboard styles */
-@import './styles/dashboard.css';
+
 
 /* Notification Dropdown Styles */
 .notification-dropdown-overlay .ant-dropdown {

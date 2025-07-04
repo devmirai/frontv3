@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 import { useState, useEffect } from "react"
 import {
@@ -271,6 +269,7 @@ const UserDashboard: React.FC = () => {
         onClick: () => setSettingsDrawerVisible(true),
       },
       {
+        key: "divider",
         type: "divider",
       },
       {
@@ -284,25 +283,17 @@ const UserDashboard: React.FC = () => {
 
   // Fixed interview start function - single request flow
   const handleStartInterview = async (postulacionId: number) => {
-    if (startingInterview === postulacionId) return // Prevent double clicks
-    
-    setStartingInterview(postulacionId)
-    
     try {
-      message.loading("Starting your interview...", 0)
-
-      // Single request to start interview - this will update status and generate questions
+      setStartingInterview(postulacionId)
+      
+      // Update status first
       await postulacionAPI.iniciarEntrevista(postulacionId)
-
-      message.destroy()
-      message.success("Interview started successfully!")
-
+      
       // Navigate to interview page
       navigate(`/usuario/interview/${postulacionId}`)
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error starting interview:", error)
-      message.destroy()
-      message.error("Error starting interview. Please try again.")
+      message.error("Failed to start interview. Please try again.")
     } finally {
       setStartingInterview(null)
     }
@@ -580,9 +571,19 @@ const UserDashboard: React.FC = () => {
             defaultSelectedKeys={["dashboard"]}
             items={menuItems}
             className="enhanced-menu"
-            onClick={({ key, item }) => {
-              if (item?.props?.onClick) {
-                item.props.onClick()
+            onClick={(info) => {
+              // Use the info.key instead of accessing item directly
+              const clickedMenuItem = menuItems.find(item => {
+                if ('key' in item && item.key === info.key) {
+                  return item;
+                } else if ('children' in item) {
+                  return item.children?.find(child => 'key' in child && child.key === info.key);
+                }
+                return false;
+              });
+              
+              if (clickedMenuItem && 'onClick' in clickedMenuItem && typeof clickedMenuItem.onClick === 'function') {
+                clickedMenuItem.onClick();
               }
             }}
             style={{
@@ -665,7 +666,36 @@ const UserDashboard: React.FC = () => {
                 </Button>
                 <NotificationDropdown />
                 <ThemeToggle />
-                <Dropdown menu={userMenu} trigger={["click"]} placement="bottomRight">
+                <Dropdown 
+                  menu={{ 
+                    items: [
+                      {
+                        key: "profile",
+                        label: "Profile",
+                        icon: <UserOutlined />,
+                        onClick: () => setProfileModalVisible(true),
+                      },
+                      {
+                        key: "settings",
+                        label: "Settings",
+                        icon: <SettingOutlined />,
+                        onClick: () => setSettingsDrawerVisible(true),
+                      },
+                      {
+                        key: "divider",
+                        type: "divider",
+                      },
+                      {
+                        key: "logout",
+                        label: "Logout",
+                        icon: <LogoutOutlined />,
+                        onClick: logout,
+                      },
+                    ]
+                  }} 
+                  trigger={["click"]} 
+                  placement="bottomRight"
+                >
                   <Avatar src={user?.avatar} size="large" className="user-avatar" />
                 </Dropdown>
               </Space>
@@ -822,18 +852,20 @@ const UserDashboard: React.FC = () => {
                                   <Title level={5} className="job-title">
                                     {job.titulo}
                                   </Title>
-                                  <Text className="job-company">{job.empresa?.nombre}</Text>
-                                  <Tag color="blue" className="job-position">
-                                    {job.puesto}
-                                  </Tag>
+                                  <div className="job-meta">
+                                    <Text className="job-company">{job.empresa?.nombre}</Text>
+                                    <Tag color="blue" className="job-position">
+                                      {job.puesto}
+                                    </Tag>
+                                  </div>
                                 </div>
                               </div>
 
-                              <Paragraph className="job-description">
-                                {job.descripcion.length > 150
-                                  ? `${job.descripcion.substring(0, 150)}...`
-                                  : job.descripcion}
-                              </Paragraph>
+                              <div className="job-description-container">
+                                <Text ellipsis={{ tooltip: job.descripcion }} className="job-description">
+                                  {job.descripcion?.length > 100 ? `${job.descripcion.substring(0, 100)}...` : job.descripcion}
+                                </Text>
+                              </div>
 
                               <div className="job-footer">
                                 <Space>
