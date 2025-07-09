@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Layout,
   Button,
@@ -51,6 +51,100 @@ const Landing: React.FC = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
+  const [serviceStatus, setServiceStatus] = useState({
+    status: 'operational',
+    loading: true
+  });
+
+  // Smooth scroll function for navigation
+  const scrollToSection = (sectionId: string) => {
+    const element = document.querySelector(sectionId);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
+  // Function to get service status from OpenAI
+  const getServiceStatus = async () => {
+    try {
+      const response = await fetch('https://status.openai.com/api/v2/components.json');
+      const data = await response.json();
+      
+      // Find the Chat component
+      const chatComponent = data.components.find((component: any) => component.name === 'Chat');
+      
+      if (chatComponent) {
+        setServiceStatus({
+          status: chatComponent.status,
+          loading: false
+        });
+      } else {
+        setServiceStatus({
+          status: 'operational',
+          loading: false
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching service status:', error);
+      setServiceStatus({
+        status: 'operational',
+        loading: false
+      });
+    }
+  };
+
+  // Get status text and color based on status
+  const getStatusInfo = (status: string) => {
+    switch (status) {
+      case 'operational':
+        return {
+          text: 'All systems operational',
+          color: 'green',
+          dotClass: 'operational'
+        };
+      case 'degraded_performance':
+        return {
+          text: 'Degraded performance',
+          color: 'orange',
+          dotClass: 'degraded'
+        };
+      case 'partial_outage':
+        return {
+          text: 'Partial outage',
+          color: 'orange',
+          dotClass: 'partial-outage'
+        };
+      case 'major_outage':
+        return {
+          text: 'Major outage',
+          color: 'red',
+          dotClass: 'major-outage'
+        };
+      case 'under_maintenance':
+        return {
+          text: 'Under maintenance',
+          color: 'blue',
+          dotClass: 'maintenance'
+        };
+      default:
+        return {
+          text: 'Status unknown',
+          color: 'gray',
+          dotClass: 'unknown'
+        };
+    }
+  };
+
+  // Fetch service status on component mount
+  useEffect(() => {
+    getServiceStatus();
+    // Refresh status every 5 minutes
+    const interval = setInterval(getServiceStatus, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const features = [
     {
@@ -599,7 +693,7 @@ const Landing: React.FC = () => {
         </section>
 
         {/* Dynamic Performance Dashboard */}
-        <section className="performance-dashboard-section">
+        <section id="performance" className="performance-dashboard-section">
           <div className="dashboard-background">
             <div className="dashboard-grid-pattern"></div>
             <div className="dashboard-particle-field">
@@ -804,7 +898,7 @@ const Landing: React.FC = () => {
         </section>
 
         {/* Modern Features Carousel Section */}
-        <section className="features-carousel-section">
+        <section id="features" className="features-carousel-section">
           <div className="features-background">
             <div className="features-pattern"></div>
           </div>
@@ -912,7 +1006,7 @@ const Landing: React.FC = () => {
         </section>
 
         {/* Revolutionary Testimonials Showcase */}
-        <section className="testimonials-showcase-section">
+        <section id="testimonials" className="testimonials-showcase-section">
           <div className="testimonials-background">
             <div className="testimonials-pattern"></div>
             <div className="floating-elements">
@@ -1326,18 +1420,30 @@ const Landing: React.FC = () => {
               >
                 <h4 className="footer-nav-title">Platform</h4>
                 <div className="footer-nav-links">
-                  <a href="#features" className="footer-nav-link">
+                  <button 
+                    onClick={() => scrollToSection('#features')} 
+                    className="footer-nav-link"
+                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                  >
                     <BulbOutlined className="link-icon" />
                     <span>Features</span>
-                  </a>
-                  <a href="#performance" className="footer-nav-link">
+                  </button>
+                  <button 
+                    onClick={() => scrollToSection('#performance')} 
+                    className="footer-nav-link"
+                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                  >
                     <BarChartOutlined className="link-icon" />
                     <span>Performance</span>
-                  </a>
-                  <a href="#testimonials" className="footer-nav-link">
+                  </button>
+                  <button 
+                    onClick={() => scrollToSection('#testimonials')} 
+                    className="footer-nav-link"
+                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                  >
                     <HeartOutlined className="link-icon" />
                     <span>Customer Stories</span>
-                  </a>
+                  </button>
                 </div>
               </motion.div>
 
@@ -1350,14 +1456,14 @@ const Landing: React.FC = () => {
               >
                 <h4 className="footer-nav-title">Connect</h4>
                 <div className="footer-nav-links">
-                  <a
-                    href="#"
+                  <button
                     className="footer-nav-link"
                     onClick={() => navigate("/login")}
+                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', width: '100%', textAlign: 'left' }}
                   >
                     <UserOutlined className="link-icon" />
                     <span>Get Started</span>
-                  </a>
+                  </button>
                   <a href="#support" className="footer-nav-link">
                     <TeamOutlined className="link-icon" />
                     <span>Expert Consultation</span>
@@ -1431,8 +1537,10 @@ const Landing: React.FC = () => {
               <div className="footer-copyright">
                 <span>© 2024 mirAI. All rights reserved.</span>
                 <div className="footer-status">
-                  <div className="status-dot-footer"></div>
-                  <span>All systems operational</span>
+                  <div className={`status-dot-footer ${getStatusInfo(serviceStatus.status).dotClass}`}></div>
+                  <span style={{ color: getStatusInfo(serviceStatus.status).color }}>
+                    {serviceStatus.loading ? 'Checking status...' : getStatusInfo(serviceStatus.status).text}
+                  </span>
                 </div>
               </div>
 
