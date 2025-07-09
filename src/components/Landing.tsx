@@ -52,6 +52,9 @@ const Landing: React.FC = () => {
   const { isDarkMode } = useTheme();
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
 
+  const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
   const features = [
     {
       icon: <RobotOutlined className="text-6xl text-indigo-600" />,
@@ -59,6 +62,14 @@ const Landing: React.FC = () => {
       description:
         "Generate personalized technical and behavioral questions tailored to each role and candidate profile with advanced machine learning algorithms that adapt to your hiring needs.",
       color: "indigo",
+      category: "AI Intelligence",
+      capabilities: [
+        "Natural Language Processing",
+        "Dynamic Question Generation",
+        "Skill-Based Targeting",
+      ],
+      metrics: { accuracy: "96%", questions: "10K+", languages: "15+" },
+      demoFeature: "Smart Question Builder",
     },
     {
       icon: <BulbOutlined className="text-6xl text-emerald-600" />,
@@ -66,6 +77,14 @@ const Landing: React.FC = () => {
       description:
         "Advanced AI analyzes responses in real-time and provides detailed feedback on candidate performance, skills assessment, and cultural fit with comprehensive scoring metrics.",
       color: "emerald",
+      category: "Assessment",
+      capabilities: [
+        "Real-time Analysis",
+        "Behavioral Insights",
+        "Cultural Fit Scoring",
+      ],
+      metrics: { speed: "2.3s", accuracy: "94%", insights: "50+" },
+      demoFeature: "Live Response Analysis",
     },
     {
       icon: <ClockCircleOutlined className="text-6xl text-blue-600" />,
@@ -73,6 +92,14 @@ const Landing: React.FC = () => {
       description:
         "Conduct interviews on your schedule. Candidates can complete assessments at their convenience, saving valuable time for everyone while maintaining interview quality.",
       color: "blue",
+      category: "Scheduling",
+      capabilities: [
+        "Flexible Timing",
+        "Multi-timezone Support",
+        "Calendar Integration",
+      ],
+      metrics: { timeSaved: "75%", satisfaction: "98%", completion: "89%" },
+      demoFeature: "Schedule Demo",
     },
     {
       icon: <BarChartOutlined className="text-6xl text-purple-600" />,
@@ -80,6 +107,70 @@ const Landing: React.FC = () => {
       description:
         "Comprehensive analytics and insights dashboard to make informed hiring decisions quickly and efficiently with data-driven recommendations and performance tracking.",
       color: "purple",
+      category: "Analytics",
+      capabilities: [
+        "Performance Tracking",
+        "Predictive Analytics",
+        "Custom Reports",
+      ],
+      metrics: { dataPoints: "200+", reports: "25+", accuracy: "92%" },
+      demoFeature: "Analytics Preview",
+    },
+    {
+      icon: <SafetyOutlined className="text-6xl text-red-600" />,
+      title: "Security & Compliance",
+      description:
+        "Enterprise-grade security with end-to-end encryption, GDPR compliance, and SOC 2 Type II certification. Your data and candidate information is always protected.",
+      color: "red",
+      category: "Security",
+      capabilities: [
+        "End-to-end Encryption",
+        "GDPR Compliance",
+        "SOC 2 Certified",
+      ],
+      metrics: { uptime: "99.9%", compliance: "100%", certifications: "5+" },
+      demoFeature: "Security Overview",
+    },
+    {
+      icon: <GlobalOutlined className="text-6xl text-cyan-600" />,
+      title: "Global Integration",
+      description:
+        "Seamlessly integrate with your existing HR tools, ATS systems, and workflow management platforms. Support for 50+ integrations and custom API connections.",
+      color: "cyan",
+      category: "Integration",
+      capabilities: ["API Integration", "ATS Sync", "Webhook Support"],
+      metrics: { integrations: "50+", uptime: "99.8%", sync: "<1min" },
+      demoFeature: "Integration Hub",
+    },
+    {
+      icon: <TeamOutlined className="text-6xl text-orange-600" />,
+      title: "Collaborative Hiring",
+      description:
+        "Enable team-based decision making with shared evaluations, comment systems, and real-time collaboration tools. Perfect for distributed teams and panel interviews.",
+      color: "orange",
+      category: "Collaboration",
+      capabilities: [
+        "Team Evaluations",
+        "Real-time Comments",
+        "Decision Workflows",
+      ],
+      metrics: { teamSize: "20+", decisions: "3x faster", satisfaction: "96%" },
+      demoFeature: "Team Collaboration",
+    },
+    {
+      icon: <ThunderboltOutlined className="text-6xl text-yellow-600" />,
+      title: "AI Video Analysis",
+      description:
+        "Advanced computer vision analyzes candidate video responses for communication skills, engagement levels, and non-verbal cues with privacy-first approach.",
+      color: "yellow",
+      category: "Video Intelligence",
+      capabilities: [
+        "Facial Expression Analysis",
+        "Speech Patterns",
+        "Engagement Metrics",
+      ],
+      metrics: { accuracy: "91%", processing: "Real-time", privacy: "100%" },
+      demoFeature: "Video AI Demo",
     },
   ];
 
