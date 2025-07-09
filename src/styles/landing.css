@@ -1194,4 +1194,54 @@
   .volume-card {
     left: -24px;
   }
+
+  /* Trust section responsive adjustments */
+  .hero-trust-section {
+    gap: 16px;
+  }
+
+  .trust-badge {
+    padding: 16px 20px;
+    border-radius: 16px;
+    gap: 12px;
+  }
+
+  .trust-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  .trust-icon {
+    font-size: 16px;
+  }
+
+  .trust-stat {
+    font-size: 20px;
+  }
+
+  .trust-label {
+    font-size: 12px;
+  }
+
+  .trust-description {
+    font-size: 11px;
+  }
+
+  .trust-indicators {
+    gap: 12px;
+  }
+
+  .indicator-item {
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+
+  .indicator-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    font-size: 10px;
+  }
 }
