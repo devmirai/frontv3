@@ -179,50 +179,37 @@
   color: #34d399;
 }
 
-/* Header Actions */
-.landing-header-actions {
+/* Streamlined Header Actions */
+.landing-header-actions-simple {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: 16px;
 }
 
-.landing-action-button {
-  height: 44px !important;
-  padding: 0 var(--spacing-lg) !important;
-  border-radius: var(--border-radius) !important;
-  font-weight: 600 !important;
+.landing-signin-simple {
+  height: 40px !important;
+  padding: 0 16px !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--gray-600) !important;
+  font-weight: 500 !important;
   font-size: 14px !important;
-  transition: var(--transition) !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--spacing-xs) !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
 }
 
-.landing-signin-button {
-  border: 2px solid var(--gray-300) !important;
-  background: white !important;
-  color: var(--gray-700) !important;
-}
-
-.landing-signin-button:hover {
-  border-color: var(--primary-color) !important;
-  color: var(--primary-color) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: var(--shadow-md) !important;
-}
-
-.dark .landing-signin-button {
-  border-color: var(--gray-600) !important;
-  background: var(--gray-800) !important;
+.dark .landing-signin-simple {
   color: var(--gray-300) !important;
 }
 
-.dark .landing-signin-button:hover {
-  border-color: var(--primary-color) !important;
+.landing-signin-simple:hover {
+  background: rgba(99, 102, 241, 0.1) !important;
   color: var(--primary-color) !important;
 }
 
-.landing-cta-button {
+.landing-cta-simple {
+  height: 40px !important;
+  padding: 0 20px !important;
   background: linear-gradient(
     135deg,
     var(--primary-color),
@@ -230,12 +217,16 @@
   ) !important;
   border: none !important;
   color: white !important;
-  box-shadow: var(--shadow-lg) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
+  transition: all 0.3s ease !important;
   position: relative !important;
   overflow: hidden !important;
 }
 
-.landing-cta-button::before {
+.landing-cta-simple::before {
   content: "";
   position: absolute;
   top: 0;
@@ -251,40 +242,15 @@
   transition: left 0.5s;
 }
 
-.landing-cta-button:hover::before {
+.landing-cta-simple:hover::before {
   left: 100%;
 }
 
-.landing-cta-button:hover {
+.landing-cta-simple:hover {
   background: linear-gradient(135deg, var(--primary-hover), #7c3aed) !important;
   color: white !important;
-  transform: translateY(-3px) !important;
-  box-shadow: var(--shadow-2xl) !important;
-}
-
-.landing-menu-button {
-  width: 44px !important;
-  height: 44px !important;
-  border-radius: var(--border-radius) !important;
-  border: 2px solid var(--gray-300) !important;
-  background: white !important;
-  color: var(--gray-700) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: var(--transition) !important;
-}
-
-.landing-menu-button:hover {
-  border-color: var(--primary-color) !important;
-  color: var(--primary-color) !important;
-  transform: scale(1.05) !important;
-}
-
-.dark .landing-menu-button {
-  border-color: var(--gray-600) !important;
-  background: var(--gray-800) !important;
-  color: var(--gray-300) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
 }
 
 /* Mobile Drawer */
