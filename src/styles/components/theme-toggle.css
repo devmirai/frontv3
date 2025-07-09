@@ -1,0 +1,33 @@
+/* Theme Toggle Component Styles */
+
+.theme-toggle {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--gray-300) !important;
+  background: white !important;
+  color: var(--gray-700) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+.theme-toggle:hover {
+  border-color: var(--primary-color) !important;
+  color: var(--primary-color) !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dark .theme-toggle {
+  border-color: var(--gray-600) !important;
+  background: var(--gray-800) !important;
+  color: var(--gray-300) !important;
+}
+
+.dark .theme-toggle:hover {
+  border-color: var(--primary-color) !important;
+  color: var(--primary-color) !important;
+}

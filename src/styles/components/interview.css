@@ -1,0 +1,179 @@
+/* Interview Component Styles */
+
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.dark .loading-screen {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.loading-content {
+  text-align: center;
+  max-width: 500px;
+  padding: var(--spacing-xl);
+}
+
+.loading-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 36px;
+  margin: 0 auto var(--spacing-lg);
+  animation: pulse 2s infinite;
+}
+
+.loading-title {
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  margin-bottom: var(--spacing-md) !important;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.loading-message {
+  font-size: 16px !important;
+  color: var(--text-secondary) !important;
+  margin-bottom: var(--spacing-lg) !important;
+  line-height: 1.6 !important;
+}
+
+.loading-progress {
+  margin-bottom: var(--spacing-lg);
+}
+
+.loading-tips {
+  background: rgba(99, 102, 241, 0.05);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  text-align: left;
+}
+
+.loading-tips-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-sm);
+}
+
+.loading-tips-text {
+  font-size: 14px !important;
+  color: var(--text-secondary) !important;
+  margin: 0 !important;
+  line-height: 1.5 !important;
+}
+
+.interview-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.progress-container {
+  background: white !important;
+  border: 1px solid var(--gray-200) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden !important;
+}
+
+.dark .progress-container {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.question-card {
+  background: white !important;
+  border: 1px solid var(--gray-200) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden !important;
+}
+
+.dark .question-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.mirabot-avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.ai-message {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.stats-card {
+  background: white !important;
+  border: 1px solid var(--gray-200) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease !important;
+}
+
+.dark .stats-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+@media (max-width: 768px) {
+  .interview-container {
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+
+  .loading-content {
+    padding: var(--spacing-lg);
+  }
+
+  .loading-icon {
+    width: 64px;
+    height: 64px;
+    font-size: 28px;
+  }
+
+  .loading-title {
+    font-size: 24px !important;
+  }
+
+  .loading-message {
+    font-size: 14px !important;
+  }
+}

@@ -1,0 +1,105 @@
+/* Form Component Styles */
+
+.enhanced-form .ant-form-item-label > label {
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  font-size: 13px !important;
+}
+
+.enhanced-input,
+.enhanced-textarea,
+.enhanced-select {
+  border-radius: 8px !important;
+  border: 1px solid var(--gray-200) !important;
+  transition: all 0.3s ease !important;
+  font-size: 13px !important;
+}
+
+.enhanced-input:focus,
+.enhanced-textarea:focus,
+.enhanced-select:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1) !important;
+}
+
+.enhanced-input:hover,
+.enhanced-textarea:hover,
+.enhanced-select:hover {
+  border-color: var(--primary-light) !important;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  margin: 0 0 12px 0 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  font-size: 11px !important;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.dark .setting-item {
+  background: #334155;
+  border-color: #475569;
+}
+
+.setting-item:hover {
+  background: var(--gray-100);
+  border-color: var(--primary-color);
+}
+
+.dark .setting-item:hover {
+  background: #475569;
+}
+
+.setting-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.setting-description {
+  font-size: 11px !important;
+  color: var(--text-secondary) !important;
+  margin: 2px 0 0 0 !important;
+  line-height: 1.3 !important;
+}
+
+.setting-toggle {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.privacy-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+}
+
+.dark .privacy-setting {
+  background: #334155;
+  border-color: #475569;
+}

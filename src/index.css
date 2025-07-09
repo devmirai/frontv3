@@ -1,44 +1,25 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-    "Droid Sans", "Helvetica Neue", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* Main CSS Entry Point */
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
-}
+/* Import global styles first */
+@import './styles/globals.css';
 
-#root {
-  min-height: 100vh;
-}
+/* Import layout styles */
+@import './styles/layout/main.css';
+@import './styles/layout/header.css';
 
-/* Dark mode support */
-html[data-theme="dark"] {
-  color-scheme: dark;
-}
+/* Import component styles */
+@import './styles/components/buttons.css';
+@import './styles/components/forms.css';
+@import './styles/components/modals.css';
+@import './styles/components/theme-toggle.css';
+@import './styles/components/notifications.css';
+@import './styles/components/interview.css';
 
-html[data-theme="dark"] body {
-  background-color: #141414;
-  color: rgba(255, 255, 255, 0.85);
-}
+/* Import dashboard styles (keeping existing import for compatibility) */
+@import './styles/dashboard.css';
 
-/* Custom styles for better appearance */
-.ant-layout {
-  min-height: 100vh;
-}
+/* Import landing styles (keeping existing import for compatibility) */
+@import './styles/landing.css';
 
-.ant-card {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.ant-btn-primary {
-  background-color: #1890ff;
-  border-color: #1890ff;
-}
-
-.ant-btn-primary:hover {
-  background-color: #40a9ff;
-  border-color: #40a9ff;
-}
+/* Import login styles (keeping existing import for compatibility) */
+@import './styles/login.css';

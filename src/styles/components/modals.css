@@ -1,0 +1,103 @@
+/* Modal Component Styles */
+
+.enhanced-modal .ant-modal-content {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important;
+  overflow: hidden !important;
+}
+
+.enhanced-modal .ant-modal-header {
+  background: var(--gray-50) !important;
+  border-bottom: 1px solid var(--gray-200) !important;
+  padding: 16px !important;
+}
+
+.dark .enhanced-modal .ant-modal-header {
+  background: #334155 !important;
+  border-bottom-color: #475569 !important;
+}
+
+.enhanced-modal .ant-modal-body {
+  padding: 20px !important;
+}
+
+.enhanced-modal .ant-modal-footer {
+  background: var(--gray-50) !important;
+  border-top: 1px solid var(--gray-200) !important;
+  padding: 16px !important;
+}
+
+.dark .enhanced-modal .ant-modal-footer {
+  background: #334155 !important;
+  border-top-color: #475569 !important;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+}
+
+.modal-icon {
+  color: var(--primary-color);
+  font-size: 18px;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-button {
+  height: 36px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+/* Enhanced Drawer */
+.enhanced-drawer .ant-drawer-content {
+  background: white !important;
+}
+
+.dark .enhanced-drawer .ant-drawer-content {
+  background: #1e293b !important;
+}
+
+.enhanced-drawer .ant-drawer-header {
+  background: var(--gray-50) !important;
+  border-bottom: 1px solid var(--gray-200) !important;
+  padding: 16px !important;
+}
+
+.dark .enhanced-drawer .ant-drawer-header {
+  background: #334155 !important;
+  border-bottom-color: #475569 !important;
+}
+
+.enhanced-drawer .ant-drawer-body {
+  padding: 20px !important;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+}
+
+.drawer-icon {
+  color: var(--primary-color);
+  font-size: 18px;
+}
+
+.drawer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
