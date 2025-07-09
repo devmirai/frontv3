@@ -50,7 +50,11 @@
 .landing-logo-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   border-radius: var(--border-radius);
   display: flex;
   align-items: center;
@@ -75,7 +79,11 @@
 .landing-logo-text {
   font-size: 28px;
   font-weight: 900;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -129,7 +137,12 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(99, 102, 241, 0.1),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -191,7 +204,11 @@
 }
 
 .landing-cta-button {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  ) !important;
   border: none !important;
   color: white !important;
   box-shadow: var(--shadow-lg) !important;
@@ -206,7 +223,12 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -334,7 +356,11 @@
 .landing-mobile-nav-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.1),
+    rgba(139, 92, 246, 0.1)
+  );
   border-radius: var(--border-radius);
   display: flex;
   align-items: center;
@@ -405,7 +431,11 @@
 
 .landing-mobile-cta {
   height: 56px !important;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  ) !important;
   border: none !important;
   color: white !important;
   border-radius: var(--border-radius) !important;
@@ -424,7 +454,11 @@
 
 /* Status Card */
 .landing-status-card {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05)) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.05),
+    rgba(139, 92, 246, 0.05)
+  ) !important;
   border: 1px solid rgba(99, 102, 241, 0.15) !important;
   border-radius: var(--border-radius-lg) !important;
   padding: var(--spacing-lg) !important;
@@ -446,7 +480,11 @@
   position: relative;
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -548,8 +586,17 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+  background:
+    radial-gradient(
+      circle at 25% 25%,
+      rgba(99, 102, 241, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 75% 75%,
+      rgba(139, 92, 246, 0.1) 0%,
+      transparent 50%
+    );
   pointer-events: none;
 }
 
@@ -639,6 +686,228 @@
   }
 }
 
+/* Enhanced Floating Cards */
+.enhanced-floating-card {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  min-width: 200px;
+  z-index: 10;
+}
+
+.dark .enhanced-floating-card {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(71, 85, 105, 0.3);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.enhanced-floating-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+
+.enhanced-floating-card:hover::before {
+  transform: translateX(100%);
+}
+
+.card-glow {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    45deg,
+    rgba(99, 102, 241, 0.3),
+    rgba(139, 92, 246, 0.3),
+    rgba(99, 102, 241, 0.3)
+  );
+  border-radius: 26px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+}
+
+.enhanced-floating-card:hover .card-glow {
+  opacity: 1;
+}
+
+.card-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon-container {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.accuracy-icon {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+}
+
+.speed-icon {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+
+.volume-icon {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.3);
+}
+
+.card-icon {
+  font-size: 24px;
+  color: white;
+  z-index: 2;
+  position: relative;
+}
+
+.icon-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  animation: pulse-effect 2s infinite;
+}
+
+@keyframes pulse-effect {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.text-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.metric-value {
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark .metric-value {
+  color: white;
+}
+
+.metric-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-800);
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.dark .metric-label {
+  color: var(--gray-100);
+}
+
+.metric-description {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.dark .metric-description {
+  color: var(--gray-400);
+}
+
+.card-pattern {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.1) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  transform: translate(50%, -50%);
+  z-index: 1;
+}
+
+/* Positioning for enhanced cards */
+.accuracy-card {
+  top: -32px;
+  left: -32px;
+}
+
+.speed-card {
+  bottom: -32px;
+  right: -32px;
+}
+
+.volume-card {
+  top: 50%;
+  left: -40px;
+  transform: translateY(-50%);
+}
+
 @media (max-width: 640px) {
   .landing-header {
     height: 60px !important;
@@ -677,5 +946,48 @@
 
   .landing-stat-label {
     font-size: 9px;
+  }
+
+  /* Enhanced cards responsive adjustments */
+  .enhanced-floating-card {
+    padding: 16px;
+    min-width: 160px;
+    border-radius: 16px;
+  }
+
+  .icon-container {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  .card-icon {
+    font-size: 20px;
+  }
+
+  .metric-value {
+    font-size: 20px;
+  }
+
+  .metric-label {
+    font-size: 14px;
+  }
+
+  .metric-description {
+    font-size: 10px;
+  }
+
+  .accuracy-card {
+    top: -20px;
+    left: -20px;
+  }
+
+  .speed-card {
+    bottom: -20px;
+    right: -20px;
+  }
+
+  .volume-card {
+    left: -24px;
   }
 }
