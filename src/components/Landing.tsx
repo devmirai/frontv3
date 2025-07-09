@@ -242,16 +242,17 @@ const Landing: React.FC = () => {
             </motion.div>
           </motion.div>
 
-          {/* Action Buttons & Theme Toggle */}
-          <div className="landing-header-actions">
+          {/* Streamlined Actions */}
+          <div className="landing-header-actions-simple">
+            <ThemeToggle />
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
               <Button
-                className="landing-action-button landing-signin-button"
-                icon={<UserOutlined />}
+                className="landing-signin-simple"
+                type="text"
                 onClick={() => navigate("/login")}
               >
                 Sign In
@@ -263,19 +264,12 @@ const Landing: React.FC = () => {
               transition={{ duration: 0.5, delay: 0.7 }}
             >
               <Button
-                className="landing-action-button landing-cta-button"
-                icon={<RocketOutlined />}
+                className="landing-cta-simple"
                 onClick={() => navigate("/login")}
               >
-                Start Free Trial
+                Get Started
               </Button>
             </motion.div>
-            <ThemeToggle />
-            <Button
-              icon={<MenuOutlined />}
-              onClick={() => setMobileMenuVisible(true)}
-              className="landing-menu-button"
-            />
           </div>
         </div>
       </Header>
