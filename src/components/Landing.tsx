@@ -656,57 +656,111 @@ const Landing: React.FC = () => {
           </div>
         </section>
 
-        {/* Enhanced Features Section */}
-        <section className="py-24 bg-gray-50 dark:bg-gray-800">
+        {/* Modern Features Carousel Section */}
+        <section className="features-carousel-section">
+          <div className="features-background">
+            <div className="features-pattern"></div>
+          </div>
+
           <div className="container">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="text-center mb-20"
+              className="features-header"
             >
-              <Title
-                level={2}
-                className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6"
-              >
-                Powerful Features for Modern Hiring
+              <div className="features-badge">
+                <BulbOutlined className="features-badge-icon" />
+                <span>Key Features</span>
+              </div>
+              <Title level={2} className="features-title">
+                Experience the Future of
+                <span className="features-title-gradient">
+                  {" "}
+                  AI-Powered Hiring
+                </span>
               </Title>
-              <Paragraph className="text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto">
-                Our AI-powered platform provides everything you need to conduct
-                efficient, fair, and insightful interviews that help you find
-                the perfect candidates.
+              <Paragraph className="features-subtitle">
+                Revolutionary technology that transforms how you discover,
+                evaluate, and hire exceptional talent
               </Paragraph>
             </motion.div>
 
-            <Row gutter={[32, 32]}>
-              {features.map((feature, index) => (
-                <Col xs={24} sm={12} lg={6} key={index}>
+            <div className="features-carousel-container">
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 0.3 }}
+                viewport={{ once: true }}
+                className="features-carousel"
+              >
+                {features.map((feature, index) => (
                   <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    key={index}
+                    className="feature-card-modern"
+                    initial={{ opacity: 0, x: 50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.15 }}
                     viewport={{ once: true }}
-                    className="h-full"
+                    whileHover={{ y: -8, scale: 1.02 }}
                   >
-                    <Card className="h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 bg-white dark:bg-gray-900 group">
-                      <div className="text-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                        {feature.icon}
+                    <div className="feature-card-glow"></div>
+                    <div className="feature-card-content">
+                      <div className="feature-icon-section">
+                        <div
+                          className={`feature-icon-container ${feature.color}-gradient`}
+                        >
+                          <div className="feature-icon-inner">
+                            {feature.icon}
+                          </div>
+                          <div className="feature-icon-pulse"></div>
+                        </div>
+                        <div className="feature-decorative-dots">
+                          <div className="dot dot-1"></div>
+                          <div className="dot dot-2"></div>
+                          <div className="dot dot-3"></div>
+                        </div>
                       </div>
-                      <Title
-                        level={4}
-                        className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center"
-                      >
-                        {feature.title}
-                      </Title>
-                      <Paragraph className="text-gray-600 dark:text-gray-300 text-center leading-relaxed">
-                        {feature.description}
-                      </Paragraph>
-                    </Card>
+
+                      <div className="feature-text-section">
+                        <Title level={3} className="feature-card-title">
+                          {feature.title}
+                        </Title>
+                        <Paragraph className="feature-card-description">
+                          {feature.description}
+                        </Paragraph>
+
+                        <div className="feature-action">
+                          <Button className="feature-learn-more" type="text">
+                            Learn More
+                            <ArrowRightOutlined className="ml-2 transition-transform group-hover:translate-x-1" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="feature-card-border"></div>
                   </motion.div>
-                </Col>
-              ))}
-            </Row>
+                ))}
+              </motion.div>
+
+              {/* Carousel Navigation Dots */}
+              <motion.div
+                className="carousel-navigation"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+                viewport={{ once: true }}
+              >
+                {features.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`nav-dot ${index === 0 ? "active" : ""}`}
+                  ></div>
+                ))}
+              </motion.div>
+            </div>
           </div>
         </section>
 
