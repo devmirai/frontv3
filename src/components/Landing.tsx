@@ -764,69 +764,180 @@ const Landing: React.FC = () => {
           </div>
         </section>
 
-        {/* Enhanced Testimonials Section */}
-        <section className="py-24 bg-white dark:bg-gray-900">
+        {/* Revolutionary Testimonials Showcase */}
+        <section className="testimonials-showcase-section">
+          <div className="testimonials-background">
+            <div className="testimonials-pattern"></div>
+            <div className="floating-elements">
+              <div className="floating-element element-1"></div>
+              <div className="floating-element element-2"></div>
+              <div className="floating-element element-3"></div>
+            </div>
+          </div>
+
           <div className="container">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="text-center mb-20"
+              className="testimonials-header"
             >
-              <Title
-                level={2}
-                className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6"
-              >
-                What Our Customers Say
+              <div className="testimonials-badge">
+                <HeartOutlined className="testimonials-badge-icon" />
+                <span>Customer Stories</span>
+              </div>
+              <Title level={2} className="testimonials-title">
+                Loved by Industry
+                <span className="testimonials-title-gradient"> Leaders</span>
               </Title>
-              <Paragraph className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Don't just take our word for it. Here's what industry leaders
-                are saying about mirAI.
+              <Paragraph className="testimonials-subtitle">
+                Discover how leading companies are transforming their hiring
+                process with mirAI
               </Paragraph>
+
+              <div className="testimonials-stats">
+                <div className="stat-item">
+                  <div className="stat-number">4.9</div>
+                  <div className="stat-label">Average Rating</div>
+                  <div className="stat-stars">
+                    {[...Array(5)].map((_, i) => (
+                      <StarOutlined key={i} className="star-icon" />
+                    ))}
+                  </div>
+                </div>
+                <div className="stat-divider"></div>
+                <div className="stat-item">
+                  <div className="stat-number">250+</div>
+                  <div className="stat-label">Happy Clients</div>
+                </div>
+                <div className="stat-divider"></div>
+                <div className="stat-item">
+                  <div className="stat-number">98%</div>
+                  <div className="stat-label">Satisfaction</div>
+                </div>
+              </div>
             </motion.div>
 
-            <Row gutter={[32, 32]}>
-              {testimonials.map((testimonial, index) => (
-                <Col xs={24} md={8} key={index}>
+            <div className="testimonials-carousel-container">
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 0.3 }}
+                viewport={{ once: true }}
+                className="testimonials-carousel"
+              >
+                {testimonials.map((testimonial, index) => (
                   <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    key={index}
+                    className="testimonial-card-modern"
+                    initial={{ opacity: 0, scale: 0.9, y: 50 }}
+                    whileInView={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.2 }}
                     viewport={{ once: true }}
+                    whileHover={{ y: -12, scale: 1.03 }}
                   >
-                    <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
-                      <div className="flex items-center mb-6">
-                        <img
-                          src={testimonial.avatar || "/placeholder.svg"}
-                          alt={testimonial.name}
-                          className="w-16 h-16 rounded-full object-cover mr-4 border-4 border-indigo-100 dark:border-indigo-900"
+                    <div className="testimonial-card-glow"></div>
+
+                    {/* Quote Icon */}
+                    <div className="quote-icon">
+                      <svg viewBox="0 0 24 24" className="quote-svg">
+                        <path
+                          d="M14.017,21v-8l6.017-8H18L14.017,9v2H18V21H14.017z M2,21v-8L8.017,5H6L2,9v2h4v10H2z"
+                          fill="currentColor"
                         />
-                        <div>
-                          <div className="font-bold text-lg text-gray-900 dark:text-white">
+                      </svg>
+                    </div>
+
+                    <div className="testimonial-content">
+                      {/* Rating Section */}
+                      <div className="rating-section">
+                        <div className="stars-container">
+                          {[...Array(testimonial.rating)].map((_, i) => (
+                            <motion.div
+                              key={i}
+                              className="star-wrapper"
+                              initial={{ opacity: 0, scale: 0 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{
+                                duration: 0.3,
+                                delay: 0.5 + i * 0.1,
+                              }}
+                            >
+                              <StarOutlined className="star-icon-modern" />
+                            </motion.div>
+                          ))}
+                        </div>
+                        <div className="rating-text">
+                          {testimonial.rating}.0
+                        </div>
+                      </div>
+
+                      {/* Testimonial Text */}
+                      <Paragraph className="testimonial-text">
+                        "{testimonial.content}"
+                      </Paragraph>
+
+                      {/* Customer Info */}
+                      <div className="customer-info">
+                        <div className="customer-avatar-container">
+                          <div className="avatar-glow"></div>
+                          <img
+                            src={
+                              testimonial.avatar ||
+                              "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?w=100"
+                            }
+                            alt={testimonial.name}
+                            className="customer-avatar"
+                          />
+                          <div className="avatar-ring"></div>
+                        </div>
+                        <div className="customer-details">
+                          <div className="customer-name">
                             {testimonial.name}
                           </div>
-                          <div className="text-gray-600 dark:text-gray-400 text-sm">
+                          <div className="customer-role">
                             {testimonial.role}
+                          </div>
+                          <div className="company-badge">
+                            <CrownOutlined className="company-icon" />
+                            <span>Verified Customer</span>
                           </div>
                         </div>
                       </div>
-                      <div className="flex mb-4">
-                        {[...Array(testimonial.rating)].map((_, i) => (
-                          <StarOutlined
-                            key={i}
-                            className="text-yellow-400 text-lg"
-                          />
-                        ))}
+                    </div>
+
+                    <div className="testimonial-decoration">
+                      <div className="decoration-dots">
+                        <div className="dot"></div>
+                        <div className="dot"></div>
+                        <div className="dot"></div>
                       </div>
-                      <Paragraph className="text-gray-700 dark:text-gray-300 italic leading-relaxed">
-                        "{testimonial.content}"
-                      </Paragraph>
-                    </Card>
+                    </div>
                   </motion.div>
-                </Col>
-              ))}
-            </Row>
+                ))}
+              </motion.div>
+
+              {/* Enhanced Navigation */}
+              <motion.div
+                className="testimonials-navigation"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+                viewport={{ once: true }}
+              >
+                <div className="nav-controls">
+                  {testimonials.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`nav-control ${index === 0 ? "active" : ""}`}
+                    >
+                      <div className="control-inner"></div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
           </div>
         </section>
 
