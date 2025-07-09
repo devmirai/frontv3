@@ -222,26 +222,24 @@ const Landing: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Desktop Navigation */}
+          {/* Simplified Navigation - Clean & Minimal */}
           <motion.div
-            className="landing-nav"
+            className="landing-nav-simple"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            {navigationItems.map((item, index) => (
-              <motion.a
-                key={item.label}
-                href={item.href}
-                className="landing-nav-item"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-              >
-                <span className="landing-nav-item-icon">{item.icon}</span>
-                {item.label}
-              </motion.a>
-            ))}
+            <motion.div
+              className="nav-badge"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="badge-content">
+                <div className="status-dot"></div>
+                <span className="badge-text">Now Live</span>
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* Action Buttons & Theme Toggle */}
