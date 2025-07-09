@@ -833,12 +833,13 @@
     font-size: 10px;
   }
 
-  .landing-header-actions .landing-action-button {
-    display: none;
+  .landing-signin-simple {
+    display: none !important;
   }
 
-  .landing-header-actions .landing-action-button:last-child {
-    display: flex;
+  .landing-cta-simple {
+    padding: 0 16px !important;
+    font-size: 13px !important;
   }
 
   .landing-drawer-content {
