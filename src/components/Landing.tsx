@@ -55,7 +55,7 @@ const Landing: React.FC = () => {
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   // Auto-play functionality
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isAutoPlaying) return;
 
     const interval = setInterval(() => {
