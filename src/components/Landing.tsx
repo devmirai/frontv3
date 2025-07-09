@@ -451,23 +451,46 @@ const Landing: React.FC = () => {
                     </div>
                   </motion.div>
 
-                  <motion.div variants={itemVariants} className="pt-4">
-                    <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-3 sm:space-y-0 sm:space-x-8 text-base text-gray-600 dark:text-gray-400">
-                      <div className="flex items-center space-x-3">
-                        <CheckCircleOutlined className="text-green-500 text-lg" />
-                        <span className="font-semibold">Free 14-day trial</span>
+                  <motion.div variants={itemVariants} className="pt-8">
+                    <div className="hero-trust-section">
+                      <div className="trust-badge">
+                        <div className="trust-icon-wrapper">
+                          <CrownOutlined className="trust-icon" />
+                        </div>
+                        <div className="trust-content">
+                          <div className="trust-stat">250+</div>
+                          <div className="trust-label">
+                            Enterprise Companies
+                          </div>
+                          <div className="trust-description">
+                            Trust our AI platform
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-3">
-                        <SafetyOutlined className="text-blue-500 text-lg" />
-                        <span className="font-semibold">
-                          No credit card required
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <GlobalOutlined className="text-purple-500 text-lg" />
-                        <span className="font-semibold">
-                          Used by 250+ companies
-                        </span>
+
+                      <div className="trust-indicators">
+                        <div className="indicator-item">
+                          <div className="indicator-icon">
+                            <StarOutlined className="text-yellow-500" />
+                          </div>
+                          <span className="indicator-text">
+                            Enterprise Grade
+                          </span>
+                        </div>
+                        <div className="indicator-item">
+                          <div className="indicator-icon">
+                            <SafetyOutlined className="text-green-500" />
+                          </div>
+                          <span className="indicator-text">
+                            SOC 2 Compliant
+                          </span>
+                        </div>
+                        <div className="indicator-item">
+                          <div className="indicator-icon">
+                            <GlobalOutlined className="text-blue-500" />
+                          </div>
+                          <span className="indicator-text">Global Support</span>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
