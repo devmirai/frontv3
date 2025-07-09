@@ -1088,50 +1088,178 @@ const Landing: React.FC = () => {
           </div>
         </section>
 
-        {/* Enhanced CTA Section */}
-        <section className="py-24 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 relative overflow-hidden">
-          <div className="absolute inset-0 bg-black opacity-10"></div>
-          <div className="container relative z-10">
+        {/* Elegant Connection Experience */}
+        <section className="connection-experience-section">
+          <div className="connection-background">
+            <div className="connection-aurora"></div>
+            <div className="connection-mesh-gradient"></div>
+            <div className="floating-orbs">
+              <div className="orb orb-1"></div>
+              <div className="orb orb-2"></div>
+              <div className="orb orb-3"></div>
+              <div className="orb orb-4"></div>
+            </div>
+          </div>
+
+          <div className="container">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="text-center"
+              className="connection-content"
             >
-              <Title
-                level={2}
-                className="text-4xl sm:text-5xl font-black text-white mb-6"
-              >
-                Ready to Transform Your Hiring?
-              </Title>
-              <Paragraph className="text-xl text-indigo-100 max-w-3xl mx-auto mb-12">
-                Join thousands of companies using mirAI to make better hiring
-                decisions. Start your free trial today and experience the future
-                of interviews.
-              </Paragraph>
-              <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                <Button
-                  type="primary"
-                  size="large"
-                  className="h-16 px-12 text-xl font-bold bg-white text-indigo-600 border-0 hover:bg-gray-100 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
-                  icon={<RocketOutlined />}
+              <div className="connection-header">
+                <motion.div
+                  className="connection-badge"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  viewport={{ once: true }}
+                >
+                  <RocketOutlined className="connection-badge-icon" />
+                  <span>Ready When You Are</span>
+                </motion.div>
+
+                <Title level={2} className="connection-title">
+                  Let's Build the Future of
+                  <span className="connection-title-gradient">
+                    {" "}
+                    Hiring Together
+                  </span>
+                </Title>
+
+                <Paragraph className="connection-subtitle">
+                  Join the AI revolution that's reshaping how companies discover
+                  exceptional talent. Your journey towards smarter hiring starts
+                  here.
+                </Paragraph>
+              </div>
+
+              <div className="connection-options">
+                <motion.div
+                  className="connection-card primary-card"
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -8, scale: 1.02 }}
                   onClick={() => navigate("/login")}
                 >
-                  Start Free Trial
-                </Button>
-                <Button
-                  size="large"
-                  className="h-16 px-12 text-xl font-bold border-2 border-white text-white hover:bg-white hover:text-indigo-600 rounded-2xl transition-all duration-300 transform hover:-translate-y-1"
-                  icon={<PhoneOutlined />}
+                  <div className="card-glow-effect"></div>
+                  <div className="card-content">
+                    <div className="card-icon-section">
+                      <div className="card-icon-wrapper">
+                        <UserOutlined className="card-icon" />
+                      </div>
+                      <div className="card-status">
+                        <div className="status-indicator"></div>
+                        <span>Instant Access</span>
+                      </div>
+                    </div>
+
+                    <div className="card-info">
+                      <h3 className="card-title">Get Started Now</h3>
+                      <p className="card-description">
+                        Join our platform and start experiencing the power of
+                        AI-driven interviews immediately. Perfect for teams
+                        ready to innovate.
+                      </p>
+
+                      <div className="card-features">
+                        <div className="feature-item">
+                          <CheckCircleOutlined className="feature-icon" />
+                          <span>Immediate platform access</span>
+                        </div>
+                        <div className="feature-item">
+                          <CheckCircleOutlined className="feature-icon" />
+                          <span>Full feature availability</span>
+                        </div>
+                        <div className="feature-item">
+                          <CheckCircleOutlined className="feature-icon" />
+                          <span>24/7 AI assistance</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="card-action">
+                      <Button className="connection-button primary-button">
+                        <span>Begin Your Journey</span>
+                        <ArrowRightOutlined className="button-arrow" />
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  className="connection-card secondary-card"
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -8, scale: 1.02 }}
                 >
-                  Schedule Demo
-                </Button>
+                  <div className="card-glow-effect"></div>
+                  <div className="card-content">
+                    <div className="card-icon-section">
+                      <div className="card-icon-wrapper secondary">
+                        <TeamOutlined className="card-icon" />
+                      </div>
+                      <div className="card-status">
+                        <div className="status-indicator secondary"></div>
+                        <span>Personalized</span>
+                      </div>
+                    </div>
+
+                    <div className="card-info">
+                      <h3 className="card-title">Expert Consultation</h3>
+                      <p className="card-description">
+                        Let our specialists craft a customized solution for your
+                        unique hiring challenges. Ideal for enterprise teams
+                        with specific requirements.
+                      </p>
+
+                      <div className="card-features">
+                        <div className="feature-item">
+                          <StarOutlined className="feature-icon secondary" />
+                          <span>Custom implementation plan</span>
+                        </div>
+                        <div className="feature-item">
+                          <StarOutlined className="feature-icon secondary" />
+                          <span>Dedicated success manager</span>
+                        </div>
+                        <div className="feature-item">
+                          <StarOutlined className="feature-icon secondary" />
+                          <span>Priority enterprise support</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="card-action">
+                      <Button className="connection-button secondary-button">
+                        <span>Connect With Expert</span>
+                        <ArrowRightOutlined className="button-arrow" />
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
-              <div className="mt-8 text-indigo-200 text-sm">
-                <CheckCircleOutlined className="mr-2" />
-                No credit card required • 14-day free trial • Cancel anytime
-              </div>
+
+              <motion.div
+                className="trust-indicators-section"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+                viewport={{ once: true }}
+              >
+                <div className="trust-message">
+                  <GlobalOutlined className="trust-icon" />
+                  <span>
+                    Trusted by 250+ companies worldwide • Built with enterprise
+                    security • Available in 15+ languages
+                  </span>
+                </div>
+              </motion.div>
             </motion.div>
           </div>
         </section>
