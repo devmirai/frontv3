@@ -598,61 +598,208 @@ const Landing: React.FC = () => {
           </div>
         </section>
 
-        {/* Enhanced Stats Section */}
-        <section className="py-24 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+        {/* Dynamic Performance Dashboard */}
+        <section className="performance-dashboard-section">
+          <div className="dashboard-background">
+            <div className="dashboard-grid-pattern"></div>
+            <div className="dashboard-particle-field">
+              {[...Array(20)].map((_, i) => (
+                <div key={i} className={`particle particle-${i + 1}`}></div>
+              ))}
+            </div>
+          </div>
+
           <div className="container">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="dashboard-header"
             >
-              <Title
-                level={2}
-                className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6"
-              >
-                Trusted by Industry Leaders
+              <div className="performance-badge">
+                <BarChartOutlined className="performance-badge-icon" />
+                <span>Live Performance</span>
+                <div className="live-indicator">
+                  <div className="pulse-dot"></div>
+                  <span>LIVE</span>
+                </div>
+              </div>
+
+              <Title level={2} className="dashboard-title">
+                Real-time Platform
+                <span className="dashboard-title-gradient"> Metrics</span>
               </Title>
-              <Paragraph className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Join thousands of companies that have transformed their hiring
-                process with mirAI
+
+              <Paragraph className="dashboard-subtitle">
+                Watch our AI platform perform in real-time across global
+                enterprises
               </Paragraph>
             </motion.div>
 
-            <Row gutter={[32, 32]}>
-              {stats.map((stat, index) => (
-                <Col xs={12} sm={12} lg={6} key={index}>
+            <div className="metrics-dashboard">
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 0.3 }}
+                viewport={{ once: true }}
+                className="metrics-grid"
+              >
+                {stats.map((stat, index) => (
                   <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    key={index}
+                    className="metric-card-advanced"
+                    initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                    whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{
+                      duration: 0.8,
+                      delay: index * 0.15,
+                      type: "spring",
+                      stiffness: 100,
+                    }}
                     viewport={{ once: true }}
+                    whileHover={{ y: -12, scale: 1.05 }}
                   >
-                    <Card className="text-center h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
-                      <div className="mb-4">{stat.icon}</div>
-                      <Statistic
-                        title={
-                          <span className="text-lg font-bold text-gray-900 dark:text-white">
-                            {stat.title}
-                          </span>
-                        }
-                        value={stat.value}
-                        suffix={stat.suffix}
-                        valueStyle={{
-                          color: isDarkMode ? "#ffffff" : "#1f2937",
-                          fontSize: "2.5rem",
-                          fontWeight: "900",
-                        }}
-                      />
-                      <Paragraph className="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-0">
-                        {stat.description}
-                      </Paragraph>
-                    </Card>
+                    <div className="metric-card-glow"></div>
+
+                    {/* Progress Ring */}
+                    <div className="progress-ring-container">
+                      <svg className="progress-ring" viewBox="0 0 120 120">
+                        <circle
+                          className="progress-ring-background"
+                          cx="60"
+                          cy="60"
+                          r="54"
+                        />
+                        <circle
+                          className="progress-ring-progress"
+                          cx="60"
+                          cy="60"
+                          r="54"
+                          style={{
+                            strokeDasharray: `${(stat.value / (stat.title.includes("Rate") ? 100 : 15000)) * 339.29} 339.29`,
+                          }}
+                        />
+                      </svg>
+
+                      <div className="metric-icon-wrapper">
+                        <div className="metric-icon-glow"></div>
+                        {stat.icon}
+                      </div>
+                    </div>
+
+                    {/* Metric Content */}
+                    <div className="metric-content">
+                      <div className="metric-value-container">
+                        <motion.div
+                          className="metric-value-large"
+                          initial={{ scale: 0 }}
+                          whileInView={{ scale: 1 }}
+                          transition={{
+                            duration: 0.8,
+                            delay: index * 0.2 + 0.5,
+                          }}
+                          viewport={{ once: true }}
+                        >
+                          {stat.value}
+                          <span className="metric-suffix">{stat.suffix}</span>
+                        </motion.div>
+
+                        <div className="metric-change">
+                          <ArrowRightOutlined className="change-arrow" />
+                          <span className="change-text">+12% this month</span>
+                        </div>
+                      </div>
+
+                      <div className="metric-info">
+                        <div className="metric-title-modern">{stat.title}</div>
+                        <div className="metric-description-modern">
+                          {stat.description}
+                        </div>
+
+                        {/* Mini Chart */}
+                        <div className="mini-chart">
+                          <div className="chart-bars">
+                            {[...Array(8)].map((_, i) => (
+                              <motion.div
+                                key={i}
+                                className="chart-bar"
+                                initial={{ height: 0 }}
+                                whileInView={{
+                                  height: `${Math.random() * 30 + 10}px`,
+                                }}
+                                transition={{
+                                  duration: 0.6,
+                                  delay: index * 0.1 + i * 0.05,
+                                }}
+                                viewport={{ once: true }}
+                              ></motion.div>
+                            ))}
+                          </div>
+                          <div className="chart-label">Trending Up</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Effects */}
+                    <div className="metric-card-border"></div>
+                    <div className="metric-card-shine"></div>
                   </motion.div>
-                </Col>
-              ))}
-            </Row>
+                ))}
+              </motion.div>
+
+              {/* Real-time Activity Feed */}
+              <motion.div
+                className="activity-feed"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 1.0 }}
+                viewport={{ once: true }}
+              >
+                <div className="activity-header">
+                  <div className="activity-title">
+                    <GlobalOutlined className="activity-icon" />
+                    <span>Global Activity</span>
+                  </div>
+                  <div className="activity-status">
+                    <div className="status-dot active"></div>
+                    <span>1,247 active sessions</span>
+                  </div>
+                </div>
+
+                <div className="activity-items">
+                  <motion.div
+                    className="activity-item"
+                    animate={{ opacity: [1, 0.7, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <div className="activity-dot"></div>
+                    <span>New interview completed in San Francisco</span>
+                    <span className="activity-time">2s ago</span>
+                  </motion.div>
+
+                  <motion.div
+                    className="activity-item"
+                    animate={{ opacity: [1, 0.7, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                  >
+                    <div className="activity-dot"></div>
+                    <span>AI assessment generated for TechCorp</span>
+                    <span className="activity-time">5s ago</span>
+                  </motion.div>
+
+                  <motion.div
+                    className="activity-item"
+                    animate={{ opacity: [1, 0.7, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: 1.0 }}
+                  >
+                    <div className="activity-dot"></div>
+                    <span>Candidate matched in London</span>
+                    <span className="activity-time">8s ago</span>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </section>
 
