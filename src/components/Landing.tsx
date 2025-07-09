@@ -959,77 +959,214 @@ const Landing: React.FC = () => {
             </motion.div>
 
             <div className="features-carousel-container">
+              {/* Carousel Controls */}
+              <div className="carousel-controls">
+                <div className="carousel-info">
+                  <div className="feature-counter">
+                    <span className="counter-current">
+                      {String(activeFeatureIndex + 1).padStart(2, "0")}
+                    </span>
+                    <span className="counter-divider">/</span>
+                    <span className="counter-total">
+                      {String(features.length).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <div className="autoplay-control">
+                    <Button
+                      className="autoplay-button"
+                      onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+                      icon={
+                        isAutoPlaying ? (
+                          <PlayCircleOutlined />
+                        ) : (
+                          <PlayCircleOutlined />
+                        )
+                      }
+                    >
+                      {isAutoPlaying ? "Auto-playing" : "Paused"}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="navigation-arrows">
+                  <Button
+                    className="nav-arrow prev-arrow"
+                    onClick={prevFeature}
+                  >
+                    <ArrowRightOutlined
+                      style={{ transform: "rotate(180deg)" }}
+                    />
+                  </Button>
+                  <Button
+                    className="nav-arrow next-arrow"
+                    onClick={nextFeature}
+                  >
+                    <ArrowRightOutlined />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Enhanced Carousel */}
               <motion.div
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 1, delay: 0.3 }}
                 viewport={{ once: true }}
-                className="features-carousel"
+                className="features-carousel-wrapper"
               >
-                {features.map((feature, index) => (
-                  <motion.div
-                    key={index}
-                    className="feature-card-modern"
-                    initial={{ opacity: 0, x: 50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.15 }}
-                    viewport={{ once: true }}
-                    whileHover={{ y: -8, scale: 1.02 }}
-                  >
-                    <div className="feature-card-glow"></div>
-                    <div className="feature-card-content">
-                      <div className="feature-icon-section">
-                        <div
-                          className={`feature-icon-container ${feature.color}-gradient`}
-                        >
-                          <div className="feature-icon-inner">
-                            {feature.icon}
+                <div
+                  className="features-carousel-track"
+                  style={{
+                    transform: `translateX(-${activeFeatureIndex * 100}%)`,
+                  }}
+                >
+                  {features.map((feature, index) => (
+                    <motion.div
+                      key={index}
+                      className={`feature-slide ${index === activeFeatureIndex ? "active" : ""}`}
+                      whileHover={{ y: -8, scale: 1.02 }}
+                    >
+                      <div className="feature-card-enhanced">
+                        <div className="feature-card-glow"></div>
+
+                        {/* Feature Header */}
+                        <div className="feature-header">
+                          <div className="feature-category">
+                            <span className="category-badge">
+                              {feature.category}
+                            </span>
+                            <div className="feature-status">
+                              <div className="status-dot active"></div>
+                              <span>Live</span>
+                            </div>
                           </div>
-                          <div className="feature-icon-pulse"></div>
+
+                          <div
+                            className={`feature-icon-container ${feature.color}-gradient`}
+                          >
+                            <div className="feature-icon-inner">
+                              {feature.icon}
+                            </div>
+                            <div className="feature-icon-pulse"></div>
+                          </div>
                         </div>
-                        <div className="feature-decorative-dots">
-                          <div className="dot dot-1"></div>
-                          <div className="dot dot-2"></div>
-                          <div className="dot dot-3"></div>
+
+                        {/* Feature Content */}
+                        <div className="feature-content">
+                          <Title level={2} className="feature-title">
+                            {feature.title}
+                          </Title>
+                          <Paragraph className="feature-description">
+                            {feature.description}
+                          </Paragraph>
+
+                          {/* Capabilities List */}
+                          <div className="feature-capabilities">
+                            <h4 className="capabilities-title">
+                              Key Capabilities
+                            </h4>
+                            <div className="capabilities-list">
+                              {feature.capabilities.map(
+                                (capability, capIndex) => (
+                                  <div
+                                    key={capIndex}
+                                    className="capability-item"
+                                  >
+                                    <CheckCircleOutlined className="capability-icon" />
+                                    <span>{capability}</span>
+                                  </div>
+                                ),
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Metrics Grid */}
+                          <div className="feature-metrics">
+                            {Object.entries(feature.metrics).map(
+                              ([key, value], metricIndex) => (
+                                <div key={metricIndex} className="metric-item">
+                                  <div className="metric-value">{value}</div>
+                                  <div className="metric-label">
+                                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                                  </div>
+                                </div>
+                              ),
+                            )}
+                          </div>
+
+                          {/* Feature Actions */}
+                          <div className="feature-actions">
+                            <Button className="demo-button primary">
+                              <PlayCircleOutlined />
+                              <span>{feature.demoFeature}</span>
+                            </Button>
+                            <Button className="learn-more-button">
+                              <span>Documentation</span>
+                              <ArrowRightOutlined />
+                            </Button>
+                          </div>
                         </div>
+
+                        <div className="feature-card-border"></div>
                       </div>
-
-                      <div className="feature-text-section">
-                        <Title level={3} className="feature-card-title">
-                          {feature.title}
-                        </Title>
-                        <Paragraph className="feature-card-description">
-                          {feature.description}
-                        </Paragraph>
-
-                        <div className="feature-action">
-                          <Button className="feature-learn-more" type="text">
-                            Learn More
-                            <ArrowRightOutlined className="ml-2 transition-transform group-hover:translate-x-1" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="feature-card-border"></div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  ))}
+                </div>
               </motion.div>
 
-              {/* Carousel Navigation Dots */}
+              {/* Enhanced Navigation */}
               <motion.div
-                className="carousel-navigation"
+                className="carousel-navigation-enhanced"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.8 }}
                 viewport={{ once: true }}
               >
-                {features.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`nav-dot ${index === 0 ? "active" : ""}`}
-                  ></div>
-                ))}
+                <div className="nav-thumbnails">
+                  {features.map((feature, index) => (
+                    <motion.div
+                      key={index}
+                      className={`nav-thumbnail ${index === activeFeatureIndex ? "active" : ""}`}
+                      onClick={() => goToFeature(index)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <div className="thumbnail-icon">{feature.icon}</div>
+                      <div className="thumbnail-info">
+                        <div className="thumbnail-title">{feature.title}</div>
+                        <div className="thumbnail-category">
+                          {feature.category}
+                        </div>
+                      </div>
+                      {index === activeFeatureIndex && (
+                        <motion.div
+                          className="active-indicator"
+                          layoutId="activeIndicator"
+                        />
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Progress Bar */}
+                <div className="carousel-progress">
+                  <div className="progress-track">
+                    <motion.div
+                      className="progress-fill"
+                      initial={{ width: 0 }}
+                      animate={{
+                        width: `${((activeFeatureIndex + 1) / features.length) * 100}%`,
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </div>
+                  <div className="progress-labels">
+                    <span>Features</span>
+                    <span>
+                      {activeFeatureIndex + 1} of {features.length}
+                    </span>
+                  </div>
+                </div>
               </motion.div>
             </div>
           </div>
