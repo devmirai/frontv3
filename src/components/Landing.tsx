@@ -55,6 +55,39 @@ const Landing: React.FC = () => {
   const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
+  // Auto-play functionality
+  React.useEffect(() => {
+    if (!isAutoPlaying) return;
+
+    const interval = setInterval(() => {
+      setActiveFeatureIndex((prev) => (prev + 1) % features.length);
+    }, 4000); // Change slide every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, features.length]);
+
+  // Navigation functions
+  const goToFeature = (index: number) => {
+    setActiveFeatureIndex(index);
+    setIsAutoPlaying(false);
+    // Resume auto-play after 10 seconds of inactivity
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const nextFeature = () => {
+    setActiveFeatureIndex((prev) => (prev + 1) % features.length);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const prevFeature = () => {
+    setActiveFeatureIndex(
+      (prev) => (prev - 1 + features.length) % features.length,
+    );
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
   const features = [
     {
       icon: <RobotOutlined className="text-6xl text-indigo-600" />,
