@@ -1,8 +1,18 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { Layout, Button, Typography, Row, Col, Card, Statistic, Divider, Drawer } from "antd"
+import type React from "react";
+import { useState } from "react";
+import {
+  Layout,
+  Button,
+  Typography,
+  Row,
+  Col,
+  Card,
+  Statistic,
+  Divider,
+  Drawer,
+} from "antd";
 import {
   RobotOutlined,
   BulbOutlined,
@@ -27,20 +37,20 @@ import {
   InfoCircleOutlined,
   PhoneOutlined,
   DollarOutlined,
-} from "@ant-design/icons"
-import { motion } from "framer-motion"
-import { useNavigate } from "react-router-dom"
-import { useTheme } from "../contexts/ThemeContext"
-import ThemeToggle from "./ThemeToggle"
-import "../styles/landing.css"
+} from "@ant-design/icons";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useTheme } from "../contexts/ThemeContext";
+import ThemeToggle from "./ThemeToggle";
+import "../styles/landing.css";
 
-const { Header, Content, Footer } = Layout
-const { Title, Paragraph } = Typography
+const { Header, Content, Footer } = Layout;
+const { Title, Paragraph } = Typography;
 
 const Landing: React.FC = () => {
-  const navigate = useNavigate()
-  const { isDarkMode } = useTheme()
-  const [mobileMenuVisible, setMobileMenuVisible] = useState(false)
+  const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
+  const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
 
   const features = [
     {
@@ -71,7 +81,7 @@ const Landing: React.FC = () => {
         "Comprehensive analytics and insights dashboard to make informed hiring decisions quickly and efficiently with data-driven recommendations and performance tracking.",
       color: "purple",
     },
-  ]
+  ];
 
   const stats = [
     {
@@ -102,7 +112,7 @@ const Landing: React.FC = () => {
       icon: <AimOutlined className="text-purple-600 text-3xl" />,
       description: "Interview assessment accuracy",
     },
-  ]
+  ];
 
   const testimonials = [
     {
@@ -110,7 +120,8 @@ const Landing: React.FC = () => {
       role: "Head of Talent, TechCorp",
       content:
         "mirAI transformed our hiring process completely. We've reduced time-to-hire by 60% while improving candidate quality significantly. The AI insights are incredibly accurate.",
-      avatar: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?w=100",
+      avatar:
+        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?w=100",
       rating: 5,
     },
     {
@@ -118,7 +129,8 @@ const Landing: React.FC = () => {
       role: "CEO, StartupXYZ",
       content:
         "The AI-powered insights help us identify the best candidates faster than ever before. This is truly game-changing technology that every modern company needs.",
-      avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?w=100",
+      avatar:
+        "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?w=100",
       rating: 5,
     },
     {
@@ -126,10 +138,11 @@ const Landing: React.FC = () => {
       role: "HR Director, GlobalTech",
       content:
         "Our candidates love the modern interview experience, and we get detailed analytics to make better hiring decisions. The ROI has been exceptional.",
-      avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?w=100",
+      avatar:
+        "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?w=100",
       rating: 5,
     },
-  ]
+  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -139,7 +152,7 @@ const Landing: React.FC = () => {
         staggerChildren: 0.1,
       },
     },
-  }
+  };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -150,7 +163,7 @@ const Landing: React.FC = () => {
         duration: 0.6,
       },
     },
-  }
+  };
 
   const navigationItems = [
     {
@@ -183,7 +196,7 @@ const Landing: React.FC = () => {
       icon: <PhoneOutlined />,
       description: "Get in touch",
     },
-  ]
+  ];
 
   return (
     <Layout className="main-layout">
@@ -191,14 +204,20 @@ const Landing: React.FC = () => {
       <Header className="landing-header">
         <div className="landing-header-content">
           {/* Logo Section */}
-          <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
             <div className="landing-logo">
               <div className="landing-logo-icon">
                 <RobotOutlined />
               </div>
               <div className="landing-logo-content">
                 <span className="landing-logo-text">mirAI</span>
-                <span className="landing-logo-subtitle">Interview Platform</span>
+                <span className="landing-logo-subtitle">
+                  Interview Platform
+                </span>
               </div>
             </div>
           </motion.div>
@@ -299,8 +318,12 @@ const Landing: React.FC = () => {
                     <div className="landing-mobile-nav-content">
                       <div className="landing-mobile-nav-icon">{item.icon}</div>
                       <div className="landing-mobile-nav-info">
-                        <div className="landing-mobile-nav-title">{item.label}</div>
-                        <div className="landing-mobile-nav-desc">{item.description}</div>
+                        <div className="landing-mobile-nav-title">
+                          {item.label}
+                        </div>
+                        <div className="landing-mobile-nav-desc">
+                          {item.description}
+                        </div>
                       </div>
                     </div>
                     <ArrowRightOutlined className="landing-mobile-nav-arrow" />
@@ -319,8 +342,8 @@ const Landing: React.FC = () => {
               <Button
                 className="landing-mobile-signin"
                 onClick={() => {
-                  navigate("/login")
-                  setMobileMenuVisible(false)
+                  navigate("/login");
+                  setMobileMenuVisible(false);
                 }}
               >
                 <div className="flex items-center justify-between w-full">
@@ -336,8 +359,8 @@ const Landing: React.FC = () => {
                 className="landing-mobile-cta"
                 icon={<RocketOutlined />}
                 onClick={() => {
-                  navigate("/login")
-                  setMobileMenuVisible(false)
+                  navigate("/login");
+                  setMobileMenuVisible(false);
                 }}
               >
                 Get Started Free
@@ -355,7 +378,8 @@ const Landing: React.FC = () => {
               <div className="landing-status-info">
                 <div className="landing-status-title">mirAI Assistant</div>
                 <div className="landing-status-desc">
-                  AI-powered interview platform ready to transform your hiring process
+                  AI-powered interview platform ready to transform your hiring
+                  process
                 </div>
                 <div className="landing-status-stats">
                   <div className="landing-stat-item">
@@ -391,15 +415,17 @@ const Landing: React.FC = () => {
                 >
                   <motion.div variants={itemVariants}>
                     <Title className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight text-gray-900 dark:text-white mb-8">
-                      The Future of <span className="gradient-text">AI Interviews</span>
+                      The Future of{" "}
+                      <span className="gradient-text">AI Interviews</span>
                     </Title>
                   </motion.div>
 
                   <motion.div variants={itemVariants}>
                     <Paragraph className="text-xl sm:text-2xl lg:text-3xl text-gray-600 dark:text-gray-300 leading-relaxed font-medium max-w-3xl mx-auto lg:mx-0 mb-8">
-                      mirAI revolutionizes hiring with intelligent interview assistance. Generate personalized
-                      questions, evaluate candidates with AI precision, and make better hiring decisions faster than
-                      ever before.
+                      mirAI revolutionizes hiring with intelligent interview
+                      assistance. Generate personalized questions, evaluate
+                      candidates with AI precision, and make better hiring
+                      decisions faster than ever before.
                     </Paragraph>
                   </motion.div>
 
@@ -433,11 +459,15 @@ const Landing: React.FC = () => {
                       </div>
                       <div className="flex items-center space-x-3">
                         <SafetyOutlined className="text-blue-500 text-lg" />
-                        <span className="font-semibold">No credit card required</span>
+                        <span className="font-semibold">
+                          No credit card required
+                        </span>
                       </div>
                       <div className="flex items-center space-x-3">
                         <GlobalOutlined className="text-purple-500 text-lg" />
-                        <span className="font-semibold">Used by 250+ companies</span>
+                        <span className="font-semibold">
+                          Used by 250+ companies
+                        </span>
                       </div>
                     </div>
                   </motion.div>
@@ -461,56 +491,90 @@ const Landing: React.FC = () => {
                       />
                     </div>
 
-                    {/* Enhanced Floating Cards */}
+                    {/* Enhanced Floating Stats Cards */}
                     <motion.div
-                      className="floating-card absolute -top-6 -left-6 sm:-top-8 sm:-left-8"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.8, delay: 0.8 }}
+                      className="enhanced-floating-card accuracy-card"
+                      initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{
+                        duration: 0.8,
+                        delay: 0.8,
+                        type: "spring",
+                        stiffness: 100,
+                      }}
+                      whileHover={{ scale: 1.05, y: -5 }}
                     >
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
-                          <CheckCircleOutlined className="text-green-600 text-xl" />
+                      <div className="card-glow"></div>
+                      <div className="card-content">
+                        <div className="icon-container accuracy-icon">
+                          <CheckCircleOutlined className="card-icon" />
+                          <div className="icon-pulse"></div>
                         </div>
-                        <div>
-                          <div className="font-bold text-gray-900 dark:text-white text-lg">94% Accuracy</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">AI Assessment</div>
+                        <div className="text-content">
+                          <div className="metric-value">94%</div>
+                          <div className="metric-label">AI Accuracy</div>
+                          <div className="metric-description">
+                            Precision Rate
+                          </div>
                         </div>
                       </div>
+                      <div className="card-pattern"></div>
                     </motion.div>
 
                     <motion.div
-                      className="floating-card absolute -bottom-6 -right-6 sm:-bottom-8 sm:-right-8"
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.8, delay: 1.0 }}
+                      className="enhanced-floating-card speed-card"
+                      initial={{ opacity: 0, y: -20, scale: 0.8 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{
+                        duration: 0.8,
+                        delay: 1.0,
+                        type: "spring",
+                        stiffness: 100,
+                      }}
+                      whileHover={{ scale: 1.05, y: -5 }}
                     >
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                          <ClockCircleOutlined className="text-blue-600 text-xl" />
+                      <div className="card-glow"></div>
+                      <div className="card-content">
+                        <div className="icon-container speed-icon">
+                          <ThunderboltOutlined className="card-icon" />
+                          <div className="icon-pulse"></div>
                         </div>
-                        <div>
-                          <div className="font-bold text-gray-900 dark:text-white text-lg">85% Faster</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Hiring Process</div>
+                        <div className="text-content">
+                          <div className="metric-value">85%</div>
+                          <div className="metric-label">Faster Process</div>
+                          <div className="metric-description">
+                            Time Reduction
+                          </div>
                         </div>
                       </div>
+                      <div className="card-pattern"></div>
                     </motion.div>
 
                     <motion.div
-                      className="floating-card absolute top-1/2 -left-8 transform -translate-y-1/2"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.8, delay: 1.2 }}
+                      className="enhanced-floating-card volume-card"
+                      initial={{ opacity: 0, x: -20, scale: 0.8 }}
+                      animate={{ opacity: 1, x: 0, scale: 1 }}
+                      transition={{
+                        duration: 0.8,
+                        delay: 1.2,
+                        type: "spring",
+                        stiffness: 100,
+                      }}
+                      whileHover={{ scale: 1.05, x: 5 }}
                     >
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
-                          <TeamOutlined className="text-purple-600 text-xl" />
+                      <div className="card-glow"></div>
+                      <div className="card-content">
+                        <div className="icon-container volume-icon">
+                          <TeamOutlined className="card-icon" />
+                          <div className="icon-pulse"></div>
                         </div>
-                        <div>
-                          <div className="font-bold text-gray-900 dark:text-white text-lg">12.5K+</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Interviews</div>
+                        <div className="text-content">
+                          <div className="metric-value">12.5K+</div>
+                          <div className="metric-label">Interviews</div>
+                          <div className="metric-description">Completed</div>
                         </div>
                       </div>
+                      <div className="card-pattern"></div>
                     </motion.div>
                   </div>
                 </motion.div>
@@ -529,11 +593,15 @@ const Landing: React.FC = () => {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <Title level={2} className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6">
+              <Title
+                level={2}
+                className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6"
+              >
                 Trusted by Industry Leaders
               </Title>
               <Paragraph className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Join thousands of companies that have transformed their hiring process with mirAI
+                Join thousands of companies that have transformed their hiring
+                process with mirAI
               </Paragraph>
             </motion.div>
 
@@ -549,7 +617,11 @@ const Landing: React.FC = () => {
                     <Card className="text-center h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
                       <div className="mb-4">{stat.icon}</div>
                       <Statistic
-                        title={<span className="text-lg font-bold text-gray-900 dark:text-white">{stat.title}</span>}
+                        title={
+                          <span className="text-lg font-bold text-gray-900 dark:text-white">
+                            {stat.title}
+                          </span>
+                        }
                         value={stat.value}
                         suffix={stat.suffix}
                         valueStyle={{
@@ -579,12 +651,16 @@ const Landing: React.FC = () => {
               viewport={{ once: true }}
               className="text-center mb-20"
             >
-              <Title level={2} className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6">
+              <Title
+                level={2}
+                className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6"
+              >
                 Powerful Features for Modern Hiring
               </Title>
               <Paragraph className="text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto">
-                Our AI-powered platform provides everything you need to conduct efficient, fair, and insightful
-                interviews that help you find the perfect candidates.
+                Our AI-powered platform provides everything you need to conduct
+                efficient, fair, and insightful interviews that help you find
+                the perfect candidates.
               </Paragraph>
             </motion.div>
 
@@ -602,7 +678,10 @@ const Landing: React.FC = () => {
                       <div className="text-center mb-6 group-hover:scale-110 transition-transform duration-300">
                         {feature.icon}
                       </div>
-                      <Title level={4} className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+                      <Title
+                        level={4}
+                        className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center"
+                      >
                         {feature.title}
                       </Title>
                       <Paragraph className="text-gray-600 dark:text-gray-300 text-center leading-relaxed">
@@ -626,11 +705,15 @@ const Landing: React.FC = () => {
               viewport={{ once: true }}
               className="text-center mb-20"
             >
-              <Title level={2} className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6">
+              <Title
+                level={2}
+                className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-6"
+              >
                 What Our Customers Say
               </Title>
               <Paragraph className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Don't just take our word for it. Here's what industry leaders are saying about mirAI.
+                Don't just take our word for it. Here's what industry leaders
+                are saying about mirAI.
               </Paragraph>
             </motion.div>
 
@@ -651,13 +734,20 @@ const Landing: React.FC = () => {
                           className="w-16 h-16 rounded-full object-cover mr-4 border-4 border-indigo-100 dark:border-indigo-900"
                         />
                         <div>
-                          <div className="font-bold text-lg text-gray-900 dark:text-white">{testimonial.name}</div>
-                          <div className="text-gray-600 dark:text-gray-400 text-sm">{testimonial.role}</div>
+                          <div className="font-bold text-lg text-gray-900 dark:text-white">
+                            {testimonial.name}
+                          </div>
+                          <div className="text-gray-600 dark:text-gray-400 text-sm">
+                            {testimonial.role}
+                          </div>
                         </div>
                       </div>
                       <div className="flex mb-4">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <StarOutlined key={i} className="text-yellow-400 text-lg" />
+                          <StarOutlined
+                            key={i}
+                            className="text-yellow-400 text-lg"
+                          />
                         ))}
                       </div>
                       <Paragraph className="text-gray-700 dark:text-gray-300 italic leading-relaxed">
@@ -682,12 +772,16 @@ const Landing: React.FC = () => {
               viewport={{ once: true }}
               className="text-center"
             >
-              <Title level={2} className="text-4xl sm:text-5xl font-black text-white mb-6">
+              <Title
+                level={2}
+                className="text-4xl sm:text-5xl font-black text-white mb-6"
+              >
                 Ready to Transform Your Hiring?
               </Title>
               <Paragraph className="text-xl text-indigo-100 max-w-3xl mx-auto mb-12">
-                Join thousands of companies using mirAI to make better hiring decisions. Start your free trial today and
-                experience the future of interviews.
+                Join thousands of companies using mirAI to make better hiring
+                decisions. Start your free trial today and experience the future
+                of interviews.
               </Paragraph>
               <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <Button
@@ -727,12 +821,14 @@ const Landing: React.FC = () => {
                 </div>
                 <div className="landing-logo-content">
                   <span className="landing-logo-text text-white">mirAI</span>
-                  <span className="landing-logo-subtitle">Interview Platform</span>
+                  <span className="landing-logo-subtitle">
+                    Interview Platform
+                  </span>
                 </div>
               </div>
               <Paragraph className="text-gray-400 mb-6 leading-relaxed">
-                The future of AI-powered interviews. Transform your hiring process with intelligent automation and
-                data-driven insights.
+                The future of AI-powered interviews. Transform your hiring
+                process with intelligent automation and data-driven insights.
               </Paragraph>
               <div className="flex space-x-4">
                 <Button
@@ -750,22 +846,34 @@ const Landing: React.FC = () => {
               </Title>
               <div className="space-y-3">
                 <div>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
                     Features
                   </a>
                 </div>
                 <div>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
                     Pricing
                   </a>
                 </div>
                 <div>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
                     API
                   </a>
                 </div>
                 <div>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
                     Integrations
                   </a>
                 </div>
@@ -777,22 +885,34 @@ const Landing: React.FC = () => {
               </Title>
               <div className="space-y-3">
                 <div>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
                     About
                   </a>
                 </div>
                 <div>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
                     Blog
                   </a>
                 </div>
                 <div>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
                     Careers
                   </a>
                 </div>
                 <div>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
                     Contact
                   </a>
                 </div>
@@ -811,7 +931,10 @@ const Landing: React.FC = () => {
                   placeholder="Enter your email"
                   className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
                 />
-                <Button type="primary" className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 border-0 rounded-lg">
+                <Button
+                  type="primary"
+                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 border-0 rounded-lg"
+                >
                   Subscribe
                 </Button>
               </div>
@@ -820,16 +943,26 @@ const Landing: React.FC = () => {
           <Divider className="border-gray-700 my-12" />
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="text-gray-400 text-sm mb-4 sm:mb-0">
-              © 2024 mirAI. All rights reserved. Built with ❤️ for better hiring.
+              © 2024 mirAI. All rights reserved. Built with ❤️ for better
+              hiring.
             </div>
             <div className="flex space-x-6 text-sm">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 Privacy Policy
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 Terms of Service
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 Cookie Policy
               </a>
             </div>
@@ -837,7 +970,7 @@ const Landing: React.FC = () => {
         </div>
       </Footer>
     </Layout>
-  )
-}
+  );
+};
 
-export default Landing
+export default Landing;
