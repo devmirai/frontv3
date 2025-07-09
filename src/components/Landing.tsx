@@ -1265,163 +1265,190 @@ const Landing: React.FC = () => {
         </section>
       </Content>
 
-      {/* Enhanced Footer */}
-      <Footer className="bg-gray-900 dark:bg-black text-white py-16">
+      {/* Modern Footer */}
+      <Footer className="modern-footer">
+        <div className="footer-background">
+          <div className="footer-gradient"></div>
+          <div className="footer-pattern"></div>
+        </div>
+
         <div className="container">
-          <Row gutter={[48, 48]}>
-            <Col xs={24} sm={12} lg={8}>
-              <div className="landing-logo mb-6">
-                <div className="landing-logo-icon">
+          <div className="footer-content">
+            {/* Brand Section */}
+            <motion.div
+              className="footer-brand"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <div className="footer-logo">
+                <div className="footer-logo-icon">
                   <RobotOutlined />
                 </div>
-                <div className="landing-logo-content">
-                  <span className="landing-logo-text text-white">mirAI</span>
-                  <span className="landing-logo-subtitle">
+                <div className="footer-logo-content">
+                  <span className="footer-logo-text">mirAI</span>
+                  <span className="footer-logo-subtitle">
                     Interview Platform
                   </span>
                 </div>
               </div>
-              <Paragraph className="text-gray-400 mb-6 leading-relaxed">
-                The future of AI-powered interviews. Transform your hiring
-                process with intelligent automation and data-driven insights.
+
+              <Paragraph className="footer-description">
+                Revolutionizing the future of hiring with AI-powered interview
+                intelligence. Trusted by leading companies worldwide.
               </Paragraph>
-              <div className="flex space-x-4">
+
+              <div className="footer-stats">
+                <div className="footer-stat">
+                  <div className="stat-value">250+</div>
+                  <div className="stat-label">Companies</div>
+                </div>
+                <div className="footer-stat">
+                  <div className="stat-value">12.5K+</div>
+                  <div className="stat-label">Interviews</div>
+                </div>
+                <div className="footer-stat">
+                  <div className="stat-value">94%</div>
+                  <div className="stat-label">Accuracy</div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Navigation Links */}
+            <div className="footer-navigation">
+              <motion.div
+                className="footer-nav-section"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                viewport={{ once: true }}
+              >
+                <h4 className="footer-nav-title">Platform</h4>
+                <div className="footer-nav-links">
+                  <a href="#features" className="footer-nav-link">
+                    <BulbOutlined className="link-icon" />
+                    <span>Features</span>
+                  </a>
+                  <a href="#performance" className="footer-nav-link">
+                    <BarChartOutlined className="link-icon" />
+                    <span>Performance</span>
+                  </a>
+                  <a href="#testimonials" className="footer-nav-link">
+                    <HeartOutlined className="link-icon" />
+                    <span>Customer Stories</span>
+                  </a>
+                </div>
+              </motion.div>
+
+              <motion.div
+                className="footer-nav-section"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                viewport={{ once: true }}
+              >
+                <h4 className="footer-nav-title">Connect</h4>
+                <div className="footer-nav-links">
+                  <a
+                    href="#"
+                    className="footer-nav-link"
+                    onClick={() => navigate("/login")}
+                  >
+                    <UserOutlined className="link-icon" />
+                    <span>Get Started</span>
+                  </a>
+                  <a href="#support" className="footer-nav-link">
+                    <TeamOutlined className="link-icon" />
+                    <span>Expert Consultation</span>
+                  </a>
+                  <a href="#help" className="footer-nav-link">
+                    <SafetyOutlined className="link-icon" />
+                    <span>Help Center</span>
+                  </a>
+                </div>
+              </motion.div>
+
+              <motion.div
+                className="footer-nav-section"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                viewport={{ once: true }}
+              >
+                <h4 className="footer-nav-title">Resources</h4>
+                <div className="footer-nav-links">
+                  <a href="#documentation" className="footer-nav-link">
+                    <InfoCircleOutlined className="link-icon" />
+                    <span>Documentation</span>
+                  </a>
+                  <a href="#api" className="footer-nav-link">
+                    <ThunderboltOutlined className="link-icon" />
+                    <span>API Reference</span>
+                  </a>
+                  <a href="#security" className="footer-nav-link">
+                    <SafetyOutlined className="link-icon" />
+                    <span>Security</span>
+                  </a>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Action Section */}
+            <motion.div
+              className="footer-action"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+            >
+              <div className="footer-cta">
+                <h4 className="footer-cta-title">Ready to Transform Hiring?</h4>
+                <p className="footer-cta-text">
+                  Join the AI revolution and discover how mirAI can enhance your
+                  recruitment process.
+                </p>
                 <Button
-                  type="text"
-                  icon={<HeartOutlined />}
-                  className="text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 rounded-lg"
+                  className="footer-cta-button"
+                  onClick={() => navigate("/login")}
                 >
-                  Made with ❤️
+                  <span>Explore Platform</span>
+                  <ArrowRightOutlined className="cta-arrow" />
                 </Button>
               </div>
-            </Col>
-            <Col xs={12} sm={6} lg={4}>
-              <Title level={5} className="text-white mb-6">
-                Product
-              </Title>
-              <div className="space-y-3">
-                <div>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Features
-                  </a>
-                </div>
-                <div>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Pricing
-                  </a>
-                </div>
-                <div>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    API
-                  </a>
-                </div>
-                <div>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Integrations
-                  </a>
-                </div>
-              </div>
-            </Col>
-            <Col xs={12} sm={6} lg={4}>
-              <Title level={5} className="text-white mb-6">
-                Company
-              </Title>
-              <div className="space-y-3">
-                <div>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    About
-                  </a>
-                </div>
-                <div>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Blog
-                  </a>
-                </div>
-                <div>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Careers
-                  </a>
-                </div>
-                <div>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Contact
-                  </a>
-                </div>
-              </div>
-            </Col>
-            <Col xs={24} sm={12} lg={8}>
-              <Title level={5} className="text-white mb-6">
-                Stay Updated
-              </Title>
-              <Paragraph className="text-gray-400 mb-4">
-                Get the latest updates on new features and industry insights.
-              </Paragraph>
-              <div className="flex space-x-3">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
-                />
-                <Button
-                  type="primary"
-                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 border-0 rounded-lg"
-                >
-                  Subscribe
-                </Button>
-              </div>
-            </Col>
-          </Row>
-          <Divider className="border-gray-700 my-12" />
-          <div className="flex flex-col sm:flex-row justify-between items-center">
-            <div className="text-gray-400 text-sm mb-4 sm:mb-0">
-              © 2024 mirAI. All rights reserved. Built with ❤️ for better
-              hiring.
-            </div>
-            <div className="flex space-x-6 text-sm">
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                Privacy Policy
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                Terms of Service
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                Cookie Policy
-              </a>
-            </div>
+            </motion.div>
           </div>
+
+          {/* Footer Bottom */}
+          <motion.div
+            className="footer-bottom"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <div className="footer-bottom-content">
+              <div className="footer-copyright">
+                <span>© 2024 mirAI. All rights reserved.</span>
+                <div className="footer-status">
+                  <div className="status-dot-footer"></div>
+                  <span>All systems operational</span>
+                </div>
+              </div>
+
+              <div className="footer-legal">
+                <a href="#privacy" className="footer-legal-link">
+                  Privacy
+                </a>
+                <a href="#terms" className="footer-legal-link">
+                  Terms
+                </a>
+                <a href="#security" className="footer-legal-link">
+                  Security
+                </a>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </Footer>
     </Layout>
