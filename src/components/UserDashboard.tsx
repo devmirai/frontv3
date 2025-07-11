@@ -1,5 +1,5 @@
-import type React from "react"
-import { useState, useEffect } from "react"
+import type React from "react";
+import { useState, useEffect } from "react";
 import {
   Layout,
   Menu,
@@ -24,7 +24,7 @@ import {
   Select,
   Drawer,
   Divider,
-} from "antd"
+} from "antd";
 import {
   DashboardOutlined,
   UserOutlined,
@@ -47,46 +47,49 @@ import {
   LoadingOutlined,
   BookOutlined,
   HeartOutlined,
-} from "@ant-design/icons"
-import { motion } from "framer-motion"
-import { useNavigate } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
-import { convocatoriaAPI, postulacionAPI } from "../services/api"
-import type { Convocatoria, Postulacion } from "../types/api"
-import { EstadoPostulacion } from "../types/api"
-import ThemeToggle from "./ThemeToggle"
-import NotificationDropdown from "./NotificationDropdown"
-import { 
-  getMockConvocatorias, 
-  getMockPostulacionesByUsuario, 
-  simulateApplyToJob, 
+} from "@ant-design/icons";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { convocatoriaAPI, postulacionAPI } from "../services/api";
+import type { Convocatoria, Postulacion } from "../types/api";
+import { EstadoPostulacion } from "../types/api";
+import ThemeToggle from "./ThemeToggle";
+import NotificationDropdown from "./NotificationDropdown";
+import {
+  getMockConvocatorias,
+  getMockPostulacionesByUsuario,
+  simulateApplyToJob,
   simulateStartInterview,
   getMockUser,
-  generateMockQuestions 
-} from "../data/mockDataUtils"
-import dayjs from "dayjs"
+  generateMockQuestions,
+} from "../data/mockDataUtils";
+import dayjs from "dayjs";
 
-const { Header, Sider, Content } = Layout
-const { Title, Paragraph, Text } = Typography
-const { Option } = Select
+const { Header, Sider, Content } = Layout;
+const { Title, Paragraph, Text } = Typography;
+const { Option } = Select;
 
 const UserDashboard: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false)
-  const [availableJobs, setAvailableJobs] = useState<Convocatoria[]>([])
-  const [myApplications, setMyApplications] = useState<Postulacion[]>([])
-  const [loading, setLoading] = useState(true)
-  const [applyModalVisible, setApplyModalVisible] = useState(false)
-  const [selectedJob, setSelectedJob] = useState<Convocatoria | null>(null)
-  const [applying, setApplying] = useState(false)
-  const [profileModalVisible, setProfileModalVisible] = useState(false)
-  const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false)
-  const [applicationsModalVisible, setApplicationsModalVisible] = useState(false)
-  const [jobsModalVisible, setJobsModalVisible] = useState(false)
-  const [profileForm] = Form.useForm()
-  const [settingsForm] = Form.useForm()
-  const [startingInterview, setStartingInterview] = useState<number | null>(null)
-  const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const [collapsed, setCollapsed] = useState(false);
+  const [availableJobs, setAvailableJobs] = useState<Convocatoria[]>([]);
+  const [myApplications, setMyApplications] = useState<Postulacion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [applyModalVisible, setApplyModalVisible] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<Convocatoria | null>(null);
+  const [applying, setApplying] = useState(false);
+  const [profileModalVisible, setProfileModalVisible] = useState(false);
+  const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false);
+  const [applicationsModalVisible, setApplicationsModalVisible] =
+    useState(false);
+  const [jobsModalVisible, setJobsModalVisible] = useState(false);
+  const [profileForm] = Form.useForm();
+  const [settingsForm] = Form.useForm();
+  const [startingInterview, setStartingInterview] = useState<number | null>(
+    null,
+  );
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const menuItems = [
     {
@@ -174,10 +177,10 @@ const UserDashboard: React.FC = () => {
         },
       ],
     },
-  ]
+  ];
 
   useEffect(() => {
-    loadDashboardData()
+    loadDashboardData();
     // Initialize forms with user data
     if (user) {
       profileForm.setFieldsValue({
@@ -185,25 +188,25 @@ const UserDashboard: React.FC = () => {
         email: user.email,
         phone: user.telefono,
         birthDate: user.nacimiento ? dayjs(user.nacimiento) : null,
-      })
+      });
       settingsForm.setFieldsValue({
         notifications: true,
         emailUpdates: true,
         theme: "auto",
         language: "en",
-      })
+      });
     }
-  }, [user])
+  }, [user]);
 
   const loadDashboardData = async () => {
-    if (!user?.id) return
+    if (!user?.id) return;
 
     try {
-      setLoading(true)
+      setLoading(true);
 
       // SIEMPRE usar datos mock para pruebas de diseño
-      console.log('🔧 Usando datos mock para pruebas de diseño');
-      
+      console.log("🔧 Usando datos mock para pruebas de diseño");
+
       // Cargar trabajos disponibles desde mock
       const mockJobs = getMockConvocatorias();
       setAvailableJobs(mockJobs);
@@ -212,14 +215,16 @@ const UserDashboard: React.FC = () => {
       const mockApplications = getMockPostulacionesByUsuario(user.id);
       setMyApplications(mockApplications);
 
-      console.log(`📊 Mock data loaded: ${mockJobs.length} jobs, ${mockApplications.length} applications`);
+      console.log(
+        `📊 Mock data loaded: ${mockJobs.length} jobs, ${mockApplications.length} applications`,
+      );
     } catch (error: any) {
-      console.error("Error loading dashboard data:", error)
-      message.error("Error loading dashboard data")
+      console.error("Error loading dashboard data:", error);
+      message.error("Error loading dashboard data");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const stats = [
     {
@@ -232,7 +237,9 @@ const UserDashboard: React.FC = () => {
     },
     {
       title: "Completed Interviews",
-      value: myApplications.filter((a) => a.estado === EstadoPostulacion.COMPLETADA).length,
+      value: myApplications.filter(
+        (a) => a.estado === EstadoPostulacion.COMPLETADA,
+      ).length,
       icon: <CheckCircleOutlined className="text-green-600" />,
       color: "green",
       change: `${Math.round((myApplications.filter((a) => a.estado === EstadoPostulacion.COMPLETADA).length / Math.max(myApplications.length, 1)) * 100)}% completion rate`,
@@ -240,7 +247,9 @@ const UserDashboard: React.FC = () => {
     },
     {
       title: "In Progress",
-      value: myApplications.filter((a) => a.estado === EstadoPostulacion.EN_EVALUACION).length,
+      value: myApplications.filter(
+        (a) => a.estado === EstadoPostulacion.EN_EVALUACION,
+      ).length,
       icon: <ClockCircleOutlined className="text-orange-600" />,
       color: "orange",
       change: "Active interviews",
@@ -254,18 +263,21 @@ const UserDashboard: React.FC = () => {
       change: "New opportunities",
       trend: "up",
     },
-  ]
+  ];
 
   const getStatusTag = (status: EstadoPostulacion) => {
     const statusConfig = {
       [EstadoPostulacion.PENDIENTE]: { color: "warning", text: "Pending" },
-      [EstadoPostulacion.EN_EVALUACION]: { color: "processing", text: "In Progress" },
+      [EstadoPostulacion.EN_EVALUACION]: {
+        color: "processing",
+        text: "In Progress",
+      },
       [EstadoPostulacion.COMPLETADA]: { color: "success", text: "Completed" },
       [EstadoPostulacion.RECHAZADA]: { color: "error", text: "Rejected" },
-    }
-    const config = statusConfig[status]
-    return <Tag color={config.color}>{config.text}</Tag>
-  }
+    };
+    const config = statusConfig[status];
+    return <Tag color={config.color}>{config.text}</Tag>;
+  };
 
   const userMenu = {
     items: [
@@ -292,25 +304,25 @@ const UserDashboard: React.FC = () => {
         onClick: logout,
       },
     ],
-  }
+  };
 
   // Fixed interview start function - single request flow
   const handleStartInterview = async (postulacionId: number) => {
     try {
-      setStartingInterview(postulacionId)
-      
+      setStartingInterview(postulacionId);
+
       // Update status first
-      await postulacionAPI.iniciarEntrevista(postulacionId)
-      
+      await postulacionAPI.iniciarEntrevista(postulacionId);
+
       // Navigate to interview page
-      navigate(`/usuario/interview/${postulacionId}`)
+      navigate(`/usuario/interview/${postulacionId}`);
     } catch (error) {
-      console.error("Error starting interview:", error)
-      message.error("Failed to start interview. Please try again.")
+      console.error("Error starting interview:", error);
+      message.error("Failed to start interview. Please try again.");
     } finally {
-      setStartingInterview(null)
+      setStartingInterview(null);
     }
-  }
+  };
 
   const applicationColumns = [
     {
@@ -318,9 +330,15 @@ const UserDashboard: React.FC = () => {
       key: "job",
       render: (_: any, record: Postulacion) => (
         <div>
-          <div className="font-medium text-gray-800 dark:text-gray-200">{record.convocatoria?.titulo}</div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">{record.convocatoria?.puesto}</div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">{record.convocatoria?.empresa?.nombre}</div>
+          <div className="font-medium text-gray-800 dark:text-gray-200">
+            {record.convocatoria?.titulo}
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {record.convocatoria?.puesto}
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {record.convocatoria?.empresa?.nombre}
+          </div>
         </div>
       ),
     },
@@ -335,7 +353,9 @@ const UserDashboard: React.FC = () => {
       dataIndex: "fechaPostulacion",
       key: "fechaPostulacion",
       render: (date: string) => (
-        <span className="text-gray-600 dark:text-gray-300">{dayjs(date).format("MMM DD, YYYY")}</span>
+        <span className="text-gray-600 dark:text-gray-300">
+          {dayjs(date).format("MMM DD, YYYY")}
+        </span>
       ),
     },
     {
@@ -345,25 +365,29 @@ const UserDashboard: React.FC = () => {
         const getProgress = () => {
           switch (record.estado) {
             case EstadoPostulacion.PENDIENTE:
-              return 25
+              return 25;
             case EstadoPostulacion.EN_EVALUACION:
-              return 75
+              return 75;
             case EstadoPostulacion.COMPLETADA:
-              return 100
+              return 100;
             case EstadoPostulacion.RECHAZADA:
-              return 100
+              return 100;
             default:
-              return 0
+              return 0;
           }
-        }
+        };
         return (
           <Progress
             percent={getProgress()}
             size="small"
-            strokeColor={record.estado === EstadoPostulacion.RECHAZADA ? "#ef4444" : "#6366f1"}
+            strokeColor={
+              record.estado === EstadoPostulacion.RECHAZADA
+                ? "#ef4444"
+                : "#6366f1"
+            }
             showInfo={false}
           />
-        )
+        );
       },
     },
     {
@@ -375,7 +399,13 @@ const UserDashboard: React.FC = () => {
             <Button
               type="primary"
               size="small"
-              icon={startingInterview === record.id ? <LoadingOutlined /> : <PlayCircleOutlined />}
+              icon={
+                startingInterview === record.id ? (
+                  <LoadingOutlined />
+                ) : (
+                  <PlayCircleOutlined />
+                )
+              }
               className="btn-gradient"
               loading={startingInterview === record.id}
               onClick={() => handleStartInterview(record.id!)}
@@ -398,7 +428,9 @@ const UserDashboard: React.FC = () => {
             <Button
               size="small"
               icon={<EyeOutlined />}
-              onClick={() => navigate(`/usuario/interview/${record.id}/results`)}
+              onClick={() =>
+                navigate(`/usuario/interview/${record.id}/results`)
+              }
             >
               View Results
             </Button>
@@ -406,7 +438,7 @@ const UserDashboard: React.FC = () => {
         </Space>
       ),
     },
-  ]
+  ];
 
   const jobsColumns = [
     {
@@ -414,8 +446,12 @@ const UserDashboard: React.FC = () => {
       key: "title",
       render: (_: any, record: Convocatoria) => (
         <div>
-          <div className="font-medium text-gray-800 dark:text-gray-200">{record.titulo}</div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">{record.empresa?.nombre}</div>
+          <div className="font-medium text-gray-800 dark:text-gray-200">
+            {record.titulo}
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {record.empresa?.nombre}
+          </div>
         </div>
       ),
     },
@@ -430,14 +466,18 @@ const UserDashboard: React.FC = () => {
       dataIndex: "fechaCierre",
       key: "fechaCierre",
       render: (date: string) => (
-        <span className="text-gray-600 dark:text-gray-300">{dayjs(date).format("MMM DD, YYYY")}</span>
+        <span className="text-gray-600 dark:text-gray-300">
+          {dayjs(date).format("MMM DD, YYYY")}
+        </span>
       ),
     },
     {
       title: "Actions",
       key: "actions",
       render: (_: any, record: Convocatoria) => {
-        const alreadyApplied = myApplications.some((app) => app.convocatoria?.id === record.id)
+        const alreadyApplied = myApplications.some(
+          (app) => app.convocatoria?.id === record.id,
+        );
         return (
           <Button
             type="primary"
@@ -449,28 +489,30 @@ const UserDashboard: React.FC = () => {
           >
             {alreadyApplied ? "Applied" : "Apply Now"}
           </Button>
-        )
+        );
       },
     },
-  ]
+  ];
 
   // Fixed Apply to Job function - creates application then starts interview
   const handleApplyToJob = async () => {
-    if (!selectedJob || !user?.id) return
+    if (!selectedJob || !user?.id) return;
 
-    setApplying(true)
+    setApplying(true);
     try {
       // Check if user already applied to prevent duplicates
-      const existingApplication = myApplications.find((app) => app.convocatoria?.id === selectedJob.id)
+      const existingApplication = myApplications.find(
+        (app) => app.convocatoria?.id === selectedJob.id,
+      );
       if (existingApplication) {
-        message.warning("You have already applied to this position.")
-        setApplyModalVisible(false)
-        setSelectedJob(null)
-        setApplying(false)
-        return
+        message.warning("You have already applied to this position.");
+        setApplyModalVisible(false);
+        setSelectedJob(null);
+        setApplying(false);
+        return;
       }
 
-      message.loading("Creating your application...", 0)
+      message.loading("Creating your application...", 0);
 
       // Create a new application
       const applicationResponse = await postulacionAPI.create({
@@ -478,21 +520,22 @@ const UserDashboard: React.FC = () => {
         convocatoria: { id: selectedJob.id },
         estado: EstadoPostulacion.PENDIENTE,
         fechaPostulacion: new Date().toISOString(),
-      })
+      });
 
-      const newApplicationId = applicationResponse.data.id || applicationResponse.data
+      const newApplicationId =
+        applicationResponse.data.id || applicationResponse.data;
 
       if (!newApplicationId) {
-        throw new Error("Failed to create application - no ID returned")
+        throw new Error("Failed to create application - no ID returned");
       }
 
-      message.destroy()
-      message.success("Application submitted successfully!")
+      message.destroy();
+      message.success("Application submitted successfully!");
 
       // Close modal and refresh data
-      setApplyModalVisible(false)
-      setSelectedJob(null)
-      await loadDashboardData()
+      setApplyModalVisible(false);
+      setSelectedJob(null);
+      await loadDashboardData();
 
       // Ask if user wants to start interview immediately
       Modal.confirm({
@@ -501,44 +544,49 @@ const UserDashboard: React.FC = () => {
         okText: "Start Interview",
         cancelText: "Later",
         onOk: () => handleStartInterview(newApplicationId),
-      })
+      });
     } catch (error: any) {
-      console.error("Error in application process:", error)
-      message.destroy()
+      console.error("Error in application process:", error);
+      message.destroy();
 
       if (error.response?.status === 409) {
-        message.error("You have already applied to this position.")
+        message.error("You have already applied to this position.");
       } else {
-        message.error(error.response?.data?.message || "Error processing your application. Please try again.")
+        message.error(
+          error.response?.data?.message ||
+            "Error processing your application. Please try again.",
+        );
       }
     } finally {
-      setApplying(false)
+      setApplying(false);
     }
-  }
+  };
 
   const openApplyModal = (job: Convocatoria) => {
     // Check if user already applied
-    const alreadyApplied = myApplications.some((app) => app.convocatoria?.id === job.id)
+    const alreadyApplied = myApplications.some(
+      (app) => app.convocatoria?.id === job.id,
+    );
     if (alreadyApplied) {
-      message.warning("You have already applied to this position.")
-      return
+      message.warning("You have already applied to this position.");
+      return;
     }
 
-    setSelectedJob(job)
-    setApplyModalVisible(true)
-  }
+    setSelectedJob(job);
+    setApplyModalVisible(true);
+  };
 
   const handleProfileSave = (values: any) => {
-    console.log("Profile values:", values)
-    message.success("Profile updated successfully!")
-    setProfileModalVisible(false)
-  }
+    console.log("Profile values:", values);
+    message.success("Profile updated successfully!");
+    setProfileModalVisible(false);
+  };
 
   const handleSettingsSave = (values: any) => {
-    console.log("Settings values:", values)
-    message.success("Settings saved successfully!")
-    setSettingsDrawerVisible(false)
-  }
+    console.log("Settings values:", values);
+    message.success("Settings saved successfully!");
+    setSettingsDrawerVisible(false);
+  };
 
   return (
     <Layout className="main-layout min-h-screen">
@@ -558,7 +606,11 @@ const UserDashboard: React.FC = () => {
       >
         {/* Enhanced Logo Section */}
         <div className="sidebar-logo-container">
-          <motion.div className="sidebar-logo" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+          <motion.div
+            className="sidebar-logo"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
             <div className="logo-icon">
               <RobotOutlined />
             </div>
@@ -586,16 +638,22 @@ const UserDashboard: React.FC = () => {
             className="enhanced-menu"
             onClick={(info) => {
               // Use the info.key instead of accessing item directly
-              const clickedMenuItem = menuItems.find(item => {
-                if ('key' in item && item.key === info.key) {
+              const clickedMenuItem = menuItems.find((item) => {
+                if ("key" in item && item.key === info.key) {
                   return item;
-                } else if ('children' in item) {
-                  return item.children?.find(child => 'key' in child && child.key === info.key);
+                } else if ("children" in item) {
+                  return item.children?.find(
+                    (child) => "key" in child && child.key === info.key,
+                  );
                 }
                 return false;
               });
-              
-              if (clickedMenuItem && 'onClick' in clickedMenuItem && typeof clickedMenuItem.onClick === 'function') {
+
+              if (
+                clickedMenuItem &&
+                "onClick" in clickedMenuItem &&
+                typeof clickedMenuItem.onClick === "function"
+              ) {
                 clickedMenuItem.onClick();
               }
             }}
@@ -624,14 +682,20 @@ const UserDashboard: React.FC = () => {
                   <Title level={5} className="status-title">
                     AI Assistant
                   </Title>
-                  <Text className="status-description">Ready to help you succeed!</Text>
+                  <Text className="status-description">
+                    Ready to help you succeed!
+                  </Text>
                   <div className="status-stats">
                     <div className="stat-item">
-                      <span className="stat-number">{myApplications.length}</span>
+                      <span className="stat-number">
+                        {myApplications.length}
+                      </span>
                       <span className="stat-label">Applications</span>
                     </div>
                     <div className="stat-item">
-                      <span className="stat-number">{availableJobs.length}</span>
+                      <span className="stat-number">
+                        {availableJobs.length}
+                      </span>
                       <span className="stat-label">Jobs</span>
                     </div>
                   </div>
@@ -662,7 +726,8 @@ const UserDashboard: React.FC = () => {
                   My Dashboard
                 </Title>
                 <Text className="page-subtitle">
-                  Welcome back, {user?.name}! Track your applications and interviews.
+                  Welcome back, {user?.name}! Track your applications and
+                  interviews.
                 </Text>
               </div>
             </div>
@@ -679,8 +744,8 @@ const UserDashboard: React.FC = () => {
                 </Button>
                 <NotificationDropdown />
                 <ThemeToggle />
-                <Dropdown 
-                  menu={{ 
+                <Dropdown
+                  menu={{
                     items: [
                       {
                         key: "profile",
@@ -704,12 +769,16 @@ const UserDashboard: React.FC = () => {
                         icon: <LogoutOutlined />,
                         onClick: logout,
                       },
-                    ]
-                  }} 
-                  trigger={["click"]} 
+                    ],
+                  }}
+                  trigger={["click"]}
                   placement="bottomRight"
                 >
-                  <Avatar src={user?.avatar} size="large" className="user-avatar" />
+                  <Avatar
+                    src={user?.avatar}
+                    size="large"
+                    className="user-avatar"
+                  />
                 </Dropdown>
               </Space>
             </div>
@@ -734,26 +803,44 @@ const UserDashboard: React.FC = () => {
                   <Paragraph className="welcome-description">
                     You have{" "}
                     <strong>
-                      {myApplications.filter((a) => a.estado === EstadoPostulacion.EN_EVALUACION).length} interviews
+                      {
+                        myApplications.filter(
+                          (a) => a.estado === EstadoPostulacion.EN_EVALUACION,
+                        ).length
+                      }{" "}
+                      interviews
                     </strong>{" "}
-                    in progress and <strong>{availableJobs.length} new job opportunities</strong> available.
+                    in progress and{" "}
+                    <strong>
+                      {availableJobs.length} new job opportunities
+                    </strong>{" "}
+                    available.
                   </Paragraph>
                   <Space wrap>
                     <Button
                       type="primary"
                       className="btn-gradient"
                       size="large"
-                      disabled={myApplications.filter((a) => a.estado === EstadoPostulacion.EN_EVALUACION).length === 0}
+                      disabled={
+                        myApplications.filter(
+                          (a) => a.estado === EstadoPostulacion.EN_EVALUACION,
+                        ).length === 0
+                      }
                       onClick={() => {
-                        const inProgressApp = myApplications.find((a) => a.estado === EstadoPostulacion.EN_EVALUACION)
+                        const inProgressApp = myApplications.find(
+                          (a) => a.estado === EstadoPostulacion.EN_EVALUACION,
+                        );
                         if (inProgressApp) {
-                          navigate(`/usuario/interview/${inProgressApp.id}`)
+                          navigate(`/usuario/interview/${inProgressApp.id}`);
                         }
                       }}
                     >
                       Continue Interview
                     </Button>
-                    <Button size="large" onClick={() => setJobsModalVisible(true)}>
+                    <Button
+                      size="large"
+                      onClick={() => setJobsModalVisible(true)}
+                    >
                       Browse Jobs
                     </Button>
                   </Space>
@@ -782,13 +869,18 @@ const UserDashboard: React.FC = () => {
                     <Card className="enhanced-stats-card">
                       <div className="stats-header">
                         <div className="stats-icon">{stat.icon}</div>
-                        <Tag color={stat.trend === "up" ? "success" : "default"} className="trend-tag">
+                        <Tag
+                          color={stat.trend === "up" ? "success" : "default"}
+                          className="trend-tag"
+                        >
                           {stat.change}
                         </Tag>
                       </div>
                       <div className="stats-content">
                         <Statistic
-                          title={<span className="stats-title">{stat.title}</span>}
+                          title={
+                            <span className="stats-title">{stat.title}</span>
+                          }
                           value={stat.value}
                           valueStyle={{
                             color: "var(--text-primary)",
@@ -811,7 +903,11 @@ const UserDashboard: React.FC = () => {
                   <Title level={4} className="table-title">
                     My Applications
                   </Title>
-                  <Button type="link" className="view-all-button" onClick={() => setApplicationsModalVisible(true)}>
+                  <Button
+                    type="link"
+                    className="view-all-button"
+                    onClick={() => setApplicationsModalVisible(true)}
+                  >
                     View All
                   </Button>
                 </div>
@@ -839,7 +935,11 @@ const UserDashboard: React.FC = () => {
                   <Title level={4} className="table-title">
                     Available Job Opportunities
                   </Title>
-                  <Button type="link" className="view-all-button" onClick={() => setJobsModalVisible(true)}>
+                  <Button
+                    type="link"
+                    className="view-all-button"
+                    onClick={() => setJobsModalVisible(true)}
+                  >
                     Browse All
                   </Button>
                 </div>
@@ -849,7 +949,9 @@ const UserDashboard: React.FC = () => {
               {availableJobs.length > 0 ? (
                 <Row gutter={[24, 24]}>
                   {availableJobs.slice(0, 4).map((job) => {
-                    const alreadyApplied = myApplications.some((app) => app.convocatoria?.id === job.id)
+                    const alreadyApplied = myApplications.some(
+                      (app) => app.convocatoria?.id === job.id,
+                    );
                     return (
                       <Col xs={24} lg={12} key={job.id}>
                         <motion.div
@@ -866,7 +968,9 @@ const UserDashboard: React.FC = () => {
                                     {job.titulo}
                                   </Title>
                                   <div className="job-meta">
-                                    <Text className="job-company">{job.empresa?.nombre}</Text>
+                                    <Text className="job-company">
+                                      {job.empresa?.nombre}
+                                    </Text>
                                     <Tag color="blue" className="job-position">
                                       {job.puesto}
                                     </Tag>
@@ -875,15 +979,23 @@ const UserDashboard: React.FC = () => {
                               </div>
 
                               <div className="job-description-container">
-                                <Text ellipsis={{ tooltip: job.descripcion }} className="job-description">
-                                  {job.descripcion?.length > 100 ? `${job.descripcion.substring(0, 100)}...` : job.descripcion}
+                                <Text
+                                  ellipsis={{ tooltip: job.descripcion }}
+                                  className="job-description"
+                                >
+                                  {job.descripcion?.length > 100
+                                    ? `${job.descripcion.substring(0, 100)}...`
+                                    : job.descripcion}
                                 </Text>
                               </div>
 
                               <div className="job-footer">
                                 <Space>
                                   <ClockCircleOutlined className="job-icon" />
-                                  <Text className="job-date">Ends {dayjs(job.fechaCierre).format("MMM DD")}</Text>
+                                  <Text className="job-date">
+                                    Ends{" "}
+                                    {dayjs(job.fechaCierre).format("MMM DD")}
+                                  </Text>
                                 </Space>
                                 <Button
                                   type="primary"
@@ -900,7 +1012,7 @@ const UserDashboard: React.FC = () => {
                           </Card>
                         </motion.div>
                       </Col>
-                    )
+                    );
                   })}
                 </Row>
               ) : (
@@ -928,7 +1040,8 @@ const UserDashboard: React.FC = () => {
                         </Text>
                       </div>
                       <Text className="insight-description">
-                        Technical skills and problem-solving approach show consistent improvement.
+                        Technical skills and problem-solving approach show
+                        consistent improvement.
                       </Text>
                     </div>
                     <div className="insight-item insight-improvement">
@@ -939,7 +1052,8 @@ const UserDashboard: React.FC = () => {
                         </Text>
                       </div>
                       <Text className="insight-description">
-                        Focus on communication clarity and providing more detailed examples.
+                        Focus on communication clarity and providing more
+                        detailed examples.
                       </Text>
                     </div>
                   </div>
@@ -960,7 +1074,8 @@ const UserDashboard: React.FC = () => {
                         </Text>
                       </div>
                       <Text className="insight-description">
-                        Based on your applications, consider strengthening your React and Node.js skills.
+                        Based on your applications, consider strengthening your
+                        React and Node.js skills.
                       </Text>
                     </div>
                     <div className="insight-item insight-next">
@@ -971,7 +1086,8 @@ const UserDashboard: React.FC = () => {
                         </Text>
                       </div>
                       <Text className="insight-description">
-                        Apply to more senior positions to challenge yourself and grow your career.
+                        Apply to more senior positions to challenge yourself and
+                        grow your career.
                       </Text>
                     </div>
                   </div>
@@ -982,88 +1098,186 @@ const UserDashboard: React.FC = () => {
         </Content>
       </Layout>
 
-      {/* Apply to Job Modal */}
+      {/* Professional Apply Modal */}
       <Modal
-        title={
-          <div className="modal-header">
-            <SendOutlined className="modal-icon" />
-            <span>Apply for Position</span>
-          </div>
-        }
+        title={null}
         open={applyModalVisible}
         onCancel={() => {
           if (!applying) {
-            setApplyModalVisible(false)
-            setSelectedJob(null)
+            setApplyModalVisible(false);
+            setSelectedJob(null);
           }
         }}
-        footer={[
-          <Button key="cancel" onClick={() => setApplyModalVisible(false)} disabled={applying} className="modal-button">
-            Cancel
-          </Button>,
-          <Button
-            key="apply"
-            type="primary"
-            className="btn-gradient modal-button"
-            loading={applying}
-            onClick={handleApplyToJob}
-            icon={applying ? <LoadingOutlined /> : <SendOutlined />}
-            disabled={applying}
-          >
-            {applying ? "Processing..." : "Apply Now"}
-          </Button>,
-        ]}
-        className="enhanced-modal"
+        footer={null}
+        className="professional-apply-modal"
         closable={!applying}
         maskClosable={!applying}
+        width={680}
+        centered
       >
         {selectedJob && (
-          <div className="modal-content">
-            <div className="job-preview-card">
-              <Title level={4} className="job-preview-title">
-                {selectedJob.titulo}
+          <div className="professional-modal-content">
+            {/* Header Section */}
+            <div className="professional-modal-header">
+              <div className="header-content">
+                <div className="header-icon">
+                  <div className="icon-wrapper">
+                    <SendOutlined />
+                  </div>
+                </div>
+                <div className="header-text">
+                  <Title level={3} className="header-title">
+                    Apply for Position
+                  </Title>
+                  <Text className="header-subtitle">
+                    Complete your application in just a few clicks
+                  </Text>
+                </div>
+              </div>
+            </div>
+
+            {/* Job Details Section */}
+            <div className="professional-job-details">
+              <div className="job-header">
+                <div className="company-avatar">
+                  <div className="avatar-placeholder">
+                    <BankOutlined />
+                  </div>
+                </div>
+                <div className="job-info">
+                  <Title level={4} className="job-title">
+                    {selectedJob.titulo}
+                  </Title>
+                  <Text className="company-name">
+                    {selectedJob.empresa?.nombre}
+                  </Text>
+                  <div className="job-meta">
+                    <div className="meta-item">
+                      <UserOutlined className="meta-icon" />
+                      <span>{selectedJob.puesto}</span>
+                    </div>
+                    <div className="meta-item">
+                      <ClockCircleOutlined className="meta-icon" />
+                      <span>
+                        Closes{" "}
+                        {dayjs(selectedJob.fechaCierre).format("MMM DD, YYYY")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {selectedJob.descripcion && (
+                <div className="job-description">
+                  <Text className="description-text">
+                    {selectedJob.descripcion.length > 150
+                      ? `${selectedJob.descripcion.substring(0, 150)}...`
+                      : selectedJob.descripcion}
+                  </Text>
+                </div>
+              )}
+            </div>
+
+            {/* Process Timeline */}
+            <div className="application-process">
+              <Title level={5} className="process-title">
+                Application Process
               </Title>
-              <div className="job-preview-details">
-                <Text className="job-preview-detail">
-                  <strong>Position:</strong> {selectedJob.puesto}
-                </Text>
-                <Text className="job-preview-detail">
-                  <strong>Company:</strong> {selectedJob.empresa?.nombre}
-                </Text>
-                <Text className="job-preview-detail">
-                  <strong>Closing Date:</strong> {dayjs(selectedJob.fechaCierre).format("MMM DD, YYYY")}
-                </Text>
+              <div className="process-steps">
+                <div className="step">
+                  <div className="step-number active">1</div>
+                  <div className="step-content">
+                    <Text className="step-title">Submit Application</Text>
+                    <Text className="step-description">
+                      Review and confirm your application
+                    </Text>
+                  </div>
+                </div>
+                <div className="step-connector"></div>
+                <div className="step">
+                  <div className="step-number">2</div>
+                  <div className="step-content">
+                    <Text className="step-title">AI Interview</Text>
+                    <Text className="step-description">
+                      Complete personalized interview questions
+                    </Text>
+                  </div>
+                </div>
+                <div className="step-connector"></div>
+                <div className="step">
+                  <div className="step-number">3</div>
+                  <div className="step-content">
+                    <Text className="step-title">Review Results</Text>
+                    <Text className="step-description">
+                      Receive feedback and next steps
+                    </Text>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="process-info-card">
-              <div className="process-header">
-                <RobotOutlined className="process-icon" />
-                <Text strong className="process-title">
-                  What happens next?
-                </Text>
+            {/* Key Information */}
+            <div className="key-information">
+              <div className="info-grid">
+                <div className="info-card">
+                  <RobotOutlined className="info-icon ai-icon" />
+                  <div className="info-content">
+                    <Text className="info-title">AI-Powered Assessment</Text>
+                    <Text className="info-description">
+                      Personalized questions based on job requirements
+                    </Text>
+                  </div>
+                </div>
+                <div className="info-card">
+                  <ClockCircleOutlined className="info-icon time-icon" />
+                  <div className="info-content">
+                    <Text className="info-title">30-60 Minutes</Text>
+                    <Text className="info-description">
+                      Complete at your own pace
+                    </Text>
+                  </div>
+                </div>
+                <div className="info-card">
+                  <SafetyOutlined className="info-icon security-icon" />
+                  <div className="info-content">
+                    <Text className="info-title">One Application</Text>
+                    <Text className="info-description">
+                      Single submission per position
+                    </Text>
+                  </div>
+                </div>
               </div>
-              <Text className="process-description">
-                After submitting your application, you'll be able to start your AI-powered interview immediately or later.
-                The interview is personalized based on the job requirements and typically takes 30-60 minutes.
+            </div>
+
+            {/* Action Buttons */}
+            <div className="professional-modal-footer">
+              <div className="footer-actions">
+                <Button
+                  size="large"
+                  onClick={() => setApplyModalVisible(false)}
+                  disabled={applying}
+                  className="cancel-button"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="primary"
+                  size="large"
+                  className="apply-button"
+                  loading={applying}
+                  onClick={handleApplyToJob}
+                  icon={applying ? <LoadingOutlined /> : <SendOutlined />}
+                  disabled={applying}
+                >
+                  {applying
+                    ? "Submitting Application..."
+                    : "Submit Application"}
+                </Button>
+              </div>
+              <Text className="footer-note">
+                By applying, you agree to our terms and conditions
               </Text>
             </div>
-
-            <div className="warning-info-card">
-              <div className="warning-header">
-                <ExclamationCircleOutlined className="warning-icon" />
-                <Text strong className="warning-title">
-                  Important Note
-                </Text>
-              </div>
-              <Text className="warning-description">
-                You can only apply once per position. Make sure you're ready to start the interview process.
-              </Text>
-            </div>
-
-            <Text className="confirmation-text">
-              Are you ready to apply for this position?
-            </Text>
           </div>
         )}
       </Modal>
@@ -1079,7 +1293,11 @@ const UserDashboard: React.FC = () => {
         open={profileModalVisible}
         onCancel={() => setProfileModalVisible(false)}
         footer={[
-          <Button key="cancel" onClick={() => setProfileModalVisible(false)} className="modal-button">
+          <Button
+            key="cancel"
+            onClick={() => setProfileModalVisible(false)}
+            className="modal-button"
+          >
             Cancel
           </Button>,
           <Button
@@ -1096,15 +1314,25 @@ const UserDashboard: React.FC = () => {
         className="enhanced-modal"
       >
         <div className="modal-content">
-          <Form form={profileForm} layout="vertical" onFinish={handleProfileSave} className="enhanced-form">
+          <Form
+            form={profileForm}
+            layout="vertical"
+            onFinish={handleProfileSave}
+            className="enhanced-form"
+          >
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
                   name="name"
                   label="Full Name"
-                  rules={[{ required: true, message: "Please enter your name" }]}
+                  rules={[
+                    { required: true, message: "Please enter your name" },
+                  ]}
                 >
-                  <Input placeholder="Enter your full name" className="enhanced-input" />
+                  <Input
+                    placeholder="Enter your full name"
+                    className="enhanced-input"
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -1116,19 +1344,29 @@ const UserDashboard: React.FC = () => {
                     { type: "email", message: "Please enter a valid email" },
                   ]}
                 >
-                  <Input placeholder="Enter your email" disabled className="enhanced-input" />
+                  <Input
+                    placeholder="Enter your email"
+                    disabled
+                    className="enhanced-input"
+                  />
                 </Form.Item>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item name="phone" label="Phone Number">
-                  <Input placeholder="Enter your phone number" className="enhanced-input" />
+                  <Input
+                    placeholder="Enter your phone number"
+                    className="enhanced-input"
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item name="birthDate" label="Birth Date">
-                  <DatePicker className="enhanced-input w-full" placeholder="Select birth date" />
+                  <DatePicker
+                    className="enhanced-input w-full"
+                    placeholder="Select birth date"
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -1156,7 +1394,11 @@ const UserDashboard: React.FC = () => {
         open={applicationsModalVisible}
         onCancel={() => setApplicationsModalVisible(false)}
         footer={[
-          <Button key="close" type="primary" onClick={() => setApplicationsModalVisible(false)}>
+          <Button
+            key="close"
+            type="primary"
+            onClick={() => setApplicationsModalVisible(false)}
+          >
             Close
           </Button>,
         ]}
@@ -1173,7 +1415,8 @@ const UserDashboard: React.FC = () => {
                 pageSize: 10,
                 showSizeChanger: true,
                 showQuickJumper: true,
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} applications`,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} applications`,
               }}
               className="enhanced-table"
               scroll={{ x: 800 }}
@@ -1194,7 +1437,11 @@ const UserDashboard: React.FC = () => {
         open={jobsModalVisible}
         onCancel={() => setJobsModalVisible(false)}
         footer={[
-          <Button key="close" type="primary" onClick={() => setJobsModalVisible(false)}>
+          <Button
+            key="close"
+            type="primary"
+            onClick={() => setJobsModalVisible(false)}
+          >
             Close
           </Button>,
         ]}
@@ -1211,7 +1458,8 @@ const UserDashboard: React.FC = () => {
                 pageSize: 10,
                 showSizeChanger: true,
                 showQuickJumper: true,
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} jobs`,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} jobs`,
               }}
               className="enhanced-table"
               scroll={{ x: 800 }}
@@ -1235,13 +1483,23 @@ const UserDashboard: React.FC = () => {
         width={400}
         className="enhanced-drawer"
         extra={
-          <Button type="primary" className="btn-gradient" icon={<SaveOutlined />} onClick={() => settingsForm.submit()}>
+          <Button
+            type="primary"
+            className="btn-gradient"
+            icon={<SaveOutlined />}
+            onClick={() => settingsForm.submit()}
+          >
             Save
           </Button>
         }
       >
         <div className="drawer-content">
-          <Form form={settingsForm} layout="vertical" onFinish={handleSettingsSave} className="enhanced-form">
+          <Form
+            form={settingsForm}
+            layout="vertical"
+            onFinish={handleSettingsSave}
+            className="enhanced-form"
+          >
             <div className="form-section">
               <Title level={5} className="section-title">
                 Notifications
@@ -1284,7 +1542,10 @@ const UserDashboard: React.FC = () => {
                 </Select>
               </Form.Item>
               <Form.Item name="language" label="Language">
-                <Select placeholder="Select language" className="enhanced-select">
+                <Select
+                  placeholder="Select language"
+                  className="enhanced-select"
+                >
                   <Option value="en">English</Option>
                   <Option value="es">Spanish</Option>
                   <Option value="fr">French</Option>
@@ -1316,7 +1577,7 @@ const UserDashboard: React.FC = () => {
         </div>
       </Drawer>
     </Layout>
-  )
-}
+  );
+};
 
-export default UserDashboard
+export default UserDashboard;
