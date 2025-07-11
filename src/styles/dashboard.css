@@ -495,7 +495,6 @@
   overflow: hidden !important;
   position: relative !important;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  animation: float 6s ease-in-out infinite !important;
 }
 
 .welcome-card::before {
