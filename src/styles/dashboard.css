@@ -427,6 +427,19 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
 }
 
+.dark .action-button {
+  border: 1px solid rgba(71, 85, 105, 0.8) !important;
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.9),
+    rgba(51, 65, 85, 0.9)
+  ) !important;
+  color: #94a3b8 !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
 .action-button:hover {
   border-color: rgba(102, 126, 234, 0.6) !important;
   color: #667eea !important;
@@ -438,6 +451,19 @@
     145deg,
     rgba(255, 255, 255, 1),
     rgba(248, 250, 252, 1)
+  ) !important;
+}
+
+.dark .action-button:hover {
+  border-color: rgba(129, 140, 248, 0.6) !important;
+  color: #818cf8 !important;
+  box-shadow:
+    0 8px 24px rgba(129, 140, 248, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  background: linear-gradient(
+    145deg,
+    rgba(51, 65, 85, 1),
+    rgba(71, 85, 105, 1)
   ) !important;
 }
 
