@@ -7,7 +7,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { ConfigProvider, theme, App } from "antd";
+import { ConfigProvider, theme, App as AntdApp } from "antd";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
