@@ -1,6 +1,5 @@
-import type React from "react"
-import { useState } from "react"
-import { Form, Input, Button, Card, Typography, Alert, Row, Col, Divider } from "antd"
+import React, { useState } from "react";
+import { Form, Input, Button, Typography, Alert } from "antd";
 import {
   UserOutlined,
   LockOutlined,
@@ -10,103 +9,107 @@ import {
   RobotOutlined,
   ArrowLeftOutlined,
   SafetyOutlined,
-  SunOutlined,
-  MoonOutlined,
-  TrophyOutlined,
-  TeamOutlined,
   CheckCircleOutlined,
-} from "@ant-design/icons"
-import { motion } from "framer-motion"
-import { useNavigate } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
-import { useTheme } from "../contexts/ThemeContext"
-import "../styles/login.css"
-import { Rol } from "../types/api" // Add this import
+  EyeOutlined,
+  ShieldCheckOutlined,
+  StarOutlined,
+  GlobalOutlined,
+  ThunderboltOutlined,
+  HeartOutlined,
+} from "@ant-design/icons";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
+import "../styles/login.css";
+import { Rol } from "../types/api";
 
-const { Title, Paragraph } = Typography
+const { Title, Paragraph } = Typography;
 
 interface LoginFormData {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 interface RegisterFormData {
-  name: string
-  email: string
-  password: string
-  confirmPassword: string
-  phone: string
-  company?: string
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  phone: string;
+  company?: string;
 }
 
 const Login: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("login")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const navigate = useNavigate()
-  const { login } = useAuth()
-  const { isDarkMode, toggleTheme } = useTheme()
+  const [activeTab, setActiveTab] = useState("login");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   const handleLogin = async (values: LoginFormData) => {
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
 
     try {
       // Use the login function from AuthContext instead of direct axios call
       const success = await login({
         email: values.email,
-        password: values.password
-      })
+        password: values.password,
+      });
 
       if (success) {
         // Get the user data from localStorage to ensure we have the latest data
-        const userDataStr = localStorage.getItem('mirai_user');
+        const userDataStr = localStorage.getItem("mirai_user");
         if (userDataStr) {
           const userData = JSON.parse(userDataStr);
-          
+
           // Navigate based on user role
           if (userData.role === Rol.ADMIN) {
-            navigate('/admin/dashboard');
+            navigate("/admin/dashboard");
           } else if (userData.role === Rol.EMPRESA) {
-            navigate('/empresa/dashboard');
+            navigate("/empresa/dashboard");
           } else {
-            navigate('/usuario/dashboard');
+            navigate("/usuario/dashboard");
           }
         } else {
           // Fallback navigation
-          navigate('/dashboard');
+          navigate("/dashboard");
         }
       } else {
-        setError("Authentication failed. Please check your credentials and try again.")
+        setError(
+          "Authentication failed. Please check your credentials and try again.",
+        );
       }
     } catch (err) {
-      console.error("Login error:", err)
-      setError("Login failed. Please check your credentials and try again.")
+      console.error("Login error:", err);
+      setError("Login failed. Please check your credentials and try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleRegister = async (values: RegisterFormData) => {
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
 
     if (values.password !== values.confirmPassword) {
-      setError("Passwords do not match")
-      setLoading(false)
-      return
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      setActiveTab("login")
-      setError("")
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setActiveTab("login");
+      setError("");
     } catch (err) {
-      setError("Registration failed. Please try again.")
+      setError("Registration failed. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -117,7 +120,7 @@ const Login: React.FC = () => {
         staggerChildren: 0.15,
       },
     },
-  }
+  };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -129,7 +132,7 @@ const Login: React.FC = () => {
         ease: [0.4, 0, 0.2, 1],
       },
     },
-  }
+  };
 
   const floatingVariants = {
     hidden: { opacity: 0, scale: 0.8, y: 20 },
@@ -146,7 +149,7 @@ const Login: React.FC = () => {
       scale: 1.05,
       y: -5,
       boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-      transition: { duration: 0.3 }
+      transition: { duration: 0.3 },
     },
     floating: {
       y: [0, -8, 0],
@@ -154,10 +157,10 @@ const Login: React.FC = () => {
         duration: 3,
         repeat: Infinity,
         repeatType: "reverse",
-        ease: "easeInOut"
-      }
-    }
-  }
+        ease: "easeInOut",
+      },
+    },
+  };
 
   return (
     <div className="login-layout">
@@ -166,10 +169,18 @@ const Login: React.FC = () => {
           <Row className="login-row">
             {/* Hero Section */}
             <Col xs={24} lg={12}>
-              <motion.div className="login-hero" variants={containerVariants} initial="hidden" animate="visible">
+              <motion.div
+                className="login-hero"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
                 {/* Back to Home Link */}
                 <motion.div variants={itemVariants}>
-                  <div className="login-back-link" onClick={() => navigate("/")}>
+                  <div
+                    className="login-back-link"
+                    onClick={() => navigate("/")}
+                  >
                     <ArrowLeftOutlined />
                     <span>Back to Home</span>
                   </div>
@@ -183,7 +194,9 @@ const Login: React.FC = () => {
                     </div>
                     <div className="login-hero-logo-content">
                       <div className="login-hero-logo-text">mirAI</div>
-                      <div className="login-hero-logo-subtitle">Interview Platform</div>
+                      <div className="login-hero-logo-subtitle">
+                        Interview Platform
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -197,7 +210,9 @@ const Login: React.FC = () => {
                         alt="AI Interview Platform"
                       />
                       <div className="login-hero-image-overlay">
-                        <p className="login-hero-image-caption">Transform your hiring process with AI</p>
+                        <p className="login-hero-image-caption">
+                          Transform your hiring process with AI
+                        </p>
                       </div>
                     </div>
 
@@ -215,7 +230,9 @@ const Login: React.FC = () => {
                         <div className="login-hero-floating-card-icon">
                           <TrophyOutlined />
                         </div>
-                        <p className="login-hero-floating-card-text">98% Success Rate</p>
+                        <p className="login-hero-floating-card-text">
+                          98% Success Rate
+                        </p>
                       </div>
                     </motion.div>
 
@@ -232,7 +249,9 @@ const Login: React.FC = () => {
                         <div className="login-hero-floating-card-icon">
                           <TeamOutlined />
                         </div>
-                        <p className="login-hero-floating-card-text">500+ Companies</p>
+                        <p className="login-hero-floating-card-text">
+                          500+ Companies
+                        </p>
                       </div>
                     </motion.div>
                   </div>
@@ -241,14 +260,17 @@ const Login: React.FC = () => {
                 {/* Hero Content */}
                 <motion.div variants={itemVariants}>
                   <Title className="login-hero-title">
-                    Welcome to the <span className="login-hero-title-highlight">Future</span> of Hiring
+                    Welcome to the{" "}
+                    <span className="login-hero-title-highlight">Future</span>{" "}
+                    of Hiring
                   </Title>
                 </motion.div>
 
                 <motion.div variants={itemVariants}>
                   <Paragraph className="login-hero-description">
-                    Join thousands of companies using mirAI to conduct smarter interviews, evaluate candidates with AI
-                    precision, and make better hiring decisions faster than ever before.
+                    Join thousands of companies using mirAI to conduct smarter
+                    interviews, evaluate candidates with AI precision, and make
+                    better hiring decisions faster than ever before.
                   </Paragraph>
                 </motion.div>
 
@@ -327,15 +349,27 @@ const Login: React.FC = () => {
                           >
                             <Form.Item
                               name="email"
-                              label={<span className="login-form-label">Email Address</span>}
+                              label={
+                                <span className="login-form-label">
+                                  Email Address
+                                </span>
+                              }
                               rules={[
-                                { required: true, message: "Please enter your email" },
-                                { type: "email", message: "Please enter a valid email" },
+                                {
+                                  required: true,
+                                  message: "Please enter your email",
+                                },
+                                {
+                                  type: "email",
+                                  message: "Please enter a valid email",
+                                },
                               ]}
                               className="login-form-item"
                             >
                               <Input
-                                prefix={<MailOutlined className="login-input-prefix" />}
+                                prefix={
+                                  <MailOutlined className="login-input-prefix" />
+                                }
                                 placeholder="Enter your email address"
                                 className="login-input"
                                 autoComplete="email"
@@ -344,12 +378,23 @@ const Login: React.FC = () => {
 
                             <Form.Item
                               name="password"
-                              label={<span className="login-form-label">Password</span>}
-                              rules={[{ required: true, message: "Please enter your password" }]}
+                              label={
+                                <span className="login-form-label">
+                                  Password
+                                </span>
+                              }
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Please enter your password",
+                                },
+                              ]}
                               className="login-form-item"
                             >
                               <Input.Password
-                                prefix={<LockOutlined className="login-input-prefix" />}
+                                prefix={
+                                  <LockOutlined className="login-input-prefix" />
+                                }
                                 placeholder="Enter your password"
                                 className="login-password"
                                 autoComplete="current-password"
@@ -372,7 +417,8 @@ const Login: React.FC = () => {
                           <div className="login-security">
                             <SafetyOutlined className="login-security-icon" />
                             <span className="login-security-text">
-                              Your data is protected with enterprise-grade security
+                              Your data is protected with enterprise-grade
+                              security
                             </span>
                           </div>
                         </motion.div>
@@ -406,12 +452,23 @@ const Login: React.FC = () => {
                           >
                             <Form.Item
                               name="name"
-                              label={<span className="login-form-label">Full Name</span>}
-                              rules={[{ required: true, message: "Please enter your full name" }]}
+                              label={
+                                <span className="login-form-label">
+                                  Full Name
+                                </span>
+                              }
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Please enter your full name",
+                                },
+                              ]}
                               className="login-form-item"
                             >
                               <Input
-                                prefix={<UserOutlined className="login-input-prefix" />}
+                                prefix={
+                                  <UserOutlined className="login-input-prefix" />
+                                }
                                 placeholder="Enter your full name"
                                 className="login-input"
                                 autoComplete="name"
@@ -420,15 +477,27 @@ const Login: React.FC = () => {
 
                             <Form.Item
                               name="email"
-                              label={<span className="login-form-label">Email Address</span>}
+                              label={
+                                <span className="login-form-label">
+                                  Email Address
+                                </span>
+                              }
                               rules={[
-                                { required: true, message: "Please enter your email" },
-                                { type: "email", message: "Please enter a valid email" },
+                                {
+                                  required: true,
+                                  message: "Please enter your email",
+                                },
+                                {
+                                  type: "email",
+                                  message: "Please enter a valid email",
+                                },
                               ]}
                               className="login-form-item"
                             >
                               <Input
-                                prefix={<MailOutlined className="login-input-prefix" />}
+                                prefix={
+                                  <MailOutlined className="login-input-prefix" />
+                                }
                                 placeholder="Enter your email address"
                                 className="login-input"
                                 autoComplete="email"
@@ -439,19 +508,34 @@ const Login: React.FC = () => {
                               <Col span={12}>
                                 <Form.Item
                                   name="password"
-                                  label={<span className="login-form-label">Password</span>}
+                                  label={
+                                    <span className="login-form-label">
+                                      Password
+                                    </span>
+                                  }
                                   rules={[
-                                    { required: true, message: "Please enter password" },
-                                    { min: 8, message: "Password must be at least 8 characters" },
                                     {
-                                      pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                                      message: "Password must contain uppercase, lowercase and number",
+                                      required: true,
+                                      message: "Please enter password",
+                                    },
+                                    {
+                                      min: 8,
+                                      message:
+                                        "Password must be at least 8 characters",
+                                    },
+                                    {
+                                      pattern:
+                                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                                      message:
+                                        "Password must contain uppercase, lowercase and number",
                                     },
                                   ]}
                                   className="login-form-item"
                                 >
                                   <Input.Password
-                                    prefix={<LockOutlined className="login-input-prefix" />}
+                                    prefix={
+                                      <LockOutlined className="login-input-prefix" />
+                                    }
                                     placeholder="Create password"
                                     className="login-password"
                                     autoComplete="new-password"
@@ -461,23 +545,37 @@ const Login: React.FC = () => {
                               <Col span={12}>
                                 <Form.Item
                                   name="confirmPassword"
-                                  label={<span className="login-form-label">Confirm Password</span>}
+                                  label={
+                                    <span className="login-form-label">
+                                      Confirm Password
+                                    </span>
+                                  }
                                   dependencies={["password"]}
                                   rules={[
-                                    { required: true, message: "Please confirm password" },
+                                    {
+                                      required: true,
+                                      message: "Please confirm password",
+                                    },
                                     ({ getFieldValue }) => ({
                                       validator(_, value) {
-                                        if (!value || getFieldValue("password") === value) {
-                                          return Promise.resolve()
+                                        if (
+                                          !value ||
+                                          getFieldValue("password") === value
+                                        ) {
+                                          return Promise.resolve();
                                         }
-                                        return Promise.reject(new Error("Passwords do not match!"))
+                                        return Promise.reject(
+                                          new Error("Passwords do not match!"),
+                                        );
                                       },
                                     }),
                                   ]}
                                   className="login-form-item"
                                 >
                                   <Input.Password
-                                    prefix={<LockOutlined className="login-input-prefix" />}
+                                    prefix={
+                                      <LockOutlined className="login-input-prefix" />
+                                    }
                                     placeholder="Confirm password"
                                     className="login-password"
                                     autoComplete="new-password"
@@ -488,9 +586,16 @@ const Login: React.FC = () => {
 
                             <Form.Item
                               name="phone"
-                              label={<span className="login-form-label">Phone Number</span>}
+                              label={
+                                <span className="login-form-label">
+                                  Phone Number
+                                </span>
+                              }
                               rules={[
-                                { required: true, message: "Please enter phone number" },
+                                {
+                                  required: true,
+                                  message: "Please enter phone number",
+                                },
                                 {
                                   pattern: /^\+?[\d\s\-$$$$]+$/,
                                   message: "Please enter a valid phone number",
@@ -499,7 +604,9 @@ const Login: React.FC = () => {
                               className="login-form-item"
                             >
                               <Input
-                                prefix={<PhoneOutlined className="login-input-prefix" />}
+                                prefix={
+                                  <PhoneOutlined className="login-input-prefix" />
+                                }
                                 placeholder="Enter phone number"
                                 className="login-input"
                                 autoComplete="tel"
@@ -508,11 +615,17 @@ const Login: React.FC = () => {
 
                             <Form.Item
                               name="company"
-                              label={<span className="login-form-label">Company Name (Optional)</span>}
+                              label={
+                                <span className="login-form-label">
+                                  Company Name (Optional)
+                                </span>
+                              }
                               className="login-form-item"
                             >
                               <Input
-                                prefix={<BankOutlined className="login-input-prefix" />}
+                                prefix={
+                                  <BankOutlined className="login-input-prefix" />
+                                }
                                 placeholder="Enter your company name"
                                 className="login-input"
                                 autoComplete="organization"
@@ -527,7 +640,9 @@ const Login: React.FC = () => {
                                 className="login-button login-button-primary"
                                 block
                               >
-                                {loading ? "Creating Account..." : "Create Account"}
+                                {loading
+                                  ? "Creating Account..."
+                                  : "Create Account"}
                               </Button>
                             </Form.Item>
                           </Form>
@@ -535,7 +650,8 @@ const Login: React.FC = () => {
                           <div className="login-security">
                             <CheckCircleOutlined className="login-security-icon" />
                             <span className="login-security-text">
-                              By signing up, you agree to our Terms of Service and Privacy Policy
+                              By signing up, you agree to our Terms of Service
+                              and Privacy Policy
                             </span>
                           </div>
                         </motion.div>
@@ -578,7 +694,7 @@ const Login: React.FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
