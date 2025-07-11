@@ -1385,45 +1385,288 @@ const UserDashboard: React.FC = () => {
         </div>
       </Modal>
 
-      {/* My Applications Modal */}
+      {/* Professional My Applications Modal */}
       <Modal
-        title={
-          <div className="modal-header">
-            <FileTextOutlined className="modal-icon" />
-            <span>My Applications ({myApplications.length})</span>
-          </div>
-        }
+        title={null}
         open={applicationsModalVisible}
         onCancel={() => setApplicationsModalVisible(false)}
-        footer={[
-          <Button
-            key="close"
-            type="primary"
-            onClick={() => setApplicationsModalVisible(false)}
-          >
-            Close
-          </Button>,
-        ]}
-        width={1000}
-        className="enhanced-modal"
+        footer={null}
+        width={1100}
+        className="professional-applications-modal"
+        centered
       >
-        <div className="modal-content">
-          <div className="table-container">
-            <Table
-              columns={applicationColumns}
-              dataSource={myApplications}
-              loading={loading}
-              pagination={{
-                pageSize: 10,
-                showSizeChanger: true,
-                showQuickJumper: true,
-                showTotal: (total, range) =>
-                  `${range[0]}-${range[1]} of ${total} applications`,
-              }}
-              className="enhanced-table"
-              scroll={{ x: 800 }}
-              rowKey="id"
-            />
+        <div className="professional-applications-content">
+          {/* Header Section */}
+          <div className="applications-header">
+            <div className="header-main">
+              <div className="header-icon-wrapper">
+                <FileTextOutlined className="header-icon" />
+              </div>
+              <div className="header-text">
+                <Title level={3} className="applications-title">
+                  My Applications
+                </Title>
+                <Text className="applications-subtitle">
+                  Track your job applications and interview progress
+                </Text>
+              </div>
+            </div>
+            <div className="header-stats">
+              <div className="stat-item">
+                <div className="stat-number">{myApplications.length}</div>
+                <div className="stat-label">Total Applications</div>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <div className="stat-number">
+                  {
+                    myApplications.filter(
+                      (a) => a.estado === EstadoPostulacion.EN_EVALUACION,
+                    ).length
+                  }
+                </div>
+                <div className="stat-label">In Progress</div>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <div className="stat-number">
+                  {
+                    myApplications.filter(
+                      (a) => a.estado === EstadoPostulacion.COMPLETADA,
+                    ).length
+                  }
+                </div>
+                <div className="stat-label">Completed</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filter and Search Section */}
+          <div className="applications-controls">
+            <div className="controls-left">
+              <Input.Search
+                placeholder="Search applications..."
+                style={{ width: 280 }}
+                className="search-input"
+              />
+            </div>
+            <div className="controls-right">
+              <Select
+                placeholder="Filter by status"
+                style={{ width: 180 }}
+                className="status-filter"
+                allowClear
+              >
+                <Option value="all">All Applications</Option>
+                <Option value={EstadoPostulacion.PENDIENTE}>Pending</Option>
+                <Option value={EstadoPostulacion.EN_EVALUACION}>
+                  In Progress
+                </Option>
+                <Option value={EstadoPostulacion.COMPLETADA}>Completed</Option>
+                <Option value={EstadoPostulacion.RECHAZADA}>Rejected</Option>
+              </Select>
+            </div>
+          </div>
+
+          {/* Applications Content */}
+          <div className="applications-body">
+            {myApplications.length > 0 ? (
+              <div className="applications-grid">
+                {myApplications.map((application) => (
+                  <motion.div
+                    key={application.id}
+                    className="application-card"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    whileHover={{ y: -4 }}
+                  >
+                    <div className="card-header">
+                      <div className="company-info">
+                        <div className="company-avatar">
+                          <BankOutlined />
+                        </div>
+                        <div className="company-details">
+                          <Text className="job-title">
+                            {application.convocatoria?.titulo}
+                          </Text>
+                          <Text className="company-name">
+                            {application.convocatoria?.empresa?.nombre}
+                          </Text>
+                        </div>
+                      </div>
+                      <div className="application-status">
+                        {getStatusTag(application.estado)}
+                      </div>
+                    </div>
+
+                    <div className="card-content">
+                      <div className="job-meta">
+                        <div className="meta-row">
+                          <UserOutlined className="meta-icon" />
+                          <span>{application.convocatoria?.puesto}</span>
+                        </div>
+                        <div className="meta-row">
+                          <ClockCircleOutlined className="meta-icon" />
+                          <span>
+                            Applied{" "}
+                            {dayjs(application.fechaPostulacion).format(
+                              "MMM DD, YYYY",
+                            )}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="progress-section">
+                        <div className="progress-label">
+                          <span>Progress</span>
+                          <span>
+                            {(() => {
+                              switch (application.estado) {
+                                case EstadoPostulacion.PENDIENTE:
+                                  return "25%";
+                                case EstadoPostulacion.EN_EVALUACION:
+                                  return "75%";
+                                case EstadoPostulacion.COMPLETADA:
+                                  return "100%";
+                                case EstadoPostulacion.RECHAZADA:
+                                  return "100%";
+                                default:
+                                  return "0%";
+                              }
+                            })()}
+                          </span>
+                        </div>
+                        <Progress
+                          percent={(() => {
+                            switch (application.estado) {
+                              case EstadoPostulacion.PENDIENTE:
+                                return 25;
+                              case EstadoPostulacion.EN_EVALUACION:
+                                return 75;
+                              case EstadoPostulacion.COMPLETADA:
+                                return 100;
+                              case EstadoPostulacion.RECHAZADA:
+                                return 100;
+                              default:
+                                return 0;
+                            }
+                          })()}
+                          strokeColor={
+                            application.estado === EstadoPostulacion.RECHAZADA
+                              ? "#ef4444"
+                              : "#667eea"
+                          }
+                          showInfo={false}
+                          className="progress-bar"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="card-actions">
+                      {application.estado === EstadoPostulacion.PENDIENTE && (
+                        <Button
+                          type="primary"
+                          className="action-button primary"
+                          icon={
+                            startingInterview === application.id ? (
+                              <LoadingOutlined />
+                            ) : (
+                              <PlayCircleOutlined />
+                            )
+                          }
+                          loading={startingInterview === application.id}
+                          onClick={() => handleStartInterview(application.id!)}
+                          block
+                        >
+                          Start Interview
+                        </Button>
+                      )}
+                      {application.estado ===
+                        EstadoPostulacion.EN_EVALUACION && (
+                        <Button
+                          type="primary"
+                          className="action-button primary"
+                          icon={<PlayCircleOutlined />}
+                          onClick={() =>
+                            navigate(`/usuario/interview/${application.id}`)
+                          }
+                          block
+                        >
+                          Continue Interview
+                        </Button>
+                      )}
+                      {application.estado === EstadoPostulacion.COMPLETADA && (
+                        <Button
+                          className="action-button secondary"
+                          icon={<EyeOutlined />}
+                          onClick={() =>
+                            navigate(
+                              `/usuario/interview/${application.id}/results`,
+                            )
+                          }
+                          block
+                        >
+                          View Results
+                        </Button>
+                      )}
+                      {application.estado === EstadoPostulacion.RECHAZADA && (
+                        <Button
+                          className="action-button disabled"
+                          disabled
+                          block
+                        >
+                          Application Closed
+                        </Button>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-state">
+                <div className="empty-icon">
+                  <FileTextOutlined />
+                </div>
+                <Title level={4} className="empty-title">
+                  No Applications Yet
+                </Title>
+                <Text className="empty-description">
+                  You haven't applied to any positions yet. Start exploring job
+                  opportunities!
+                </Text>
+                <Button
+                  type="primary"
+                  className="btn-gradient"
+                  size="large"
+                  onClick={() => {
+                    setApplicationsModalVisible(false);
+                    setJobsModalVisible(true);
+                  }}
+                >
+                  Browse Jobs
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="applications-footer">
+            <div className="footer-info">
+              <Text className="footer-text">
+                Showing {myApplications.length} application
+                {myApplications.length !== 1 ? "s" : ""}
+              </Text>
+            </div>
+            <div className="footer-actions">
+              <Button
+                size="large"
+                onClick={() => setApplicationsModalVisible(false)}
+                className="close-button"
+              >
+                Close
+              </Button>
+            </div>
           </div>
         </div>
       </Modal>
