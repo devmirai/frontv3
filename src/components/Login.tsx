@@ -11,7 +11,6 @@ import {
   SafetyOutlined,
   CheckCircleOutlined,
   EyeOutlined,
-  ShieldCheckOutlined,
   StarOutlined,
   GlobalOutlined,
   ThunderboltOutlined,
