@@ -294,7 +294,7 @@ const Login: React.FC = () => {
 
                 {/* Security Badge */}
                 <div className="login-security-badge">
-                  <ShieldCheckOutlined className="security-icon" />
+                  <SafetyOutlined className="security-icon" />
                   <span>Enterprise-grade security & privacy protection</span>
                 </div>
               </motion.div>
