@@ -180,13 +180,16 @@
 .mirabot-status-card {
   background: linear-gradient(
     135deg,
-    rgba(99, 102, 241, 0.05),
-    rgba(139, 92, 246, 0.05)
+    rgba(15, 23, 42, 0.8),
+    rgba(30, 41, 59, 0.8)
   ) !important;
-  border: 1px solid rgba(99, 102, 241, 0.15) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-  transition: all 0.3s ease !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(16px) !important;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .mirabot-status-card:hover {
@@ -308,22 +311,34 @@
 
 /* Enhanced Header */
 .enhanced-header {
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid var(--gray-200) !important;
-  padding: 0 24px !important;
-  height: 70px !important;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(248, 250, 252, 0.95)
+  ) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+  padding: 0 32px !important;
+  height: 80px !important;
   display: flex !important;
   align-items: center !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.1) !important;
   position: sticky !important;
   top: 0 !important;
   z-index: 99 !important;
+  border-radius: 0 0 24px 24px !important;
 }
 
 .dark .enhanced-header {
-  background: rgba(30, 41, 59, 0.95) !important;
-  border-bottom-color: var(--gray-700) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.95),
+    rgba(30, 41, 59, 0.95)
+  ) !important;
+  border-bottom-color: rgba(51, 65, 85, 0.8) !important;
+  border-radius: 0 0 24px 24px !important;
 }
 
 .header-content {
