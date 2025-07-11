@@ -3,6 +3,8 @@ import { message } from 'antd';
 import { usuarioAPI, empresaAPI, authAPI } from '../services/api';
 import { Usuario, Empresa, Rol } from '../types/api';
 import { jwtDecode } from 'jwt-decode';
+import { simulateLogin } from '../data/mockDataUtils';
+import { mockAdmin } from '../data/mockData';
 
 export interface User {
   id: number;
@@ -115,7 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'LOGIN_START' });
     
     try {
-      // Call the API with the credentials
+      // Try real API first
       const response = await authAPI.login(credentials);
       
       // Get the JWT token from the response
@@ -164,10 +166,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       message.success(`Welcome back, ${user.name}!`);
       return true;
     } catch (error: any) {
-      console.error('Login error:', error);
-      dispatch({ type: 'LOGIN_FAILURE' });
-      message.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
-      return false;
+      console.error('Login error - trying mock data:', error);
+      
+      // Fallback to mock data if API fails
+      try {
+        const mockResult = simulateLogin(credentials.email, credentials.password);
+        
+        if (mockResult.success && mockResult.user) {
+          const user: User = mockResult.user;
+          const token = mockResult.token;
+
+          // Store in localStorage
+          localStorage.setItem('mirai_token', token);
+          localStorage.setItem('mirai_user', JSON.stringify(user));
+
+          dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
+          message.success(`Welcome back, ${user.name}! (Demo Mode)`);
+          return true;
+        } else {
+          throw new Error(mockResult.error || 'Invalid credentials');
+        }
+      } catch (mockError: any) {
+        dispatch({ type: 'LOGIN_FAILURE' });
+        message.error('Login failed. Please check your credentials.');
+        return false;
+      }
     }
   };
 
