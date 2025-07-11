@@ -397,21 +397,36 @@
 }
 
 .action-button {
-  height: 36px !important;
-  border-radius: 8px !important;
-  font-weight: 500 !important;
-  transition: all 0.3s ease !important;
-  border: 1px solid var(--gray-300) !important;
-  background: white !important;
-  color: var(--gray-700) !important;
-  padding: 0 12px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(248, 250, 252, 0.9)
+  ) !important;
+  color: #4b5563 !important;
+  padding: 0 16px !important;
+  backdrop-filter: blur(8px) saturate(180%) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
 }
 
 .action-button:hover {
-  border-color: var(--primary-color) !important;
-  color: var(--primary-color) !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(102, 126, 234, 0.6) !important;
+  color: #667eea !important;
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow:
+    0 8px 24px rgba(102, 126, 234, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 1),
+    rgba(248, 250, 252, 1)
+  ) !important;
 }
 
 .user-avatar {
@@ -900,22 +915,41 @@
 }
 
 .insights-card {
-  background: white !important;
-  border: 1px solid var(--gray-200) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
-  transition: all 0.3s ease !important;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(248, 250, 252, 0.95)
+  ) !important;
+  border: 1px solid rgba(226, 232, 240, 0.6) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
   height: 100% !important;
 }
 
 .dark .insights-card {
-  background: #1e293b !important;
-  border-color: #334155 !important;
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.95),
+    rgba(51, 65, 85, 0.95)
+  ) !important;
+  border-color: rgba(71, 85, 105, 0.6) !important;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
 }
 
 .insights-card:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-6px) scale(1.01) !important;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
 }
 
 .card-icon {
