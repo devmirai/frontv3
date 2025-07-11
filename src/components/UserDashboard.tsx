@@ -56,6 +56,14 @@ import type { Convocatoria, Postulacion } from "../types/api"
 import { EstadoPostulacion } from "../types/api"
 import ThemeToggle from "./ThemeToggle"
 import NotificationDropdown from "./NotificationDropdown"
+import { 
+  getMockConvocatorias, 
+  getMockPostulacionesByUsuario, 
+  simulateApplyToJob, 
+  simulateStartInterview,
+  getMockUser,
+  generateMockQuestions 
+} from "../data/mockDataUtils"
 import dayjs from "dayjs"
 
 const { Header, Sider, Content } = Layout
@@ -193,13 +201,18 @@ const UserDashboard: React.FC = () => {
     try {
       setLoading(true)
 
-      // Load available jobs
-      const jobsResponse = await convocatoriaAPI.getActivas()
-      setAvailableJobs(jobsResponse.data)
+      // SIEMPRE usar datos mock para pruebas de diseño
+      console.log('🔧 Usando datos mock para pruebas de diseño');
+      
+      // Cargar trabajos disponibles desde mock
+      const mockJobs = getMockConvocatorias();
+      setAvailableJobs(mockJobs);
 
-      // Load user's applications
-      const applicationsResponse = await postulacionAPI.getByUsuario(user.id)
-      setMyApplications(applicationsResponse.data)
+      // Cargar aplicaciones del usuario desde mock
+      const mockApplications = getMockPostulacionesByUsuario(user.id);
+      setMyApplications(mockApplications);
+
+      console.log(`📊 Mock data loaded: ${mockJobs.length} jobs, ${mockApplications.length} applications`);
     } catch (error: any) {
       console.error("Error loading dashboard data:", error)
       message.error("Error loading dashboard data")

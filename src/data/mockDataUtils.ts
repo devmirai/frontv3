@@ -320,49 +320,180 @@ export const getInitialDashboardData = (userId: number, userRole: Rol) => {
   return null;
 };
 
-// FUNCIÓN PARA GENERAR PREGUNTAS DE ENTREVISTA MOCK
-export const generateMockInterviewQuestions = (jobTitle: string, difficulty: string) => {
-  const questions = [
+// FUNCIONES PARA DASHBOARDS
+
+// Obtener todas las convocatorias/trabajos activos
+export const getMockConvocatorias = () => {
+  return mockJobs.filter(job => job.activo);
+};
+
+// Obtener postulaciones por usuario
+export const getMockPostulacionesByUsuario = (userId: number) => {
+  return mockApplications.filter(app => app.usuario?.id === userId);
+};
+
+// Obtener convocatorias por empresa
+export const getMockConvocatoriasByEmpresa = (empresaId: number) => {
+  return mockJobs.filter(job => job.empresa?.id === empresaId);
+};
+
+// Obtener postulaciones por convocatoria
+export const getMockPostulacionesByConvocatoria = (convocatoriaId: number) => {
+  return mockApplications.filter(app => app.convocatoria?.id === convocatoriaId);
+};
+
+// Simular aplicación a trabajo
+export const simulateApplyToJob = (userId: number, jobId: number) => {
+  const user = mockUsers.find(u => u.id === userId);
+  const job = mockJobs.find(j => j.id === jobId);
+  
+  if (!user || !job) {
+    return { success: false, error: 'Usuario o trabajo no encontrado' };
+  }
+
+  // Verificar si ya aplicó
+  const existingApplication = mockApplications.find(
+    app => app.usuario?.id === userId && app.convocatoria?.id === jobId
+  );
+
+  if (existingApplication) {
+    return { success: false, error: 'Ya has aplicado a este trabajo' };
+  }
+
+  // Crear nueva aplicación
+  const newApplication = {
+    id: mockApplications.length + 1,
+    usuario: user,
+    convocatoria: job,
+    fechaPostulacion: new Date().toISOString().split('T')[0],
+    estado: EstadoPostulacion.PENDIENTE,
+    puntaje: null,
+    preguntasGeneradas: false
+  };
+
+  mockApplications.push(newApplication);
+  
+  return { 
+    success: true, 
+    message: 'Aplicación enviada exitosamente',
+    application: newApplication 
+  };
+};
+
+// Simular inicio de entrevista
+export const simulateStartInterview = (postulacionId: number) => {
+  const application = mockApplications.find(app => app.id === postulacionId);
+  
+  if (!application) {
+    return { success: false, error: 'Postulación no encontrada' };
+  }
+
+  // Actualizar estado a evaluación
+  application.estado = EstadoPostulacion.EN_EVALUACION;
+  
+  return { 
+    success: true, 
+    message: 'Entrevista iniciada',
+    application 
+  };
+};
+
+// Obtener usuario mock por ID
+export const getMockUser = (userId: number) => {
+  return mockUsers.find(user => user.id === userId) || 
+         mockCompanies.find(company => company.id === userId);
+};
+
+// Generar preguntas mock para entrevista
+export const generateMockQuestions = (jobTitle?: string, difficulty?: string) => {
+  const baseQuestions = [
     {
       id: 1,
-      question: `Cuéntame sobre tu experiencia más relevante para el puesto de ${jobTitle}`,
-      type: 'behavioral',
-      timeLimit: 300 // 5 minutos
+      texto: `Cuéntame sobre tu experiencia más relevante${jobTitle ? ` para el puesto de ${jobTitle}` : ''}`,
+      tipo: 'Behavioral',
+      dificultad: 3
     },
     {
       id: 2,
-      question: '¿Cómo manejas los conflictos en un equipo de desarrollo?',
-      type: 'behavioral',
-      timeLimit: 240
+      texto: '¿Cómo manejas los conflictos en un equipo de trabajo?',
+      tipo: 'Behavioral',
+      dificultad: 4
     },
     {
       id: 3,
-      question: `Explica un proyecto técnico desafiante que hayas completado recientemente`,
-      type: 'technical',
-      timeLimit: 360
+      texto: 'Describe un proyecto técnico desafiante que hayas completado recientemente',
+      tipo: 'Technical',
+      dificultad: 5
     },
     {
       id: 4,
-      question: '¿Cómo te mantienes actualizado con las nuevas tecnologías?',
-      type: 'behavioral',
-      timeLimit: 180
+      texto: '¿Cómo te mantienes actualizado con las nuevas tecnologías en tu campo?',
+      tipo: 'Technical',
+      dificultad: 3
     },
     {
       id: 5,
-      question: `¿Cuáles son tus fortalezas principales para ${jobTitle}?`,
-      type: 'behavioral',
-      timeLimit: 240
+      texto: '¿Cuáles consideras que son tus fortalezas principales para este rol?',
+      tipo: 'Behavioral',
+      dificultad: 2
+    },
+    {
+      id: 6,
+      texto: 'Explica un momento en el que tuviste que aprender una nueva tecnología rápidamente',
+      tipo: 'Behavioral',
+      dificultad: 4
+    },
+    {
+      id: 7,
+      texto: '¿Cómo estructurarías un proyecto desde cero?',
+      tipo: 'Technical',
+      dificultad: 5
     }
   ];
 
-  // Filtrar preguntas según dificultad
-  if (difficulty === 'Junior') {
-    return questions.slice(0, 3);
-  } else if (difficulty === 'Senior') {
-    return questions;
+  // Seleccionar preguntas según dificultad
+  let numQuestions = 5;
+  if (difficulty === 'Senior' || difficulty === 'Lead') {
+    numQuestions = 7;
+  } else if (difficulty === 'Junior') {
+    numQuestions = 4;
   }
+
+  // Mezclar y seleccionar preguntas
+  const shuffled = [...baseQuestions].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, numQuestions);
+};
+
+// Simular evaluación de entrevista
+export const simulateInterviewEvaluation = (answers: string[], questions: any[]) => {
+  const scores = answers.map((answer, index) => {
+    // Simular puntaje basado en longitud y palabras clave
+    const wordCount = answer.split(' ').length;
+    const hasKeywords = answer.toLowerCase().includes('experiencia') || 
+                       answer.toLowerCase().includes('proyecto') ||
+                       answer.toLowerCase().includes('equipo');
+    
+    let score = Math.min(wordCount / 10, 8); // Máximo 8 puntos por cantidad
+    if (hasKeywords) score += 2; // Bonus por keywords
+    if (score > 10) score = 10;
+    
+    return Math.round(score);
+  });
+
+  const averageScore = scores.reduce((a, b) => a + b, 0) / scores.length;
   
-  return questions.slice(0, 4);
+  return {
+    scores,
+    averageScore: Math.round(averageScore * 100) / 100,
+    totalScore: Math.round(averageScore * 10),
+    feedback: averageScore >= 7 ? 'Excelente desempeño' : 
+              averageScore >= 5 ? 'Buen desempeño' : 'Puede mejorar',
+    recommendations: [
+      'Continúa desarrollando tus habilidades técnicas',
+      'Practica la comunicación de ideas complejas',
+      'Considera obtener certificaciones relevantes'
+    ]
+  };
 };
 
 export default {
@@ -379,5 +510,14 @@ export default {
   getApplicationsByJob,
   simulateLogin,
   getInitialDashboardData,
-  generateMockInterviewQuestions
+  generateMockQuestions,
+  getMockConvocatorias,
+  getMockPostulacionesByUsuario,
+  getMockConvocatoriasByEmpresa,
+  getMockPostulacionesByConvocatoria,
+  simulateApplyToJob,
+  simulateStartInterview,
+  getMockUser,
+  generateMockQuestions,
+  simulateInterviewEvaluation
 };
