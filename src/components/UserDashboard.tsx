@@ -1444,8 +1444,9 @@ const UserDashboard: React.FC = () => {
           {/* Filter and Search Section */}
           <div className="applications-controls">
             <div className="controls-left">
-              <Input.Search
+              <Input
                 placeholder="Search applications..."
+                prefix={<SearchOutlined />}
                 style={{ width: 280 }}
                 className="search-input"
               />
