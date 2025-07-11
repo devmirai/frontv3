@@ -1,16 +1,28 @@
-/* Dashboard Specific Styles - Original Clean Design */
+/* Dashboard Specific Styles - Modern Sleek Design */
 
-/* Enhanced Sidebar Styles */
+/* Modern Sidebar Styles */
 .enhanced-sidebar {
   position: relative;
   z-index: 100;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: linear-gradient(
+    145deg,
+    rgba(15, 23, 42, 0.95),
+    rgba(30, 41, 59, 0.95)
+  ) !important;
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(148, 163, 184, 0.1) !important;
+  box-shadow:
+    20px 0 60px rgba(0, 0, 0, 0.15),
+    inset 1px 0 1px rgba(255, 255, 255, 0.05) !important;
 }
 
 .sidebar-logo-container {
-  padding: 20px 16px;
-  border-bottom: 1px solid var(--sidebar-border);
-  margin-bottom: 12px;
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
 }
 
 .sidebar-logo {
@@ -22,18 +34,22 @@
 }
 
 .logo-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
-  transition: all 0.3s ease;
+  box-shadow:
+    0 8px 32px rgba(102, 126, 234, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
 }
 
 .logo-content {
@@ -43,18 +59,23 @@
 }
 
 .logo-text {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--sidebar-text);
+  font-size: 20px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-family: "Poppins", sans-serif;
   line-height: 1;
+  letter-spacing: -0.5px;
 }
 
 .logo-subtitle {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  color: var(--sidebar-text-secondary);
+  color: rgba(148, 163, 184, 0.8);
   line-height: 1;
+  letter-spacing: 0.5px;
 }
 
 .sidebar-menu-container {
@@ -146,7 +167,11 @@
 }
 
 .mirabot-status-card {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05)) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.05),
+    rgba(139, 92, 246, 0.05)
+  ) !important;
   border: 1px solid rgba(99, 102, 241, 0.15) !important;
   border-radius: 12px !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
@@ -168,7 +193,11 @@
   position: relative;
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -383,7 +412,11 @@
 
 /* Enhanced Cards */
 .welcome-card {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05)) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.05),
+    rgba(139, 92, 246, 0.05)
+  ) !important;
   border: 1px solid rgba(99, 102, 241, 0.15) !important;
   border-radius: 16px !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
@@ -398,14 +431,22 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(
+    90deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
 }
 
 .welcome-title {
   font-size: 24px !important;
   font-weight: 700 !important;
   margin-bottom: 12px !important;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  ) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
@@ -826,7 +867,11 @@
 
 /* Enhanced Buttons */
 .btn-gradient {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  ) !important;
   border: none !important;
   color: white !important;
   font-weight: 600 !important;
@@ -835,7 +880,11 @@
 }
 
 .btn-gradient:hover {
-  background: linear-gradient(135deg, var(--primary-hover), var(--secondary-color)) !important;
+  background: linear-gradient(
+    135deg,
+    var(--primary-hover),
+    var(--secondary-color)
+  ) !important;
   transform: translateY(-1px) !important;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
   color: white !important;
