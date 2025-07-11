@@ -54,6 +54,11 @@ import { convocatoriaAPI, postulacionAPI } from "../services/api"
 import type { Convocatoria, Postulacion } from "../types/api"
 import ThemeToggle from "./ThemeToggle"
 import NotificationDropdown from "./NotificationDropdown"
+import { 
+  getMockConvocatoriasByEmpresa, 
+  getMockPostulacionesByConvocatoria,
+  getApplicationsByJob 
+} from "../data/mockDataUtils"
 import dayjs from "dayjs"
 
 const { Header, Sider, Content } = Layout
@@ -161,19 +166,24 @@ const CompanyDashboard: React.FC = () => {
     try {
       setLoading(true)
 
-      // Load company's convocatorias
-      const convocatoriasResponse = await convocatoriaAPI.getByEmpresa(user.id)
-      setConvocatorias(convocatoriasResponse.data)
+      // SIEMPRE usar datos mock para pruebas de diseño
+      console.log('🔧 [CompanyDashboard] Usando datos mock para pruebas de diseño');
+      
+      // Cargar convocatorias de la empresa desde mock
+      const mockConvocatorias = getMockConvocatoriasByEmpresa(user.id);
+      setConvocatorias(mockConvocatorias);
 
-      // Load all postulaciones for company's convocatorias
-      const allPostulaciones: Postulacion[] = []
-      for (const convocatoria of convocatoriasResponse.data) {
+      // Cargar todas las postulaciones para las convocatorias de la empresa
+      const allPostulaciones: Postulacion[] = [];
+      mockConvocatorias.forEach(convocatoria => {
         if (convocatoria.id) {
-          const postulacionesResponse = await postulacionAPI.getByConvocatoria(convocatoria.id)
-          allPostulaciones.push(...postulacionesResponse.data)
+          const convocatoriaApplications = getApplicationsByJob(convocatoria.id);
+          allPostulaciones.push(...convocatoriaApplications);
         }
-      }
-      setPostulaciones(allPostulaciones)
+      });
+      setPostulaciones(allPostulaciones);
+
+      console.log(`📊 [CompanyDashboard] Mock data loaded: ${mockConvocatorias.length} jobs, ${allPostulaciones.length} applications`);
     } catch (error: any) {
       console.error("Error loading dashboard data:", error)
       message.error("Error loading dashboard data")
