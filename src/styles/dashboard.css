@@ -629,16 +629,33 @@
 
 /* Enhanced Tables */
 .enhanced-table-card {
-  background: white !important;
-  border: 1px solid var(--gray-200) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(248, 250, 252, 0.95)
+  ) !important;
+  border: 1px solid rgba(226, 232, 240, 0.6) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
   overflow: hidden !important;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .dark .enhanced-table-card {
-  background: #1e293b !important;
-  border-color: #334155 !important;
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.95),
+    rgba(51, 65, 85, 0.95)
+  ) !important;
+  border-color: rgba(71, 85, 105, 0.6) !important;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
 }
 
 .table-header {
@@ -711,23 +728,44 @@
 
 /* Job Cards */
 .job-card {
-  background: white !important;
-  border: 1px solid var(--gray-200) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
-  transition: all 0.3s ease !important;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(248, 250, 252, 0.95)
+  ) !important;
+  border: 1px solid rgba(226, 232, 240, 0.6) !important;
+  border-radius: 18px !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
   overflow: hidden !important;
   height: 100% !important;
+  position: relative !important;
 }
 
 .dark .job-card {
-  background: #1e293b !important;
-  border-color: #334155 !important;
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.95),
+    rgba(51, 65, 85, 0.95)
+  ) !important;
+  border-color: rgba(71, 85, 105, 0.6) !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
 }
 
 .job-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
-  border-color: var(--primary-color) !important;
+  transform: translateY(-8px) scale(1.02) !important;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.1),
+    0 8px 32px rgba(102, 126, 234, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  border-color: rgba(102, 126, 234, 0.5) !important;
 }
 
 .job-content {
