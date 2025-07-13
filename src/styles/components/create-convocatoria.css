@@ -95,7 +95,8 @@
   height: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 40px;
+  position: relative;
 }
 
 .header-left {
@@ -138,16 +139,28 @@
 
 .header-title {
   margin: 0 !important;
-  font-size: 24px !important;
-  font-weight: 800 !important;
-  background: linear-gradient(135deg, #1f2937 0%, #374151 100%) !important;
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  background: linear-gradient(
+    135deg,
+    #0f172a 0%,
+    #1e293b 50%,
+    #334155 100%
+  ) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
+  letter-spacing: -0.5px;
+  font-family: "Inter", "Segoe UI", sans-serif;
 }
 
 .dark .header-title {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+  background: linear-gradient(
+    135deg,
+    #f8fafc 0%,
+    #e2e8f0 50%,
+    #cbd5e1 100%
+  ) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
