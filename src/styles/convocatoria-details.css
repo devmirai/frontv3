@@ -184,22 +184,22 @@
 
 .header-right {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .header-meta {
   display: flex;
   align-items: center;
   gap: 16px;
+  margin-top: 8px;
 }
 
 .meta-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #6b7280;
+  color: #94a3b8;
   font-size: 14px;
   font-weight: 500;
 }
@@ -213,6 +213,7 @@
   font-weight: 600 !important;
   font-size: 12px !important;
   padding: 4px 8px !important;
+  margin-left: 8px;
 }
 
 .header-action-btn {
