@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
+import type React from "react";
+import { useState, useEffect } from "react";
 import {
   Layout,
   Card,
@@ -23,7 +23,7 @@ import {
   Avatar,
   Dropdown,
   Menu,
-} from "antd"
+} from "antd";
 import {
   DashboardOutlined,
   UserOutlined,
@@ -47,7 +47,7 @@ import {
   BarChartOutlined,
   SecurityScanOutlined,
   DatabaseOutlined,
-} from "@ant-design/icons"
+} from "@ant-design/icons";
 import {
   LineChart,
   Line,
@@ -64,43 +64,48 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts"
-import { motion } from "framer-motion"
-import { useNavigate } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
-import { usuarioAPI, empresaAPI, convocatoriaAPI, postulacionAPI } from "../services/api"
-import ThemeToggle from "./ThemeToggle"
-import NotificationDropdown from "./NotificationDropdown"
-import PrintReport from "./PrintReport"
-import dayjs from "dayjs"
+} from "recharts";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import {
+  usuarioAPI,
+  empresaAPI,
+  convocatoriaAPI,
+  postulacionAPI,
+} from "../services/api";
+import ThemeToggle from "./ThemeToggle";
+import NotificationDropdown from "./NotificationDropdown";
+import PrintReport from "./PrintReport";
+import dayjs from "dayjs";
 
-const { Header, Sider, Content } = Layout
-const { Title, Paragraph, Text } = Typography
-const { RangePicker } = DatePicker
-const { TabPane } = Tabs
+const { Header, Sider, Content } = Layout;
+const { Title, Paragraph, Text } = Typography;
+const { RangePicker } = DatePicker;
+const { TabPane } = Tabs;
 
 interface AdminStats {
-  totalUsers: number
-  totalCompanies: number
-  totalInterviews: number
-  completedInterviews: number
-  activeJobs: number
-  completionRate: number
-  avgScore: number
-  monthlyGrowth: number
+  totalUsers: number;
+  totalCompanies: number;
+  totalInterviews: number;
+  completedInterviews: number;
+  activeJobs: number;
+  completionRate: number;
+  avgScore: number;
+  monthlyGrowth: number;
 }
 
 interface ChartData {
-  name: string
-  users: number
-  companies: number
-  interviews: number
-  completion: number
+  name: string;
+  users: number;
+  companies: number;
+  interviews: number;
+  completion: number;
 }
 
 const AdminDashboard: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [collapsed, setCollapsed] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<AdminStats>({
     totalUsers: 0,
     totalCompanies: 0,
@@ -110,15 +115,20 @@ const AdminDashboard: React.FC = () => {
     completionRate: 0,
     avgScore: 0,
     monthlyGrowth: 0,
-  })
-  const [users, setUsers] = useState([])
-  const [companies, setCompanies] = useState([])
-  const [interviews, setInterviews] = useState([])
-  const [chartData, setChartData] = useState<ChartData[]>([])
-  const [selectedDateRange, setSelectedDateRange] = useState<any>([dayjs().subtract(30, "day"), dayjs()])
-  const [activeTab, setActiveTab] = useState("overview")
-  const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  });
+  const [users, setUsers] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [interviews, setInterviews] = useState([]);
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [selectedDateRange, setSelectedDateRange] = useState<any>([
+    dayjs().subtract(30, "day"),
+    dayjs(),
+  ]);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [systemForm] = Form.useForm();
+  const [emailForm] = Form.useForm();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const menuItems = [
     {
@@ -202,35 +212,41 @@ const AdminDashboard: React.FC = () => {
         },
       ],
     },
-  ]
+  ];
 
   useEffect(() => {
-    loadAdminData()
-  }, [selectedDateRange])
+    loadAdminData();
+  }, [selectedDateRange]);
 
   const loadAdminData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       // Load all data
-      const [usersRes, companiesRes, convocatoriasRes, postulacionesRes] = await Promise.all([
-        usuarioAPI.getAll(),
-        empresaAPI.getAll(),
-        convocatoriaAPI.getAll(),
-        postulacionAPI.getAll(),
-      ])
+      const [usersRes, companiesRes, convocatoriasRes, postulacionesRes] =
+        await Promise.all([
+          usuarioAPI.getAll(),
+          empresaAPI.getAll(),
+          convocatoriaAPI.getAll(),
+          postulacionAPI.getAll(),
+        ]);
 
-      const usersData = usersRes.data
-      const companiesData = companiesRes.data
-      const convocatoriasData = convocatoriasRes.data
-      const postulacionesData = postulacionesRes.data
+      const usersData = usersRes.data;
+      const companiesData = companiesRes.data;
+      const convocatoriasData = convocatoriasRes.data;
+      const postulacionesData = postulacionesRes.data;
 
-      setUsers(usersData)
-      setCompanies(companiesData)
-      setInterviews(postulacionesData)
+      setUsers(usersData);
+      setCompanies(companiesData);
+      setInterviews(postulacionesData);
 
       // Calculate stats
-      const completedCount = postulacionesData.filter((p: any) => p.estado === "COMPLETADA").length
-      const completionRate = postulacionesData.length > 0 ? (completedCount / postulacionesData.length) * 100 : 0
+      const completedCount = postulacionesData.filter(
+        (p: any) => p.estado === "COMPLETADA",
+      ).length;
+      const completionRate =
+        postulacionesData.length > 0
+          ? (completedCount / postulacionesData.length) * 100
+          : 0;
 
       setStats({
         totalUsers: usersData.length,
@@ -241,27 +257,27 @@ const AdminDashboard: React.FC = () => {
         completionRate: Math.round(completionRate),
         avgScore: 85, // Mock average score
         monthlyGrowth: 12, // Mock growth percentage
-      })
+      });
 
       // Generate chart data
       const last7Days = Array.from({ length: 7 }, (_, i) => {
-        const date = dayjs().subtract(6 - i, "day")
+        const date = dayjs().subtract(6 - i, "day");
         return {
           name: date.format("MMM DD"),
           users: Math.floor(Math.random() * 20) + 10,
           companies: Math.floor(Math.random() * 5) + 2,
           interviews: Math.floor(Math.random() * 15) + 5,
           completion: Math.floor(Math.random() * 30) + 70,
-        }
-      })
-      setChartData(last7Days)
+        };
+      });
+      setChartData(last7Days);
     } catch (error) {
-      console.error("Error loading admin data:", error)
-      message.error("Error loading admin data")
+      console.error("Error loading admin data:", error);
+      message.error("Error loading admin data");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const userMenu = {
     items: [
@@ -285,12 +301,16 @@ const AdminDashboard: React.FC = () => {
         onClick: logout,
       },
     ],
-  }
+  };
 
   const pieData = [
     { name: "Completed", value: stats.completedInterviews, color: "#10b981" },
-    { name: "In Progress", value: stats.totalInterviews - stats.completedInterviews, color: "#f59e0b" },
-  ]
+    {
+      name: "In Progress",
+      value: stats.totalInterviews - stats.completedInterviews,
+      color: "#f59e0b",
+    },
+  ];
 
   const userColumns = [
     {
@@ -303,7 +323,9 @@ const AdminDashboard: React.FC = () => {
             <div className="font-medium">
               {record.nombre} {record.apellidoPaterno}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">{record.email}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {record.email}
+            </div>
           </div>
         </div>
       ),
@@ -313,7 +335,9 @@ const AdminDashboard: React.FC = () => {
       dataIndex: "rol",
       key: "rol",
       render: (rol: string) => (
-        <Tag color={rol === "USUARIO" ? "blue" : "green"}>{rol === "USUARIO" ? "Candidate" : "Company"}</Tag>
+        <Tag color={rol === "USUARIO" ? "blue" : "green"}>
+          {rol === "USUARIO" ? "Candidate" : "Company"}
+        </Tag>
       ),
     },
     {
@@ -338,7 +362,12 @@ const AdminDashboard: React.FC = () => {
             items: [
               { key: "view", label: "View Details", icon: <EyeOutlined /> },
               { key: "edit", label: "Edit", icon: <EditOutlined /> },
-              { key: "delete", label: "Delete", icon: <DeleteOutlined />, danger: true },
+              {
+                key: "delete",
+                label: "Delete",
+                icon: <DeleteOutlined />,
+                danger: true,
+              },
             ],
           }}
           trigger={["click"]}
@@ -347,7 +376,7 @@ const AdminDashboard: React.FC = () => {
         </Dropdown>
       ),
     },
-  ]
+  ];
 
   const companyColumns = [
     {
@@ -358,7 +387,9 @@ const AdminDashboard: React.FC = () => {
           <Avatar src={record.logo} icon={<TeamOutlined />} />
           <div>
             <div className="font-medium">{record.nombre}</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">{record.email}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {record.email}
+            </div>
           </div>
         </div>
       ),
@@ -387,7 +418,12 @@ const AdminDashboard: React.FC = () => {
             items: [
               { key: "view", label: "View Details", icon: <EyeOutlined /> },
               { key: "edit", label: "Edit", icon: <EditOutlined /> },
-              { key: "delete", label: "Delete", icon: <DeleteOutlined />, danger: true },
+              {
+                key: "delete",
+                label: "Delete",
+                icon: <DeleteOutlined />,
+                danger: true,
+              },
             ],
           }}
           trigger={["click"]}
@@ -396,7 +432,7 @@ const AdminDashboard: React.FC = () => {
         </Dropdown>
       ),
     },
-  ]
+  ];
 
   const interviewColumns = [
     {
@@ -407,7 +443,9 @@ const AdminDashboard: React.FC = () => {
           <div className="font-medium">
             {record.usuario?.nombre} {record.usuario?.apellidoPaterno}
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">{record.convocatoria?.titulo}</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {record.convocatoria?.titulo}
+          </div>
         </div>
       ),
     },
@@ -426,9 +464,12 @@ const AdminDashboard: React.FC = () => {
           EN_EVALUACION: { color: "processing", text: "In Progress" },
           COMPLETADA: { color: "success", text: "Completed" },
           RECHAZADA: { color: "error", text: "Rejected" },
-        }
-        const config = statusConfig[estado as keyof typeof statusConfig] || { color: "default", text: estado }
-        return <Tag color={config.color}>{config.text}</Tag>
+        };
+        const config = statusConfig[estado as keyof typeof statusConfig] || {
+          color: "default",
+          text: estado,
+        };
+        return <Tag color={config.color}>{config.text}</Tag>;
       },
     },
     {
@@ -445,7 +486,11 @@ const AdminDashboard: React.FC = () => {
           menu={{
             items: [
               { key: "view", label: "View Details", icon: <EyeOutlined /> },
-              { key: "results", label: "View Results", icon: <TrophyOutlined /> },
+              {
+                key: "results",
+                label: "View Results",
+                icon: <TrophyOutlined />,
+              },
             ],
           }}
           trigger={["click"]}
@@ -454,14 +499,18 @@ const AdminDashboard: React.FC = () => {
         </Dropdown>
       ),
     },
-  ]
+  ];
 
   const renderOverview = () => (
     <div className="overview-content">
       {/* Enhanced Stats Cards */}
       <Row gutter={[24, 24]} className="stats-section">
         <Col xs={24} sm={12} lg={6}>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
             <Card className="enhanced-stats-card">
               <div className="stats-header">
                 <UserOutlined className="stats-icon text-blue-600" />
@@ -482,7 +531,13 @@ const AdminDashboard: React.FC = () => {
                     fontWeight: "bold",
                   }}
                 />
-                <Progress percent={85} size="small" strokeColor="#6366f1" showInfo={false} className="stats-progress" />
+                <Progress
+                  percent={85}
+                  size="small"
+                  strokeColor="#6366f1"
+                  showInfo={false}
+                  className="stats-progress"
+                />
                 <Text className="progress-text">85% active users</Text>
               </div>
             </Card>
@@ -511,7 +566,13 @@ const AdminDashboard: React.FC = () => {
                     fontWeight: "bold",
                   }}
                 />
-                <Progress percent={92} size="small" strokeColor="#10b981" showInfo={false} className="stats-progress" />
+                <Progress
+                  percent={92}
+                  size="small"
+                  strokeColor="#10b981"
+                  showInfo={false}
+                  className="stats-progress"
+                />
                 <Text className="progress-text">92% satisfaction rate</Text>
               </div>
             </Card>
@@ -547,7 +608,9 @@ const AdminDashboard: React.FC = () => {
                   showInfo={false}
                   className="stats-progress"
                 />
-                <Text className="progress-text">{stats.completedInterviews} completed</Text>
+                <Text className="progress-text">
+                  {stats.completedInterviews} completed
+                </Text>
               </div>
             </Card>
           </motion.div>
@@ -605,8 +668,18 @@ const AdminDashboard: React.FC = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="users" stroke="#6366f1" strokeWidth={3} />
-                <Line type="monotone" dataKey="interviews" stroke="#10b981" strokeWidth={3} />
+                <Line
+                  type="monotone"
+                  dataKey="users"
+                  stroke="#6366f1"
+                  strokeWidth={3}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="interviews"
+                  stroke="#10b981"
+                  strokeWidth={3}
+                />
               </LineChart>
             </ResponsiveContainer>
           </Card>
@@ -650,7 +723,9 @@ const AdminDashboard: React.FC = () => {
               type: "interview",
               message: "Interview completed: Frontend Developer position",
               time: "5 minutes ago",
-              icon: <CheckCircleOutlined className="activity-icon text-green-600" />,
+              icon: (
+                <CheckCircleOutlined className="activity-icon text-green-600" />
+              ),
             },
             {
               type: "company",
@@ -682,7 +757,7 @@ const AdminDashboard: React.FC = () => {
         </div>
       </Card>
     </div>
-  )
+  );
 
   const renderAnalytics = () => (
     <div className="analytics-content">
@@ -692,8 +767,15 @@ const AdminDashboard: React.FC = () => {
             title="Advanced Analytics"
             extra={
               <Space>
-                <RangePicker value={selectedDateRange} onChange={setSelectedDateRange} />
-                <PrintReport data={stats} title="Platform Analytics Report" type="analytics" />
+                <RangePicker
+                  value={selectedDateRange}
+                  onChange={setSelectedDateRange}
+                />
+                <PrintReport
+                  data={stats}
+                  title="Platform Analytics Report"
+                  type="analytics"
+                />
               </Space>
             }
             className="analytics-card"
@@ -707,7 +789,13 @@ const AdminDashboard: React.FC = () => {
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Area type="monotone" dataKey="users" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
+                    <Area
+                      type="monotone"
+                      dataKey="users"
+                      stroke="#6366f1"
+                      fill="#6366f1"
+                      fillOpacity={0.3}
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </Col>
@@ -751,7 +839,10 @@ const AdminDashboard: React.FC = () => {
                   <Text>Interview Success Rate</Text>
                   <Text strong>{stats.completionRate}%</Text>
                 </div>
-                <Progress percent={stats.completionRate} strokeColor="#f59e0b" />
+                <Progress
+                  percent={stats.completionRate}
+                  strokeColor="#f59e0b"
+                />
               </div>
             </div>
           </Card>
@@ -760,16 +851,50 @@ const AdminDashboard: React.FC = () => {
           <Card title="Top Performing Categories" className="categories-card">
             <Table
               dataSource={[
-                { category: "Frontend Development", interviews: 45, avgScore: 87, completion: 92 },
-                { category: "Backend Development", interviews: 38, avgScore: 84, completion: 89 },
-                { category: "Data Science", interviews: 29, avgScore: 91, completion: 95 },
-                { category: "DevOps", interviews: 22, avgScore: 86, completion: 88 },
-                { category: "Mobile Development", interviews: 18, avgScore: 83, completion: 85 },
+                {
+                  category: "Frontend Development",
+                  interviews: 45,
+                  avgScore: 87,
+                  completion: 92,
+                },
+                {
+                  category: "Backend Development",
+                  interviews: 38,
+                  avgScore: 84,
+                  completion: 89,
+                },
+                {
+                  category: "Data Science",
+                  interviews: 29,
+                  avgScore: 91,
+                  completion: 95,
+                },
+                {
+                  category: "DevOps",
+                  interviews: 22,
+                  avgScore: 86,
+                  completion: 88,
+                },
+                {
+                  category: "Mobile Development",
+                  interviews: 18,
+                  avgScore: 83,
+                  completion: 85,
+                },
               ]}
               columns={[
                 { title: "Category", dataIndex: "category", key: "category" },
-                { title: "Interviews", dataIndex: "interviews", key: "interviews" },
-                { title: "Avg Score", dataIndex: "avgScore", key: "avgScore", render: (score: number) => `${score}%` },
+                {
+                  title: "Interviews",
+                  dataIndex: "interviews",
+                  key: "interviews",
+                },
+                {
+                  title: "Avg Score",
+                  dataIndex: "avgScore",
+                  key: "avgScore",
+                  render: (score: number) => `${score}%`,
+                },
                 {
                   title: "Completion",
                   dataIndex: "completion",
@@ -785,7 +910,7 @@ const AdminDashboard: React.FC = () => {
         </Col>
       </Row>
     </div>
-  )
+  );
 
   return (
     <Layout className="min-h-screen">
@@ -805,7 +930,11 @@ const AdminDashboard: React.FC = () => {
       >
         {/* Enhanced Logo Section */}
         <div className="sidebar-logo-container">
-          <motion.div className="sidebar-logo" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+          <motion.div
+            className="sidebar-logo"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
             <div className="logo-icon admin-logo">
               <RobotOutlined />
             </div>
@@ -855,14 +984,20 @@ const AdminDashboard: React.FC = () => {
                     Admin Access
                   </Title>
                 </div>
-                <Text className="admin-status-description">You have full system privileges</Text>
+                <Text className="admin-status-description">
+                  You have full system privileges
+                </Text>
                 <div className="admin-status-stats">
                   <div className="admin-stat-item">
-                    <span className="admin-stat-number">{stats.totalUsers + stats.totalCompanies}</span>
+                    <span className="admin-stat-number">
+                      {stats.totalUsers + stats.totalCompanies}
+                    </span>
                     <span className="admin-stat-label">Total Users</span>
                   </div>
                   <div className="admin-stat-item">
-                    <span className="admin-stat-number">{stats.totalInterviews}</span>
+                    <span className="admin-stat-number">
+                      {stats.totalInterviews}
+                    </span>
                     <span className="admin-stat-label">Interviews</span>
                   </div>
                 </div>
@@ -891,17 +1026,27 @@ const AdminDashboard: React.FC = () => {
                 <Title level={3} className="page-title">
                   Admin Dashboard
                 </Title>
-                <Text className="page-subtitle">Platform management and analytics</Text>
+                <Text className="page-subtitle">
+                  Platform management and analytics
+                </Text>
               </div>
             </div>
 
             <div className="header-right">
               <Space size="middle" className="header-actions">
-                <Input.Search placeholder="Search..." style={{ width: 200 }} className="admin-search" />
+                <Input.Search
+                  placeholder="Search..."
+                  style={{ width: 200 }}
+                  className="admin-search"
+                />
                 <NotificationDropdown />
                 <ThemeToggle />
                 <Dropdown menu={userMenu} trigger={["click"]}>
-                  <Avatar src={user?.avatar} size="large" className="admin-avatar" />
+                  <Avatar
+                    src={user?.avatar}
+                    size="large"
+                    className="admin-avatar"
+                  />
                 </Dropdown>
               </Space>
             </div>
@@ -910,8 +1055,16 @@ const AdminDashboard: React.FC = () => {
 
         {/* Main Content */}
         <Content className="enhanced-content admin-content">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <Tabs activeKey={activeTab} onChange={setActiveTab} className="admin-tabs">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Tabs
+              activeKey={activeTab}
+              onChange={setActiveTab}
+              className="admin-tabs"
+            >
               <TabPane tab="Overview" key="overview">
                 {renderOverview()}
               </TabPane>
@@ -923,7 +1076,11 @@ const AdminDashboard: React.FC = () => {
                     <Space>
                       <Input.Search placeholder="Search users..." />
                       <Button icon={<FilterOutlined />}>Filter</Button>
-                      <Button type="primary" icon={<PlusOutlined />} className="btn-gradient">
+                      <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        className="btn-gradient"
+                      >
                         Add User
                       </Button>
                     </Space>
@@ -948,7 +1105,11 @@ const AdminDashboard: React.FC = () => {
                     <Space>
                       <Input.Search placeholder="Search companies..." />
                       <Button icon={<FilterOutlined />}>Filter</Button>
-                      <Button type="primary" icon={<PlusOutlined />} className="btn-gradient">
+                      <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        className="btn-gradient"
+                      >
                         Add Company
                       </Button>
                     </Space>
@@ -975,7 +1136,9 @@ const AdminDashboard: React.FC = () => {
                       <Select defaultValue="all" style={{ width: 120 }}>
                         <Select.Option value="all">All Status</Select.Option>
                         <Select.Option value="pending">Pending</Select.Option>
-                        <Select.Option value="completed">Completed</Select.Option>
+                        <Select.Option value="completed">
+                          Completed
+                        </Select.Option>
                       </Select>
                       <Button icon={<ExportOutlined />}>Export</Button>
                     </Space>
@@ -1001,17 +1164,33 @@ const AdminDashboard: React.FC = () => {
                 <Row gutter={[24, 24]}>
                   <Col xs={24} lg={12}>
                     <Card title="System Settings" className="settings-card">
-                      <Form layout="vertical" className="enhanced-form">
+                      <Form
+                        form={systemForm}
+                        layout="vertical"
+                        className="enhanced-form"
+                      >
                         <Form.Item label="Platform Name">
-                          <Input defaultValue="mirAI" className="enhanced-input" />
+                          <Input
+                            defaultValue="mirAI"
+                            className="enhanced-input"
+                          />
                         </Form.Item>
                         <Form.Item label="Max Interview Duration (minutes)">
-                          <Input defaultValue="60" type="number" className="enhanced-input" />
+                          <Input
+                            defaultValue="60"
+                            type="number"
+                            className="enhanced-input"
+                          />
                         </Form.Item>
                         <Form.Item label="Default AI Model">
-                          <Select defaultValue="gpt-4" className="enhanced-select">
+                          <Select
+                            defaultValue="gpt-4"
+                            className="enhanced-select"
+                          >
                             <Select.Option value="gpt-4">GPT-4</Select.Option>
-                            <Select.Option value="gpt-3.5">GPT-3.5</Select.Option>
+                            <Select.Option value="gpt-3.5">
+                              GPT-3.5
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                         <Button type="primary" className="btn-gradient">
@@ -1022,16 +1201,32 @@ const AdminDashboard: React.FC = () => {
                   </Col>
                   <Col xs={24} lg={12}>
                     <Card title="Email Settings" className="settings-card">
-                      <Form layout="vertical" className="enhanced-form">
+                      <Form
+                        form={emailForm}
+                        layout="vertical"
+                        className="enhanced-form"
+                      >
                         <Form.Item label="SMTP Server">
-                          <Input placeholder="smtp.gmail.com" className="enhanced-input" />
+                          <Input
+                            placeholder="smtp.gmail.com"
+                            className="enhanced-input"
+                          />
                         </Form.Item>
                         <Form.Item label="SMTP Port">
-                          <Input defaultValue="587" type="number" className="enhanced-input" />
+                          <Input
+                            defaultValue="587"
+                            type="number"
+                            className="enhanced-input"
+                          />
                         </Form.Item>
                         <Form.Item label="Email Templates">
-                          <Select defaultValue="default" className="enhanced-select">
-                            <Select.Option value="default">Default</Select.Option>
+                          <Select
+                            defaultValue="default"
+                            className="enhanced-select"
+                          >
+                            <Select.Option value="default">
+                              Default
+                            </Select.Option>
                             <Select.Option value="modern">Modern</Select.Option>
                           </Select>
                         </Form.Item>
@@ -1048,7 +1243,7 @@ const AdminDashboard: React.FC = () => {
         </Content>
       </Layout>
     </Layout>
-  )
-}
+  );
+};
 
-export default AdminDashboard
+export default AdminDashboard;
