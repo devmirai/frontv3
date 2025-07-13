@@ -16,6 +16,7 @@ import Login from "./components/Login";
 import CompanyDashboard from "./components/CompanyDashboard";
 import UserDashboard from "./components/UserDashboard";
 import Interview from "./components/Interview";
+import InterviewLoading from "./components/InterviewLoading";
 import ConvocatoriaDetailsView from "./components/ConvocatoriaDetailsView";
 import CandidatesList from "./components/CandidatesList";
 import CreateConvocatoria from "./components/CreateConvocatoria";
@@ -140,14 +141,25 @@ const ThemedApp: React.FC = () => {
                     </ProtectedRoute>
                   }
                 />
+                {/* Interview Loading Screen */}
                 <Route
                   path="/usuario/interview/:id"
+                  element={
+                    <ProtectedRoute requiredRole={Rol.USUARIO}>
+                      <InterviewLoading />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* Active Interview */}
+                <Route
+                  path="/usuario/interview/:id/start"
                   element={
                     <ProtectedRoute requiredRole={Rol.USUARIO}>
                       <Interview />
                     </ProtectedRoute>
                   }
                 />
+                {/* Interview Results */}
                 <Route
                   path="/usuario/interview/:id/results"
                   element={

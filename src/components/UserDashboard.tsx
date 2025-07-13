@@ -309,16 +309,29 @@ const UserDashboard: React.FC = () => {
     ],
   };
 
-  // Fixed interview start function - single request flow
+  // Fixed interview start function - single request flow with mock fallback
   const handleStartInterview = async (postulacionId: number) => {
     try {
       setStartingInterview(postulacionId);
 
-      // Update status first
-      await postulacionAPI.iniciarEntrevista(postulacionId);
-
-      // Navigate to interview page
-      navigate(`/usuario/interview/${postulacionId}`);
+      // 🔧 USAR SIMULACIÓN MOCK para pruebas de diseño
+      console.log('🔧 [UserDashboard] Iniciando entrevista con datos mock');
+      
+      // Simular inicio de entrevista con datos mock
+      const startResult = simulateStartInterview(postulacionId);
+      
+      if (startResult.success) {
+        console.log(`📊 [UserDashboard] Entrevista iniciada exitosamente (mock): ${postulacionId}`);
+        message.success("Interview started successfully!");
+        
+        // Recargar datos para actualizar el estado
+        await loadDashboardData();
+        
+        // Navegar a la entrevista
+        navigate(`/usuario/interview/${postulacionId}`);
+      } else {
+        throw new Error(startResult.error || 'Error starting interview');
+      }
     } catch (error) {
       console.error("Error starting interview:", error);
       message.error("Failed to start interview. Please try again.");
@@ -517,20 +530,16 @@ const UserDashboard: React.FC = () => {
 
       message.loading("Creating your application...", 0);
 
-      // Create a new application
-      const applicationResponse = await postulacionAPI.create({
-        usuario: { id: user.id },
-        convocatoria: { id: selectedJob.id },
-        estado: EstadoPostulacion.PENDIENTE,
-        fechaPostulacion: new Date().toISOString(),
-      });
-
-      const newApplicationId =
-        applicationResponse.data.id || applicationResponse.data;
-
-      if (!newApplicationId) {
-        throw new Error("Failed to create application - no ID returned");
+      // 🔧 USAR SIMULACIÓN MOCK para aplicar a trabajos
+      console.log('🔧 [UserDashboard] Aplicando a trabajo con datos mock');
+      
+      const applyResult = simulateApplyToJob(user.id, selectedJob.id!);
+      
+      if (!applyResult.success) {
+        throw new Error(applyResult.error || 'Error applying to job');
       }
+
+      const newApplicationId = applyResult.application!.id!;
 
       message.destroy();
       message.success("Application submitted successfully!");

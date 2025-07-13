@@ -35,6 +35,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { preguntaAPI, evaluacionAPI, postulacionAPI } from "../services/api"
 import { generateMockQuestions } from "../data/mockDataUtils"
+import { mockApplications } from "../data/mockData"
 import {
   type Pregunta,
   type Postulacion,
@@ -111,21 +112,67 @@ const Interview: React.FC = () => {
     try {
       setLoading(true)
 
-      // Load postulacion details
-      const postulacionResponse = await postulacionAPI.getById(Number.parseInt(id))
-      const postulacionData = postulacionResponse.data
-      setPostulacion(postulacionData)
+      // 🔧 SIEMPRE usar datos mock para pruebas de diseño
+      console.log('🔧 [Interview] Usando datos mock para carga de entrevista');
+      
+      const postulacionId = Number.parseInt(id);
+      
+      // Buscar postulación en datos mock
+      const mockPostulacion = mockApplications.find(app => app.id === postulacionId);
+      
+      if (!mockPostulacion) {
+        throw new Error(`Postulación ${postulacionId} no encontrada en datos mock`);
+      }
+      
+      setPostulacion(mockPostulacion);
 
-      // Check if interview is completed and we should show results
-      if (window.location.pathname.includes("/results") || postulacionData.estado === EstadoPostulacion.COMPLETADA) {
-        await loadResults(Number.parseInt(id))
-        setShowResults(true)
-        setInterviewCompleted(true)
-        return
+      // Check if this is a results view
+      if (window.location.pathname.includes("/results")) {
+        console.log('🔧 [Interview] Mostrando resultados mock para entrevista completada');
+        // Para entrevistas completadas, mostrar resultados mock
+        const mockResults = {
+          puntajeFinal: 85.5,
+          resumenPorCriterio: {
+            claridad_estructura: 80,
+            dominio_tecnico: 90,
+            pertinencia: 85,
+            comunicacion_seguridad: 87
+          },
+          evaluacionesPorPregunta: [
+            {
+              pregunta: { texto: "Explain the concept of React hooks and their benefits" },
+              evaluacion: { puntuacionFinal: 8.5 },
+              respuesta: "Sample answer about React hooks...",
+              criterios: {
+                claridad_estructura: 8,
+                dominio_tecnico: 9,
+                pertinencia: 8,
+                comunicacion_seguridad: 9
+              }
+            },
+            {
+              pregunta: { texto: "How would you optimize a React application's performance?" },
+              evaluacion: { puntuacionFinal: 8.2 },
+              respuesta: "Sample answer about React optimization...",
+              criterios: {
+                claridad_estructura: 8,
+                dominio_tecnico: 8,
+                pertinencia: 9,
+                comunicacion_seguridad: 8
+              }
+            }
+          ]
+        };
+        setConsolidatedResults(mockResults);
+        setShowResults(true);
+        setInterviewCompleted(true);
+        return;
       }
 
-      // Generate questions for the interview
-      await generateQuestions(postulacionData)
+      // For active interview, load questions
+      await generateQuestions(mockPostulacion);
+      
+      console.log(`📊 [Interview] Mock interview data loaded successfully`);
     } catch (error: any) {
       console.error("Error loading interview data:", error)
       message.error("Failed to load interview data. Please try again.")
@@ -146,14 +193,6 @@ const Interview: React.FC = () => {
     questionGenerationInitiated.current = true;
     
     try {
-      setLoading(true)
-      
-      message.loading({
-        content: "Generating personalized interview questions...",
-        duration: 0,
-        key: "questionGeneration",
-      })
-
       if (!postulacionData.id) {
         throw new Error("Postulation ID is missing")
       }
@@ -179,11 +218,6 @@ const Interview: React.FC = () => {
           setQuestions(existingQuestions)
           setAnswers(new Array(existingQuestions.length).fill(""))
           setCurrentQuestion(0)
-          
-          message.success({
-            content: "Interview questions loaded!",
-            key: "questionGeneration",
-          })
           return
         }
       } catch (error) {
@@ -191,7 +225,6 @@ const Interview: React.FC = () => {
       }
 
       // Mark questions as being generated BEFORE generating them
-      // This prevents race conditions with parallel API calls
       await postulacionAPI.marcarPreguntasGeneradas(postulacionData.id, true)
 
       // Only generate new questions if none exist
@@ -211,11 +244,6 @@ const Interview: React.FC = () => {
         setQuestions(generatedQuestions)
         setAnswers(new Array(generatedQuestions.length).fill(""))
         setCurrentQuestion(0)
-        
-        message.success({
-          content: response.data.mensaje || "Interview questions ready!",
-          key: "questionGeneration",
-        })
       } else {
         throw new Error("Invalid response format from question generation API")
       }
@@ -243,23 +271,12 @@ const Interview: React.FC = () => {
         setAnswers(new Array(formattedMockQuestions.length).fill(""));
         setCurrentQuestion(0);
         
-        message.success({
-          content: `Interview questions ready! (${formattedMockQuestions.length} questions loaded)`,
-          key: "questionGeneration",
-        });
-        
         console.log(`📊 Mock questions loaded: ${formattedMockQuestions.length} questions`);
       } catch (mockError) {
         console.error("Error loading mock questions:", mockError);
-        message.error({
-          content: "Error loading interview questions. Please try again.",
-          key: "questionGeneration",
-          duration: 5,
-        });
+        message.error("Error loading interview questions. Please try again.");
         setQuestions([]);
       }
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -722,8 +739,17 @@ const Interview: React.FC = () => {
     )
   }
 
+  // Simple loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" />
+      </div>
+    )
+  }
+
   // Loading state for question generation
-  if (questions.length === 0) {
+  if (!showResults && questions.length === 0) {
     return (
       <div className="loading-screen">
         <div className="loading-content">
@@ -736,25 +762,13 @@ const Interview: React.FC = () => {
               <RobotOutlined />
             </div>
             <Title level={2} className="loading-title">
-              Preparing Your Interview
+              Loading Interview Questions
             </Title>
             <Paragraph className="loading-message">
-              mirAI is generating personalized questions based on the job requirements.
-              <br />
-              <strong>This process may take a few moments.</strong>
+              Preparing your personalized interview experience...
             </Paragraph>
             <div className="loading-progress">
-              <Progress percent={75} strokeColor="#6366f1" showInfo={false} />
-            </div>
-            <div className="loading-tips">
-              <div className="loading-tips-title">
-                <InfoCircleOutlined />
-                <span>Did you know?</span>
-              </div>
-              <Paragraph className="loading-tips-text">
-                Our AI analyzes the position details to create the most relevant questions for your interview. Take a
-                moment to prepare yourself mentally!
-              </Paragraph>
+              <Progress percent={50} strokeColor="#6366f1" showInfo={false} />
             </div>
           </motion.div>
         </div>
