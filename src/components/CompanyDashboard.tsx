@@ -117,6 +117,7 @@ const CompanyDashboard: React.FC = () => {
           icon: <BarChartOutlined />,
           label: "Analytics",
           className: "sidebar-menu-item",
+          onClick: () => message.info("Analytics feature coming soon!"),
         },
       ],
     },
