@@ -1672,45 +1672,293 @@ const UserDashboard: React.FC = () => {
         </div>
       </Modal>
 
-      {/* Browse Jobs Modal */}
+      {/* Professional Browse Jobs Modal */}
       <Modal
-        title={
-          <div className="modal-header">
-            <SearchOutlined className="modal-icon" />
-            <span>Browse Jobs ({availableJobs.length})</span>
-          </div>
-        }
+        title={null}
         open={jobsModalVisible}
         onCancel={() => setJobsModalVisible(false)}
-        footer={[
-          <Button
-            key="close"
-            type="primary"
-            onClick={() => setJobsModalVisible(false)}
-          >
-            Close
-          </Button>,
-        ]}
-        width={1000}
-        className="enhanced-modal"
+        footer={null}
+        width={1200}
+        className="professional-jobs-modal"
+        centered
       >
-        <div className="modal-content">
-          <div className="table-container">
-            <Table
-              columns={jobsColumns}
-              dataSource={availableJobs}
-              loading={loading}
-              pagination={{
-                pageSize: 10,
-                showSizeChanger: true,
-                showQuickJumper: true,
-                showTotal: (total, range) =>
-                  `${range[0]}-${range[1]} of ${total} jobs`,
-              }}
-              className="enhanced-table"
-              scroll={{ x: 800 }}
-              rowKey="id"
-            />
+        <div className="professional-jobs-content">
+          {/* Header Section */}
+          <div className="jobs-header">
+            <div className="header-main">
+              <div className="header-icon-wrapper">
+                <SearchOutlined className="header-icon" />
+              </div>
+              <div className="header-text">
+                <Title level={3} className="jobs-title">
+                  Browse Jobs
+                </Title>
+                <Text className="jobs-subtitle">
+                  Discover your next career opportunity with AI-powered
+                  interviews
+                </Text>
+              </div>
+            </div>
+            <div className="header-stats">
+              <div className="stat-item">
+                <div className="stat-number">{availableJobs.length}</div>
+                <div className="stat-label">Open Positions</div>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <div className="stat-number">
+                  {
+                    new Set(availableJobs.map((job) => job.empresa?.nombre))
+                      .size
+                  }
+                </div>
+                <div className="stat-label">Companies</div>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <div className="stat-number">
+                  {
+                    availableJobs.filter((job) => {
+                      const alreadyApplied = myApplications.some(
+                        (app) => app.convocatoria?.id === job.id,
+                      );
+                      return !alreadyApplied;
+                    }).length
+                  }
+                </div>
+                <div className="stat-label">Available to Apply</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filter and Search Section */}
+          <div className="jobs-controls">
+            <div className="controls-left">
+              <Input
+                placeholder="Search by job title, company, or position..."
+                prefix={<SearchOutlined />}
+                style={{ width: 320 }}
+                className="search-input"
+              />
+            </div>
+            <div className="controls-right">
+              <Select
+                placeholder="Filter by company"
+                style={{ width: 200 }}
+                className="company-filter"
+                allowClear
+              >
+                {Array.from(
+                  new Set(availableJobs.map((job) => job.empresa?.nombre)),
+                ).map((company) => (
+                  <Option key={company} value={company}>
+                    {company}
+                  </Option>
+                ))}
+              </Select>
+              <Select
+                placeholder="Filter by position"
+                style={{ width: 180 }}
+                className="position-filter"
+                allowClear
+              >
+                {Array.from(
+                  new Set(availableJobs.map((job) => job.puesto)),
+                ).map((position) => (
+                  <Option key={position} value={position}>
+                    {position}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+          </div>
+
+          {/* Jobs Content */}
+          <div className="jobs-body">
+            {availableJobs.length > 0 ? (
+              <div className="jobs-grid">
+                {availableJobs.map((job) => {
+                  const alreadyApplied = myApplications.some(
+                    (app) => app.convocatoria?.id === job.id,
+                  );
+                  const daysLeft = dayjs(job.fechaCierre).diff(dayjs(), "day");
+                  const urgency =
+                    daysLeft <= 3
+                      ? "urgent"
+                      : daysLeft <= 7
+                        ? "moderate"
+                        : "normal";
+
+                  return (
+                    <motion.div
+                      key={job.id}
+                      className={`job-opportunity-card ${alreadyApplied ? "applied" : ""}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      whileHover={{ y: -6 }}
+                    >
+                      <div className="job-card-header">
+                        <div className="company-section">
+                          <div className="company-avatar">
+                            <BankOutlined />
+                          </div>
+                          <div className="company-details">
+                            <Text className="company-name">
+                              {job.empresa?.nombre}
+                            </Text>
+                            <Text className="job-location">
+                              Remote • Full-time
+                            </Text>
+                          </div>
+                        </div>
+                        <div className="job-status">
+                          {alreadyApplied ? (
+                            <Tag color="green" className="applied-tag">
+                              <CheckCircleOutlined /> Applied
+                            </Tag>
+                          ) : (
+                            <Tag
+                              color={
+                                urgency === "urgent"
+                                  ? "red"
+                                  : urgency === "moderate"
+                                    ? "orange"
+                                    : "blue"
+                              }
+                              className="urgency-tag"
+                            >
+                              {daysLeft > 0
+                                ? `${daysLeft} days left`
+                                : "Deadline today"}
+                            </Tag>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="job-card-content">
+                        <Title level={4} className="job-title">
+                          {job.titulo}
+                        </Title>
+
+                        <div className="job-meta">
+                          <div className="meta-row">
+                            <UserOutlined className="meta-icon" />
+                            <span>{job.puesto}</span>
+                          </div>
+                          <div className="meta-row">
+                            <ClockCircleOutlined className="meta-icon" />
+                            <span>
+                              Closes{" "}
+                              {dayjs(job.fechaCierre).format("MMM DD, YYYY")}
+                            </span>
+                          </div>
+                          <div className="meta-row">
+                            <StarOutlined className="meta-icon" />
+                            <span>AI Interview</span>
+                          </div>
+                        </div>
+
+                        {job.descripcion && (
+                          <div className="job-description">
+                            <Text className="description-text">
+                              {job.descripcion.length > 120
+                                ? `${job.descripcion.substring(0, 120)}...`
+                                : job.descripcion}
+                            </Text>
+                          </div>
+                        )}
+
+                        <div className="job-highlights">
+                          <div className="highlight-item">
+                            <RobotOutlined className="highlight-icon" />
+                            <span>AI-Powered Assessment</span>
+                          </div>
+                          <div className="highlight-item">
+                            <ThunderboltOutlined className="highlight-icon" />
+                            <span>Instant Feedback</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="job-card-footer">
+                        <div className="footer-info">
+                          <Text className="posted-date">
+                            Posted {dayjs(job.fechaPublicacion).fromNow()}
+                          </Text>
+                        </div>
+                        <div className="footer-actions">
+                          {alreadyApplied ? (
+                            <Button className="view-application-button" block>
+                              View Application
+                            </Button>
+                          ) : (
+                            <Button
+                              type="primary"
+                              className="apply-job-button"
+                              icon={<SendOutlined />}
+                              onClick={() => openApplyModal(job)}
+                              block
+                            >
+                              Apply Now
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="empty-state">
+                <div className="empty-icon">
+                  <SearchOutlined />
+                </div>
+                <Title level={4} className="empty-title">
+                  No Jobs Available
+                </Title>
+                <Text className="empty-description">
+                  There are currently no open positions. Check back later for
+                  new opportunities!
+                </Text>
+                <Button
+                  type="primary"
+                  className="btn-gradient"
+                  size="large"
+                  onClick={() => setJobsModalVisible(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="jobs-footer">
+            <div className="footer-info">
+              <Text className="footer-text">
+                Showing {availableJobs.length} job
+                {availableJobs.length !== 1 ? "s" : ""} •{" "}
+                {
+                  availableJobs.filter((job) => {
+                    const alreadyApplied = myApplications.some(
+                      (app) => app.convocatoria?.id === job.id,
+                    );
+                    return !alreadyApplied;
+                  }).length
+                }{" "}
+                available to apply
+              </Text>
+            </div>
+            <div className="footer-actions">
+              <Button
+                size="large"
+                onClick={() => setJobsModalVisible(false)}
+                className="close-button"
+              >
+                Close
+              </Button>
+            </div>
           </div>
         </div>
       </Modal>
