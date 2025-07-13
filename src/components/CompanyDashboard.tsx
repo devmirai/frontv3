@@ -46,6 +46,9 @@ import {
   ArrowUpOutlined,
   SaveOutlined,
   BarChartOutlined,
+  CalendarOutlined,
+  StarOutlined,
+  PlayCircleOutlined,
 } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
