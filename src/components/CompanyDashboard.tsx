@@ -1012,6 +1012,493 @@ const CompanyDashboard: React.FC = () => {
           </Form>
         </div>
       </Drawer>
+
+      {/* Job Postings Modal */}
+      <Modal
+        title={null}
+        open={jobPostingsModalVisible}
+        onCancel={() => setJobPostingsModalVisible(false)}
+        footer={null}
+        width={1200}
+        className="professional-jobs-modal"
+        centered
+      >
+        <div className="professional-jobs-content">
+          {/* Header Section */}
+          <div className="jobs-header">
+            <div className="header-main">
+              <div className="header-icon-wrapper">
+                <FileTextOutlined className="header-icon" />
+              </div>
+              <div className="header-text">
+                <Title level={3} className="jobs-title">
+                  Job Postings Management
+                </Title>
+                <Text className="jobs-subtitle">
+                  Manage your active job postings and track applications
+                </Text>
+              </div>
+            </div>
+            <div className="header-stats">
+              <div className="stat-item">
+                <div className="stat-number">{convocatorias.length}</div>
+                <div className="stat-label">Total Jobs</div>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <div className="stat-number">
+                  {convocatorias.filter((job) => job.activo).length}
+                </div>
+                <div className="stat-label">Active</div>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <div className="stat-number">{postulaciones.length}</div>
+                <div className="stat-label">Applications</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Controls Section */}
+          <div className="jobs-controls">
+            <div className="controls-left">
+              <Input.Search
+                placeholder="Search job postings..."
+                className="search-input"
+                size="large"
+                style={{ width: 300 }}
+              />
+              <Select
+                placeholder="Filter by status"
+                className="filter-select"
+                size="large"
+                style={{ width: 150 }}
+                allowClear
+              >
+                <Option value="active">Active</Option>
+                <Option value="inactive">Inactive</Option>
+                <Option value="draft">Draft</Option>
+              </Select>
+            </div>
+            <div className="controls-right">
+              <Button
+                type="primary"
+                size="large"
+                icon={<PlusOutlined />}
+                className="create-job-button"
+                onClick={() => {
+                  setJobPostingsModalVisible(false);
+                  navigate("/empresa/convocatoria/create");
+                }}
+              >
+                Create New Job
+              </Button>
+            </div>
+          </div>
+
+          {/* Jobs Grid */}
+          <div className="jobs-grid">
+            {convocatorias.length > 0 ? (
+              convocatorias.map((job) => (
+                <div key={job.id} className="job-card">
+                  <div className="job-card-header">
+                    <div className="job-title-section">
+                      <Title level={4} className="job-title">
+                        {job.titulo}
+                      </Title>
+                      <Tag
+                        color={job.activo ? "green" : "orange"}
+                        className="job-status-tag"
+                      >
+                        {job.activo ? "Active" : "Inactive"}
+                      </Tag>
+                    </div>
+                    <Dropdown
+                      menu={{
+                        items: [
+                          {
+                            key: "view",
+                            label: "View Details",
+                            icon: <EyeOutlined />,
+                            onClick: () =>
+                              navigate(`/empresa/convocatoria/${job.id}`),
+                          },
+                          {
+                            key: "candidates",
+                            label: "View Candidates",
+                            icon: <TeamOutlined />,
+                            onClick: () =>
+                              navigate(
+                                `/empresa/convocatoria/${job.id}/candidates`,
+                              ),
+                          },
+                          {
+                            key: "edit",
+                            label: "Edit Job",
+                            icon: <EditOutlined />,
+                          },
+                          {
+                            key: "divider",
+                            type: "divider",
+                          },
+                          {
+                            key: "delete",
+                            label: "Delete Job",
+                            icon: <DeleteOutlined />,
+                            danger: true,
+                          },
+                        ],
+                      }}
+                      trigger={["click"]}
+                    >
+                      <Button
+                        type="text"
+                        icon={<MoreOutlined />}
+                        className="job-actions-button"
+                      />
+                    </Dropdown>
+                  </div>
+
+                  <div className="job-description">
+                    <Text type="secondary" className="job-desc-text">
+                      {job.descripcion?.substring(0, 150)}...
+                    </Text>
+                  </div>
+
+                  <div className="job-meta">
+                    <div className="meta-item">
+                      <CalendarOutlined className="meta-icon" />
+                      <span>
+                        Posted:{" "}
+                        {dayjs(job.fechaPublicacion).format("MMM DD, YYYY")}
+                      </span>
+                    </div>
+                    <div className="meta-item">
+                      <ClockCircleOutlined className="meta-icon" />
+                      <span>
+                        Closes: {dayjs(job.fechaCierre).format("MMM DD, YYYY")}
+                      </span>
+                    </div>
+                    <div className="meta-item">
+                      <StarOutlined className="meta-icon" />
+                      <span>Difficulty: {job.dificultad}/10</span>
+                    </div>
+                  </div>
+
+                  <div className="job-stats">
+                    <div className="stat-item">
+                      <div className="stat-number">
+                        {
+                          postulaciones.filter(
+                            (p) => p.convocatoriaId === job.id,
+                          ).length
+                        }
+                      </div>
+                      <div className="stat-label">Applications</div>
+                    </div>
+                    <div className="stat-item">
+                      <div className="stat-number">
+                        {
+                          postulaciones.filter(
+                            (p) =>
+                              p.convocatoriaId === job.id &&
+                              p.estado === "EN_EVALUACION",
+                          ).length
+                        }
+                      </div>
+                      <div className="stat-label">In Review</div>
+                    </div>
+                    <div className="stat-item">
+                      <div className="stat-number">
+                        {
+                          postulaciones.filter(
+                            (p) =>
+                              p.convocatoriaId === job.id &&
+                              p.estado === "COMPLETADA",
+                          ).length
+                        }
+                      </div>
+                      <div className="stat-label">Completed</div>
+                    </div>
+                  </div>
+
+                  <div className="job-actions">
+                    <Button
+                      size="small"
+                      icon={<EyeOutlined />}
+                      onClick={() =>
+                        navigate(`/empresa/convocatoria/${job.id}`)
+                      }
+                    >
+                      View
+                    </Button>
+                    <Button
+                      size="small"
+                      icon={<TeamOutlined />}
+                      type="primary"
+                      onClick={() =>
+                        navigate(`/empresa/convocatoria/${job.id}/candidates`)
+                      }
+                    >
+                      Candidates
+                    </Button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <FileTextOutlined className="empty-icon" />
+                <Title level={4} className="empty-title">
+                  No Job Postings Yet
+                </Title>
+                <Text className="empty-description">
+                  Create your first job posting to start receiving applications
+                </Text>
+                <Button
+                  type="primary"
+                  size="large"
+                  icon={<PlusOutlined />}
+                  className="empty-action-button"
+                  onClick={() => {
+                    setJobPostingsModalVisible(false);
+                    navigate("/empresa/convocatoria/create");
+                  }}
+                >
+                  Create Job Posting
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Modal Footer */}
+          <div className="modal-footer">
+            <div className="footer-actions">
+              <Button
+                size="large"
+                onClick={() => setJobPostingsModalVisible(false)}
+                className="close-button"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Candidates Modal */}
+      <Modal
+        title={null}
+        open={candidatesModalVisible}
+        onCancel={() => setCandidatesModalVisible(false)}
+        footer={null}
+        width={1200}
+        className="professional-candidates-modal"
+        centered
+      >
+        <div className="professional-candidates-content">
+          {/* Header Section */}
+          <div className="candidates-header">
+            <div className="header-main">
+              <div className="header-icon-wrapper">
+                <TeamOutlined className="header-icon" />
+              </div>
+              <div className="header-text">
+                <Title level={3} className="candidates-title">
+                  Candidates Management
+                </Title>
+                <Text className="candidates-subtitle">
+                  Review and manage candidate applications across all job
+                  postings
+                </Text>
+              </div>
+            </div>
+            <div className="header-stats">
+              <div className="stat-item">
+                <div className="stat-number">{postulaciones.length}</div>
+                <div className="stat-label">Total Applications</div>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <div className="stat-number">
+                  {postulaciones.filter((p) => p.estado === "PENDIENTE").length}
+                </div>
+                <div className="stat-label">Pending</div>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <div className="stat-number">
+                  {
+                    postulaciones.filter((p) => p.estado === "EN_EVALUACION")
+                      .length
+                  }
+                </div>
+                <div className="stat-label">In Review</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Controls Section */}
+          <div className="candidates-controls">
+            <div className="controls-left">
+              <Input.Search
+                placeholder="Search candidates..."
+                className="search-input"
+                size="large"
+                style={{ width: 300 }}
+              />
+              <Select
+                placeholder="Filter by status"
+                className="filter-select"
+                size="large"
+                style={{ width: 150 }}
+                allowClear
+              >
+                <Option value="PENDIENTE">Pending</Option>
+                <Option value="EN_EVALUACION">In Review</Option>
+                <Option value="COMPLETADA">Completed</Option>
+                <Option value="RECHAZADA">Rejected</Option>
+              </Select>
+              <Select
+                placeholder="Filter by job"
+                className="filter-select"
+                size="large"
+                style={{ width: 200 }}
+                allowClear
+              >
+                {convocatorias.map((job) => (
+                  <Option key={job.id} value={job.id}>
+                    {job.titulo}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+          </div>
+
+          {/* Candidates Grid */}
+          <div className="candidates-grid">
+            {postulaciones.length > 0 ? (
+              postulaciones.map((application) => {
+                const job = convocatorias.find(
+                  (j) => j.id === application.convocatoriaId,
+                );
+                return (
+                  <div key={application.id} className="candidate-card">
+                    <div className="candidate-header">
+                      <div className="candidate-info">
+                        <Avatar size={48} className="candidate-avatar">
+                          {application.usuario?.nombre?.charAt(0).toUpperCase()}
+                        </Avatar>
+                        <div className="candidate-details">
+                          <Title level={5} className="candidate-name">
+                            {application.usuario?.nombre}{" "}
+                            {application.usuario?.apellidoPaterno}
+                          </Title>
+                          <Text type="secondary" className="candidate-email">
+                            {application.usuario?.email}
+                          </Text>
+                        </div>
+                      </div>
+                      <Tag
+                        color={
+                          application.estado === "PENDIENTE"
+                            ? "orange"
+                            : application.estado === "EN_EVALUACION"
+                              ? "blue"
+                              : application.estado === "COMPLETADA"
+                                ? "green"
+                                : "red"
+                        }
+                        className="application-status-tag"
+                      >
+                        {application.estado}
+                      </Tag>
+                    </div>
+
+                    <div className="application-meta">
+                      <div className="meta-item">
+                        <FileTextOutlined className="meta-icon" />
+                        <span>Job: {job?.titulo || "Unknown"}</span>
+                      </div>
+                      <div className="meta-item">
+                        <CalendarOutlined className="meta-icon" />
+                        <span>
+                          Applied:{" "}
+                          {dayjs(application.fechaPostulacion).format(
+                            "MMM DD, YYYY",
+                          )}
+                        </span>
+                      </div>
+                      {application.puntuacion && (
+                        <div className="meta-item">
+                          <StarOutlined className="meta-icon" />
+                          <span>Score: {application.puntuacion}/100</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {application.estado === "EN_EVALUACION" && (
+                      <div className="interview-progress">
+                        <Text className="progress-label">
+                          Interview Progress
+                        </Text>
+                        <Progress
+                          percent={application.puntuacion || 0}
+                          size="small"
+                          strokeColor="#10b981"
+                        />
+                      </div>
+                    )}
+
+                    <div className="candidate-actions">
+                      <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() =>
+                          navigate(`/empresa/candidate/${application.id}`)
+                        }
+                      >
+                        View Profile
+                      </Button>
+                      <Button
+                        size="small"
+                        icon={<PlayCircleOutlined />}
+                        type="primary"
+                        disabled={application.estado !== "PENDIENTE"}
+                      >
+                        Start Interview
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="empty-state">
+                <TeamOutlined className="empty-icon" />
+                <Title level={4} className="empty-title">
+                  No Applications Yet
+                </Title>
+                <Text className="empty-description">
+                  When candidates apply to your job postings, they will appear
+                  here
+                </Text>
+              </div>
+            )}
+          </div>
+
+          {/* Modal Footer */}
+          <div className="modal-footer">
+            <div className="footer-actions">
+              <Button
+                size="large"
+                onClick={() => setCandidatesModalVisible(false)}
+                className="close-button"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </Layout>
   );
 };
