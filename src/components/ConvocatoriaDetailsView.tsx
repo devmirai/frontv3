@@ -639,7 +639,7 @@ const ConvocatoriaDetailsView: React.FC = () => {
               <div className="meta-item">
                 <CalendarOutlined />
                 <span>
-                  Closes{" "}
+                  <span>Closes:&nbsp;&nbsp;</span>
                   {dayjs(convocatoria.fechaCierre).format("MMM DD, YYYY")}
                 </span>
               </div>
@@ -650,22 +650,6 @@ const ConvocatoriaDetailsView: React.FC = () => {
                 {convocatoria.activo ? "Active" : "Closed"}
               </Tag>
             </div>
-            <Space>
-              <Button
-                icon={<EditOutlined />}
-                size="large"
-                className="header-action-btn"
-              >
-                Edit Job
-              </Button>
-              <Button
-                icon={<ShareAltOutlined />}
-                size="large"
-                className="header-action-btn"
-              >
-                Share
-              </Button>
-            </Space>
           </div>
         </div>
       </Header>
