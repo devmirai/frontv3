@@ -564,9 +564,19 @@
   backdrop-filter: blur(10px) !important;
 }
 
+.dark .candidates-search {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-color: rgba(71, 85, 105, 0.8) !important;
+}
+
 .candidates-search .ant-input {
   background: transparent !important;
   font-weight: 500 !important;
+  color: #1f2937 !important;
+}
+
+.dark .candidates-search .ant-input {
+  color: #f1f5f9 !important;
 }
 
 .candidates-search:hover,
@@ -581,6 +591,12 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
   background: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(10px) !important;
+}
+
+.dark .candidates-filter .ant-select-selector {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-color: rgba(71, 85, 105, 0.8) !important;
+  color: #f1f5f9 !important;
 }
 
 .candidates-filter.ant-select-focused .ant-select-selector {
