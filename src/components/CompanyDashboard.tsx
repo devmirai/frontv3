@@ -100,12 +100,14 @@ const CompanyDashboard: React.FC = () => {
           icon: <FileTextOutlined />,
           label: "Job Postings",
           className: "sidebar-menu-item",
+          onClick: () => setJobPostingsModalVisible(true),
         },
         {
           key: "candidates",
           icon: <TeamOutlined />,
           label: "Candidates",
           className: "sidebar-menu-item",
+          onClick: () => setCandidatesModalVisible(true),
         },
         {
           key: "analytics",
@@ -700,7 +702,11 @@ const CompanyDashboard: React.FC = () => {
                   <Title level={4} className="table-title">
                     Your Job Postings
                   </Title>
-                  <Button type="link" className="view-all-button">
+                  <Button
+                    type="link"
+                    className="view-all-button"
+                    onClick={() => setJobPostingsModalVisible(true)}
+                  >
                     View All
                   </Button>
                 </div>
