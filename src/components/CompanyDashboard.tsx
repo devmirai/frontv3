@@ -72,6 +72,8 @@ const CompanyDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [profileModalVisible, setProfileModalVisible] = useState(false);
   const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false);
+  const [jobPostingsModalVisible, setJobPostingsModalVisible] = useState(false);
+  const [candidatesModalVisible, setCandidatesModalVisible] = useState(false);
   const [profileForm] = Form.useForm();
   const [settingsForm] = Form.useForm();
   const navigate = useNavigate();
