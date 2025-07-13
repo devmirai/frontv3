@@ -37,7 +37,6 @@ import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   EditOutlined,
-  ShareAltOutlined,
   DownloadOutlined,
   FilterOutlined,
   SearchOutlined,
