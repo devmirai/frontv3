@@ -219,15 +219,18 @@
   border-color: rgba(71, 85, 105, 0.8) !important;
 }
 
-/* Content */
+/* Enhanced Content Area */
 .modern-content {
-  padding: 32px !important;
-  min-height: calc(100vh - 80px) !important;
+  padding: 40px 32px 32px !important;
+  min-height: calc(100vh - 85px) !important;
+  position: relative;
+  z-index: 1;
 }
 
 .content-container {
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
 }
 
 /* Form Wrapper */
@@ -237,23 +240,27 @@
   gap: 24px;
 }
 
-/* Steps Card */
+/* Enhanced Steps Card */
 .steps-card {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border: 1px solid rgba(226, 232, 240, 0.6) !important;
-  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  border: 1px solid rgba(226, 232, 240, 0.3) !important;
+  border-radius: 20px !important;
   box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.08),
     0 4px 16px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(8px) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  padding: 24px !important;
+  transition: all 0.3s ease;
 }
 
 .dark .steps-card {
-  background: rgba(30, 41, 59, 0.95) !important;
-  border-color: rgba(71, 85, 105, 0.6) !important;
+  background: rgba(30, 41, 59, 0.7) !important;
+  border-color: rgba(71, 85, 105, 0.3) !important;
   box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
 .modern-steps .ant-steps-item-title {
@@ -275,26 +282,32 @@
   border-color: #10b981 !important;
 }
 
-/* Main Form Card */
+/* Enhanced Main Form Card */
 .main-form-card {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border: 1px solid rgba(226, 232, 240, 0.6) !important;
-  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  border: 1px solid rgba(226, 232, 240, 0.3) !important;
+  border-radius: 24px !important;
   box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.06),
+    0 20px 60px rgba(0, 0, 0, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.06),
     0 4px 16px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(16px) saturate(180%) !important;
-  min-height: 600px !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(25px) saturate(180%) !important;
+  min-height: 650px !important;
+  padding: 32px !important;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .dark .main-form-card {
-  background: rgba(30, 41, 59, 0.95) !important;
-  border-color: rgba(71, 85, 105, 0.6) !important;
+  background: rgba(30, 41, 59, 0.7) !important;
+  border-color: rgba(71, 85, 105, 0.3) !important;
   box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.2),
-    0 4px 16px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    0 4px 16px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Form Steps */
