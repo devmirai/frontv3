@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
+import type React from "react";
+import { useState, useEffect } from "react";
 import {
   Layout,
   Menu,
@@ -24,7 +24,7 @@ import {
   Select,
   Drawer,
   Divider,
-} from "antd"
+} from "antd";
 import {
   DashboardOutlined,
   UserOutlined,
@@ -46,36 +46,36 @@ import {
   ArrowUpOutlined,
   SaveOutlined,
   BarChartOutlined,
-} from "@ant-design/icons"
-import { motion } from "framer-motion"
-import { useNavigate } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
-import { convocatoriaAPI, postulacionAPI } from "../services/api"
-import type { Convocatoria, Postulacion } from "../types/api"
-import ThemeToggle from "./ThemeToggle"
-import NotificationDropdown from "./NotificationDropdown"
-import { 
-  getMockConvocatoriasByEmpresa, 
+} from "@ant-design/icons";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { convocatoriaAPI, postulacionAPI } from "../services/api";
+import type { Convocatoria, Postulacion } from "../types/api";
+import ThemeToggle from "./ThemeToggle";
+import NotificationDropdown from "./NotificationDropdown";
+import {
+  getMockConvocatoriasByEmpresa,
   getMockPostulacionesByConvocatoria,
-  getApplicationsByJob 
-} from "../data/mockDataUtils"
-import dayjs from "dayjs"
+  getApplicationsByJob,
+} from "../data/mockDataUtils";
+import dayjs from "dayjs";
 
-const { Header, Sider, Content } = Layout
-const { Title, Paragraph, Text } = Typography
-const { Option } = Select
+const { Header, Sider, Content } = Layout;
+const { Title, Paragraph, Text } = Typography;
+const { Option } = Select;
 
 const CompanyDashboard: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false)
-  const [convocatorias, setConvocatorias] = useState<Convocatoria[]>([])
-  const [postulaciones, setPostulaciones] = useState<Postulacion[]>([])
-  const [loading, setLoading] = useState(true)
-  const [profileModalVisible, setProfileModalVisible] = useState(false)
-  const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false)
-  const [profileForm] = Form.useForm()
-  const [settingsForm] = Form.useForm()
-  const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const [collapsed, setCollapsed] = useState(false);
+  const [convocatorias, setConvocatorias] = useState<Convocatoria[]>([]);
+  const [postulaciones, setPostulaciones] = useState<Postulacion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [profileModalVisible, setProfileModalVisible] = useState(false);
+  const [settingsDrawerVisible, setSettingsDrawerVisible] = useState(false);
+  const [profileForm] = Form.useForm();
+  const [settingsForm] = Form.useForm();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const menuItems = [
     {
@@ -138,10 +138,10 @@ const CompanyDashboard: React.FC = () => {
         },
       ],
     },
-  ]
+  ];
 
   useEffect(() => {
-    loadDashboardData()
+    loadDashboardData();
     // Initialize forms with user data
     if (user) {
       profileForm.setFieldsValue({
@@ -150,47 +150,53 @@ const CompanyDashboard: React.FC = () => {
         phone: user.telefono,
         address: user.direccion,
         description: user.descripcion,
-      })
+      });
       settingsForm.setFieldsValue({
         notifications: true,
         emailUpdates: true,
         theme: "auto",
         language: "en",
-      })
+      });
     }
-  }, [user])
+  }, [user]);
 
   const loadDashboardData = async () => {
-    if (!user?.id) return
+    if (!user?.id) return;
 
     try {
-      setLoading(true)
+      setLoading(true);
 
       // SIEMPRE usar datos mock para pruebas de diseño
-      console.log('🔧 [CompanyDashboard] Usando datos mock para pruebas de diseño');
-      
+      console.log(
+        "🔧 [CompanyDashboard] Usando datos mock para pruebas de diseño",
+      );
+
       // Cargar convocatorias de la empresa desde mock
       const mockConvocatorias = getMockConvocatoriasByEmpresa(user.id);
       setConvocatorias(mockConvocatorias);
 
       // Cargar todas las postulaciones para las convocatorias de la empresa
       const allPostulaciones: Postulacion[] = [];
-      mockConvocatorias.forEach(convocatoria => {
+      mockConvocatorias.forEach((convocatoria) => {
         if (convocatoria.id) {
-          const convocatoriaApplications = getApplicationsByJob(convocatoria.id);
+          const convocatoriaApplications = getApplicationsByJob(
+            convocatoria.id,
+          );
           allPostulaciones.push(...convocatoriaApplications);
         }
       });
       setPostulaciones(allPostulaciones);
 
-      console.log(`📊 [CompanyDashboard] Mock data loaded: ${mockConvocatorias.length} jobs, ${allPostulaciones.length} applications`);
+      console.log(
+        `📊 [CompanyDashboard] Mock data loaded: ${mockConvocatorias.length} jobs, ${allPostulaciones.length} applications`,
+      );
     } catch (error: any) {
-      console.error("Error loading dashboard data:", error)
-      message.error("Error loading dashboard data")
+      console.error("Error loading dashboard data:", error);
+      message.error("Error loading dashboard data");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const stats = [
     {
@@ -202,7 +208,11 @@ const CompanyDashboard: React.FC = () => {
       trend: "up",
       percentage:
         convocatorias.length > 0
-          ? Math.round((convocatorias.filter((c) => c.activo).length / convocatorias.length) * 100)
+          ? Math.round(
+              (convocatorias.filter((c) => c.activo).length /
+                convocatorias.length) *
+                100,
+            )
           : 0,
     },
     {
@@ -214,7 +224,11 @@ const CompanyDashboard: React.FC = () => {
       trend: "up",
       percentage:
         postulaciones.length > 0
-          ? Math.round((postulaciones.filter((p) => p.estado === "COMPLETADA").length / postulaciones.length) * 100)
+          ? Math.round(
+              (postulaciones.filter((p) => p.estado === "COMPLETADA").length /
+                postulaciones.length) *
+                100,
+            )
           : 0,
     },
     {
@@ -226,7 +240,11 @@ const CompanyDashboard: React.FC = () => {
       trend: "neutral",
       percentage:
         postulaciones.length > 0
-          ? Math.round((postulaciones.filter((p) => p.estado === "PENDIENTE").length / postulaciones.length) * 100)
+          ? Math.round(
+              (postulaciones.filter((p) => p.estado === "PENDIENTE").length /
+                postulaciones.length) *
+                100,
+            )
           : 0,
     },
     {
@@ -238,10 +256,15 @@ const CompanyDashboard: React.FC = () => {
       trend: "up",
       percentage:
         postulaciones.length > 0
-          ? Math.round((postulaciones.filter((p) => p.estado === "EN_EVALUACION").length / postulaciones.length) * 100)
+          ? Math.round(
+              (postulaciones.filter((p) => p.estado === "EN_EVALUACION")
+                .length /
+                postulaciones.length) *
+                100,
+            )
           : 0,
     },
-  ]
+  ];
 
   const getStatusTag = (status: string) => {
     const statusConfig = {
@@ -252,10 +275,10 @@ const CompanyDashboard: React.FC = () => {
       EN_EVALUACION: { color: "processing", text: "In Progress" },
       COMPLETADA: { color: "success", text: "Completed" },
       RECHAZADA: { color: "error", text: "Rejected" },
-    }
-    const config = statusConfig[status as keyof typeof statusConfig]
-    return <Tag color={config.color}>{config.text}</Tag>
-  }
+    };
+    const config = statusConfig[status as keyof typeof statusConfig];
+    return <Tag color={config.color}>{config.text}</Tag>;
+  };
 
   const actionMenu = (record: any) => ({
     items: [
@@ -269,7 +292,8 @@ const CompanyDashboard: React.FC = () => {
         key: "candidates",
         label: "View Candidates",
         icon: <TeamOutlined />,
-        onClick: () => navigate(`/empresa/convocatoria/${record.id}/candidates`),
+        onClick: () =>
+          navigate(`/empresa/convocatoria/${record.id}/candidates`),
       },
       {
         key: "edit",
@@ -283,7 +307,7 @@ const CompanyDashboard: React.FC = () => {
         danger: true,
       },
     ],
-  })
+  });
 
   const userMenu = {
     items: [
@@ -310,7 +334,7 @@ const CompanyDashboard: React.FC = () => {
         onClick: logout,
       },
     ],
-  }
+  };
 
   const convocatoriaColumns = [
     {
@@ -319,8 +343,12 @@ const CompanyDashboard: React.FC = () => {
       key: "titulo",
       render: (text: string, record: Convocatoria) => (
         <div>
-          <div className="font-medium text-gray-800 dark:text-gray-200">{text}</div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">{record.puesto}</div>
+          <div className="font-medium text-gray-800 dark:text-gray-200">
+            {text}
+          </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {record.puesto}
+          </div>
         </div>
       ),
     },
@@ -334,16 +362,20 @@ const CompanyDashboard: React.FC = () => {
       title: "Applications",
       key: "applications",
       render: (_: any, record: Convocatoria) => {
-        const count = postulaciones.filter((p) => p.convocatoria?.id === record.id).length
+        const count = postulaciones.filter(
+          (p) => p.convocatoria?.id === record.id,
+        ).length;
         const completed = postulaciones.filter(
           (p) => p.convocatoria?.id === record.id && p.estado === "COMPLETADA",
-        ).length
+        ).length;
         return (
           <div>
             <span className="font-medium">{count}</span>
-            <div className="text-xs text-gray-500 dark:text-gray-400">{completed} completed</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {completed} completed
+            </div>
           </div>
-        )
+        );
       },
     },
     {
@@ -351,7 +383,9 @@ const CompanyDashboard: React.FC = () => {
       dataIndex: "fechaCierre",
       key: "fechaCierre",
       render: (date: string) => (
-        <span className="text-gray-600 dark:text-gray-400">{dayjs(date).format("MMM DD, YYYY")}</span>
+        <span className="text-gray-600 dark:text-gray-400">
+          {dayjs(date).format("MMM DD, YYYY")}
+        </span>
       ),
     },
     {
@@ -363,19 +397,19 @@ const CompanyDashboard: React.FC = () => {
         </Dropdown>
       ),
     },
-  ]
+  ];
 
   const handleProfileSave = (values: any) => {
-    console.log("Profile values:", values)
-    message.success("Profile updated successfully!")
-    setProfileModalVisible(false)
-  }
+    console.log("Profile values:", values);
+    message.success("Profile updated successfully!");
+    setProfileModalVisible(false);
+  };
 
   const handleSettingsSave = (values: any) => {
-    console.log("Settings values:", values)
-    message.success("Settings saved successfully!")
-    setSettingsDrawerVisible(false)
-  }
+    console.log("Settings values:", values);
+    message.success("Settings saved successfully!");
+    setSettingsDrawerVisible(false);
+  };
 
   return (
     <Layout className="main-layout min-h-screen">
@@ -395,7 +429,11 @@ const CompanyDashboard: React.FC = () => {
       >
         {/* Enhanced Logo Section */}
         <div className="sidebar-logo-container">
-          <motion.div className="sidebar-logo" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+          <motion.div
+            className="sidebar-logo"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
             <div className="logo-icon">
               <RobotOutlined />
             </div>
@@ -421,9 +459,10 @@ const CompanyDashboard: React.FC = () => {
             defaultSelectedKeys={["dashboard"]}
             items={menuItems}
             className="enhanced-menu"
-            onClick={({ key, item }) => {
-              if (item?.props?.onClick) {
-                item.props.onClick()
+            onClick={({ key }) => {
+              const menuItem = menuItems.find((item) => item.key === key);
+              if (menuItem?.onClick) {
+                menuItem.onClick();
               }
             }}
             style={{
@@ -451,14 +490,20 @@ const CompanyDashboard: React.FC = () => {
                   <Title level={5} className="status-title">
                     AI Assistant
                   </Title>
-                  <Text className="status-description">Ready to help with interviews</Text>
+                  <Text className="status-description">
+                    Ready to help with interviews
+                  </Text>
                   <div className="status-stats">
                     <div className="stat-item">
-                      <span className="stat-number">{postulaciones.length}</span>
+                      <span className="stat-number">
+                        {postulaciones.length}
+                      </span>
                       <span className="stat-label">Interviews</span>
                     </div>
                     <div className="stat-item">
-                      <span className="stat-number">{convocatorias.length}</span>
+                      <span className="stat-number">
+                        {convocatorias.length}
+                      </span>
                       <span className="stat-label">Jobs</span>
                     </div>
                   </div>
@@ -489,14 +534,19 @@ const CompanyDashboard: React.FC = () => {
                   Company Dashboard
                 </Title>
                 <Text className="page-subtitle">
-                  Welcome back, {user?.name}! Manage your job postings and candidates.
+                  Welcome back, {user?.name}! Manage your job postings and
+                  candidates.
                 </Text>
               </div>
             </div>
 
             <div className="header-right">
               <Space size="middle" className="header-actions">
-                <Button icon={<SearchOutlined />} className="action-button" size="large">
+                <Button
+                  icon={<SearchOutlined />}
+                  className="action-button"
+                  size="large"
+                >
                   Search
                 </Button>
                 <NotificationDropdown />
@@ -510,8 +560,16 @@ const CompanyDashboard: React.FC = () => {
                   New Job Posting
                 </Button>
                 <ThemeToggle />
-                <Dropdown menu={userMenu} trigger={["click"]} placement="bottomRight">
-                  <Avatar src={user?.avatar} size="large" className="user-avatar" />
+                <Dropdown
+                  menu={userMenu}
+                  trigger={["click"]}
+                  placement="bottomRight"
+                >
+                  <Avatar
+                    src={user?.avatar}
+                    size="large"
+                    className="user-avatar"
+                  />
                 </Dropdown>
               </Space>
             </div>
@@ -535,17 +593,33 @@ const CompanyDashboard: React.FC = () => {
                   </Title>
                   <Paragraph className="welcome-description">
                     You have{" "}
-                    <strong>{postulaciones.filter((p) => p.estado === "PENDIENTE").length} pending applications</strong>{" "}
+                    <strong>
+                      {
+                        postulaciones.filter((p) => p.estado === "PENDIENTE")
+                          .length
+                      }{" "}
+                      pending applications
+                    </strong>{" "}
                     to review and{" "}
-                    <strong>{postulaciones.filter((p) => p.estado === "EN_EVALUACION").length} interviews</strong> in
-                    progress.
+                    <strong>
+                      {
+                        postulaciones.filter(
+                          (p) => p.estado === "EN_EVALUACION",
+                        ).length
+                      }{" "}
+                      interviews
+                    </strong>{" "}
+                    in progress.
                   </Paragraph>
                   <Space wrap>
                     <Button
                       type="primary"
                       className="btn-gradient"
                       size="large"
-                      disabled={postulaciones.filter((p) => p.estado === "PENDIENTE").length === 0}
+                      disabled={
+                        postulaciones.filter((p) => p.estado === "PENDIENTE")
+                          .length === 0
+                      }
                     >
                       Review Applications
                     </Button>
@@ -578,14 +652,19 @@ const CompanyDashboard: React.FC = () => {
                         <div className="stats-icon">{stat.icon}</div>
                         <div className="stats-trend">
                           <ArrowUpOutlined className="trend-icon" />
-                          <Tag color={stat.trend === "up" ? "success" : "default"} className="trend-tag">
+                          <Tag
+                            color={stat.trend === "up" ? "success" : "default"}
+                            className="trend-tag"
+                          >
                             {stat.change}
                           </Tag>
                         </div>
                       </div>
                       <div className="stats-content">
                         <Statistic
-                          title={<span className="stats-title">{stat.title}</span>}
+                          title={
+                            <span className="stats-title">{stat.title}</span>
+                          }
                           value={stat.value}
                           valueStyle={{
                             color: "var(--text-primary)",
@@ -601,7 +680,9 @@ const CompanyDashboard: React.FC = () => {
                             strokeColor="var(--primary-color)"
                             showInfo={false}
                           />
-                          <Text className="progress-text">{stat.percentage}% completion rate</Text>
+                          <Text className="progress-text">
+                            {stat.percentage}% completion rate
+                          </Text>
                         </div>
                       </div>
                     </Card>
@@ -641,7 +722,11 @@ const CompanyDashboard: React.FC = () => {
             {/* Quick Actions */}
             <Row gutter={[24, 24]} className="actions-section">
               <Col xs={24} lg={12}>
-                <Card title="Quick Actions" className="actions-card" extra={<RobotOutlined className="card-icon" />}>
+                <Card
+                  title="Quick Actions"
+                  className="actions-card"
+                  extra={<RobotOutlined className="card-icon" />}
+                >
                   <Space direction="vertical" className="w-full" size="large">
                     <Button
                       type="primary"
@@ -653,17 +738,31 @@ const CompanyDashboard: React.FC = () => {
                     >
                       Create New Job Posting
                     </Button>
-                    <Button block size="large" icon={<TeamOutlined />} className="action-button-large">
+                    <Button
+                      block
+                      size="large"
+                      icon={<TeamOutlined />}
+                      className="action-button-large"
+                    >
                       Manage Candidates
                     </Button>
-                    <Button block size="large" icon={<BarChartOutlined />} className="action-button-large">
+                    <Button
+                      block
+                      size="large"
+                      icon={<BarChartOutlined />}
+                      className="action-button-large"
+                    >
                       View Reports
                     </Button>
                   </Space>
                 </Card>
               </Col>
               <Col xs={24} lg={12}>
-                <Card title="AI Insights" className="insights-card" extra={<RobotOutlined className="card-icon" />}>
+                <Card
+                  title="AI Insights"
+                  className="insights-card"
+                  extra={<RobotOutlined className="card-icon" />}
+                >
                   <div className="insights-content">
                     <div className="insight-item insight-trending">
                       <div className="insight-header">
@@ -673,7 +772,8 @@ const CompanyDashboard: React.FC = () => {
                         </Text>
                       </div>
                       <Text className="insight-description">
-                        React and TypeScript are the most requested skills this month.
+                        React and TypeScript are the most requested skills this
+                        month.
                       </Text>
                     </div>
                     <div className="insight-item insight-performance">
@@ -684,7 +784,8 @@ const CompanyDashboard: React.FC = () => {
                         </Text>
                       </div>
                       <Text className="insight-description">
-                        Your interview completion rate increased by 15% this week.
+                        Your interview completion rate increased by 15% this
+                        week.
                       </Text>
                     </div>
                   </div>
@@ -706,7 +807,11 @@ const CompanyDashboard: React.FC = () => {
         open={profileModalVisible}
         onCancel={() => setProfileModalVisible(false)}
         footer={[
-          <Button key="cancel" onClick={() => setProfileModalVisible(false)} className="modal-button">
+          <Button
+            key="cancel"
+            onClick={() => setProfileModalVisible(false)}
+            className="modal-button"
+          >
             Cancel
           </Button>,
           <Button
@@ -723,15 +828,25 @@ const CompanyDashboard: React.FC = () => {
         className="enhanced-modal"
       >
         <div className="modal-content">
-          <Form form={profileForm} layout="vertical" onFinish={handleProfileSave} className="enhanced-form">
+          <Form
+            form={profileForm}
+            layout="vertical"
+            onFinish={handleProfileSave}
+            className="enhanced-form"
+          >
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
                   name="name"
                   label="Company Name"
-                  rules={[{ required: true, message: "Please enter company name" }]}
+                  rules={[
+                    { required: true, message: "Please enter company name" },
+                  ]}
                 >
-                  <Input placeholder="Enter company name" className="enhanced-input" />
+                  <Input
+                    placeholder="Enter company name"
+                    className="enhanced-input"
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -743,19 +858,29 @@ const CompanyDashboard: React.FC = () => {
                     { type: "email", message: "Please enter a valid email" },
                   ]}
                 >
-                  <Input placeholder="Enter your email" disabled className="enhanced-input" />
+                  <Input
+                    placeholder="Enter your email"
+                    disabled
+                    className="enhanced-input"
+                  />
                 </Form.Item>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item name="phone" label="Phone Number">
-                  <Input placeholder="Enter phone number" className="enhanced-input" />
+                  <Input
+                    placeholder="Enter phone number"
+                    className="enhanced-input"
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item name="address" label="Address">
-                  <Input placeholder="Enter company address" className="enhanced-input" />
+                  <Input
+                    placeholder="Enter company address"
+                    className="enhanced-input"
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -786,13 +911,23 @@ const CompanyDashboard: React.FC = () => {
         width={400}
         className="enhanced-drawer"
         extra={
-          <Button type="primary" className="btn-gradient" icon={<SaveOutlined />} onClick={() => settingsForm.submit()}>
+          <Button
+            type="primary"
+            className="btn-gradient"
+            icon={<SaveOutlined />}
+            onClick={() => settingsForm.submit()}
+          >
             Save
           </Button>
         }
       >
         <div className="drawer-content">
-          <Form form={settingsForm} layout="vertical" onFinish={handleSettingsSave} className="enhanced-form">
+          <Form
+            form={settingsForm}
+            layout="vertical"
+            onFinish={handleSettingsSave}
+            className="enhanced-form"
+          >
             <div className="form-section">
               <Title level={5} className="section-title">
                 Notifications
@@ -835,7 +970,10 @@ const CompanyDashboard: React.FC = () => {
                 </Select>
               </Form.Item>
               <Form.Item name="language" label="Language">
-                <Select placeholder="Select language" className="enhanced-select">
+                <Select
+                  placeholder="Select language"
+                  className="enhanced-select"
+                >
                   <Option value="en">English</Option>
                   <Option value="es">Spanish</Option>
                   <Option value="fr">French</Option>
@@ -867,7 +1005,7 @@ const CompanyDashboard: React.FC = () => {
         </div>
       </Drawer>
     </Layout>
-  )
-}
+  );
+};
 
-export default CompanyDashboard
+export default CompanyDashboard;
