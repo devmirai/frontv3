@@ -19,6 +19,7 @@
 
 /* Import dashboard styles (keeping existing import for compatibility) */
 @import "./styles/dashboard.css";
+@import "./styles/company-modals.css";
 
 /* Import landing styles (keeping existing import for compatibility) */
 @import "./styles/landing.css";
