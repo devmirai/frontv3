@@ -15,6 +15,7 @@
 @import "./styles/components/notifications.css";
 @import "./styles/components/interview.css";
 @import "./styles/components/create-convocatoria.css";
+@import "./styles/components/create-convocatoria-enhancements.css";
 
 /* Import dashboard styles (keeping existing import for compatibility) */
 @import "./styles/dashboard.css";
