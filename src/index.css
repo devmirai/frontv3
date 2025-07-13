@@ -1,25 +1,29 @@
 /* Main CSS Entry Point */
 
 /* Import global styles first */
-@import './styles/globals.css';
+@import "./styles/globals.css";
 
 /* Import layout styles */
-@import './styles/layout/main.css';
-@import './styles/layout/header.css';
+@import "./styles/layout/main.css";
+@import "./styles/layout/header.css";
 
 /* Import component styles */
-@import './styles/components/buttons.css';
-@import './styles/components/forms.css';
-@import './styles/components/modals.css';
-@import './styles/components/theme-toggle.css';
-@import './styles/components/notifications.css';
-@import './styles/components/interview.css';
+@import "./styles/components/buttons.css";
+@import "./styles/components/forms.css";
+@import "./styles/components/modals.css";
+@import "./styles/components/theme-toggle.css";
+@import "./styles/components/notifications.css";
+@import "./styles/components/interview.css";
+@import "./styles/components/create-convocatoria.css";
+@import "./styles/components/create-convocatoria-enhancements.css";
 
 /* Import dashboard styles (keeping existing import for compatibility) */
-@import './styles/dashboard.css';
+@import "./styles/dashboard.css";
+@import "./styles/company-modals.css";
+@import "./styles/convocatoria-details.css";
 
 /* Import landing styles (keeping existing import for compatibility) */
-@import './styles/landing.css';
+@import "./styles/landing.css";
 
 /* Import login styles (keeping existing import for compatibility) */
-@import './styles/login.css';
+@import "./styles/login.css";
