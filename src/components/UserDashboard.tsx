@@ -59,14 +59,6 @@ import type { Convocatoria, Postulacion } from "../types/api";
 import { EstadoPostulacion } from "../types/api";
 import ThemeToggle from "./ThemeToggle";
 import NotificationDropdown from "./NotificationDropdown";
-import {
-  getMockConvocatorias,
-  getMockPostulacionesByUsuario,
-  simulateApplyToJob,
-  simulateStartInterview,
-  getMockUser,
-  generateMockQuestions,
-} from "../data/mockDataUtils";
 import dayjs from "dayjs";
 
 const { Header, Sider, Content } = Layout;
@@ -207,23 +199,28 @@ const UserDashboard: React.FC = () => {
     try {
       setLoading(true);
 
-      // SIEMPRE usar datos mock para pruebas de diseño
-      console.log("🔧 Usando datos mock para pruebas de diseño");
+      console.log("📊 Loading dashboard data from backend...");
 
-      // Cargar trabajos disponibles desde mock
-      const mockJobs = getMockConvocatorias();
-      setAvailableJobs(mockJobs);
+      // Load active job postings from backend
+      const convocatoriasResponse = await convocatoriaAPI.getActivas();
+      const activeJobs = convocatoriasResponse.data || [];
+      setAvailableJobs(activeJobs);
 
-      // Cargar aplicaciones del usuario desde mock
-      const mockApplications = getMockPostulacionesByUsuario(user.id);
-      setMyApplications(mockApplications);
+      // Load user's applications from backend
+      const postulacionesResponse = await postulacionAPI.getByUsuario(user.id);
+      const userApplications = postulacionesResponse.data || [];
+      setMyApplications(userApplications);
 
       console.log(
-        `📊 Mock data loaded: ${mockJobs.length} jobs, ${mockApplications.length} applications`,
+        `📊 Backend data loaded: ${activeJobs.length} active jobs, ${userApplications.length} applications`,
       );
     } catch (error: any) {
       console.error("Error loading dashboard data:", error);
-      message.error("Error loading dashboard data");
+      message.error("Error loading dashboard data. Please check your connection and try again.");
+      
+      // Set empty arrays if backend fails
+      setAvailableJobs([]);
+      setMyApplications([]);
     } finally {
       setLoading(false);
     }
@@ -309,30 +306,25 @@ const UserDashboard: React.FC = () => {
     ],
   };
 
-  // Fixed interview start function - single request flow with mock fallback
+  // Interview start function - uses backend API to start interview
   const handleStartInterview = async (postulacionId: number) => {
     try {
       setStartingInterview(postulacionId);
 
-      // 🔧 USAR SIMULACIÓN MOCK para pruebas de diseño
-      console.log('🔧 [UserDashboard] Iniciando entrevista con datos mock');
+      console.log('� [UserDashboard] Starting interview via backend API');
       
-      // Simular inicio de entrevista con datos mock
-      const startResult = simulateStartInterview(postulacionId);
+      // Start interview using backend API
+      await postulacionAPI.iniciarEntrevista(postulacionId);
       
-      if (startResult.success) {
-        console.log(`📊 [UserDashboard] Entrevista iniciada exitosamente (mock): ${postulacionId}`);
-        message.success("Interview started successfully!");
-        
-        // Recargar datos para actualizar el estado
-        await loadDashboardData();
-        
-        // Navegar a la entrevista
-        navigate(`/usuario/interview/${postulacionId}`);
-      } else {
-        throw new Error(startResult.error || 'Error starting interview');
-      }
-    } catch (error) {
+      console.log(`� [UserDashboard] Interview started successfully: ${postulacionId}`);
+      message.success("Interview started successfully!");
+      
+      // Reload data to update the state
+      await loadDashboardData();
+      
+      // Navigate to the interview
+      navigate(`/usuario/interview/${postulacionId}`);
+    } catch (error: any) {
       console.error("Error starting interview:", error);
       message.error("Failed to start interview. Please try again.");
     } finally {
@@ -510,7 +502,7 @@ const UserDashboard: React.FC = () => {
     },
   ];
 
-  // Fixed Apply to Job function - creates application then starts interview
+  // Apply to Job function - creates application using backend API
   const handleApplyToJob = async () => {
     if (!selectedJob || !user?.id) return;
 
@@ -530,16 +522,18 @@ const UserDashboard: React.FC = () => {
 
       message.loading("Creating your application...", 0);
 
-      // 🔧 USAR SIMULACIÓN MOCK para aplicar a trabajos
-      console.log('🔧 [UserDashboard] Aplicando a trabajo con datos mock');
+      console.log('📊 [UserDashboard] Creating application via backend API');
       
-      const applyResult = simulateApplyToJob(user.id, selectedJob.id!);
-      
-      if (!applyResult.success) {
-        throw new Error(applyResult.error || 'Error applying to job');
-      }
+      // Create application using backend API
+      const applicationData = {
+        usuarioId: user.id,
+        convocatoriaId: selectedJob.id,
+        fechaPostulacion: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
+        estado: "PENDIENTE"
+      };
 
-      const newApplicationId = applyResult.application!.id!;
+      const response = await postulacionAPI.create(applicationData);
+      const newApplication = response.data;
 
       message.destroy();
       message.success("Application submitted successfully!");
@@ -555,7 +549,7 @@ const UserDashboard: React.FC = () => {
         content: "Would you like to start your interview immediately?",
         okText: "Start Interview",
         cancelText: "Later",
-        onOk: () => handleStartInterview(newApplicationId),
+        onOk: () => handleStartInterview(newApplication.id),
       });
     } catch (error: any) {
       console.error("Error in application process:", error);
@@ -563,6 +557,8 @@ const UserDashboard: React.FC = () => {
 
       if (error.response?.status === 409) {
         message.error("You have already applied to this position.");
+      } else if (error.response?.status === 400) {
+        message.error("Invalid application data. Please try again.");
       } else {
         message.error(
           error.response?.data?.message ||

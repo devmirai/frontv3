@@ -58,8 +58,6 @@ import type { Convocatoria, Postulacion } from "../types/api";
 import ThemeToggle from "./ThemeToggle";
 import NotificationDropdown from "./NotificationDropdown";
 import {
-  getMockConvocatoriasByEmpresa,
-  getMockPostulacionesByConvocatoria,
   getApplicationsByJob,
 } from "../data/mockDataUtils";
 import dayjs from "dayjs";
@@ -174,33 +172,38 @@ const CompanyDashboard: React.FC = () => {
     try {
       setLoading(true);
 
-      // SIEMPRE usar datos mock para pruebas de diseño
-      console.log(
-        "🔧 [CompanyDashboard] Usando datos mock para pruebas de diseño",
-      );
+      console.log("� [CompanyDashboard] Loading data from backend");
 
-      // Cargar convocatorias de la empresa desde mock
-      const mockConvocatorias = getMockConvocatoriasByEmpresa(user.id);
-      setConvocatorias(mockConvocatorias);
+      // Load company job postings from backend
+      const convocatoriasResponse = await convocatoriaAPI.getByEmpresa(user.id);
+      const companyJobs = convocatoriasResponse.data || [];
+      setConvocatorias(companyJobs);
 
-      // Cargar todas las postulaciones para las convocatorias de la empresa
+      // Load all applications for company job postings
       const allPostulaciones: Postulacion[] = [];
-      mockConvocatorias.forEach((convocatoria) => {
+      for (const convocatoria of companyJobs) {
         if (convocatoria.id) {
-          const convocatoriaApplications = getApplicationsByJob(
-            convocatoria.id,
-          );
-          allPostulaciones.push(...convocatoriaApplications);
+          try {
+            const postulacionesResponse = await postulacionAPI.getByConvocatoria(convocatoria.id);
+            const convocatoriaApplications = postulacionesResponse.data || [];
+            allPostulaciones.push(...convocatoriaApplications);
+          } catch (error) {
+            console.warn(`Failed to load applications for job ${convocatoria.id}:`, error);
+          }
         }
-      });
+      }
       setPostulaciones(allPostulaciones);
 
       console.log(
-        `📊 [CompanyDashboard] Mock data loaded: ${mockConvocatorias.length} jobs, ${allPostulaciones.length} applications`,
+        `📊 [CompanyDashboard] Backend data loaded: ${companyJobs.length} jobs, ${allPostulaciones.length} applications`,
       );
     } catch (error: any) {
       console.error("Error loading dashboard data:", error);
-      message.error("Error loading dashboard data");
+      message.error("Error loading dashboard data. Please check your connection and try again.");
+      
+      // Set empty arrays if backend fails
+      setConvocatorias([]);
+      setPostulaciones([]);
     } finally {
       setLoading(false);
     }

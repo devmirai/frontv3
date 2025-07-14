@@ -58,16 +58,16 @@ authAxios.interceptors.response.use(
 
 export const authAPI = {
   login: (credentials: { email: string; password: string }) => 
-    axios.post('http://localhost:8081/auth/login', credentials),
+    authAxios.post('/auth/login', credentials),
 };
 
 export const usuarioAPI = {
-  create: (data: any) => api.post('/usuario', data),
-  getAll: () => api.get('/usuario'),
-  getById: (id: number) => api.get(`/usuario/${id}`),
-  getByEmail: (email: string) => api.get(`/usuario/email/${email}`),
-  update: (id: number, data: any) => api.put(`/usuario/${id}`, data),
-  delete: (id: number) => api.delete(`/usuario/${id}`),
+  create: (data: any) => api.post('/usuarios', data),
+  getAll: () => api.get('/usuarios'),
+  getById: (id: number) => api.get(`/usuarios/${id}`),
+  getByEmail: (email: string) => api.get(`/usuarios/email/${email}`),
+  update: (id: number, data: any) => api.put(`/usuarios/${id}`, data),
+  delete: (id: number) => api.delete(`/usuarios/${id}`),
 };
 
 export const empresaAPI = {
@@ -81,6 +81,7 @@ export const empresaAPI = {
 
 export const convocatoriaAPI = {
   create: (data: any) => api.post('/convocatorias', data),
+  createV2: (data: any) => api.post('/convocatorias/v2', data),
   getAll: () => api.get('/convocatorias'),
   getById: (id: number) => api.get(`/convocatorias/${id}`),
   getByEmpresa: (empresaId: number) => api.get(`/convocatorias/empresa/${empresaId}`),

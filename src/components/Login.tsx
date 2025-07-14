@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Typography, Alert } from "antd";
+import dayjs from "../utils/dayjs";
 import {
   UserOutlined,
   LockOutlined,
   MailOutlined,
   PhoneOutlined,
+  CalendarOutlined,
   BankOutlined,
   RobotOutlined,
   ArrowLeftOutlined,
@@ -35,8 +37,10 @@ interface RegisterFormData {
   email: string;
   password: string;
   confirmPassword: string;
-  phone: string;
-  company?: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  telefono: string;
+  nacimiento: string; // Now using HTML date input (YYYY-MM-DD format)
 }
 
 const Login: React.FC = () => {
@@ -44,7 +48,7 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, register } = useAuth();
   const { isDarkMode } = useTheme();
 
   const handleLogin = async (values: LoginFormData) => {
@@ -96,10 +100,36 @@ const Login: React.FC = () => {
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setActiveTab("login");
-      setError("");
+      const success = await register({
+        email: values.email,
+        password: values.password,
+        role: Rol.USUARIO,
+        nombre: values.name,
+        apellidoPaterno: values.apellidoPaterno,
+        apellidoMaterno: values.apellidoMaterno,
+        telefono: parseInt(values.telefono),
+        nacimiento: values.nacimiento, // Input date is already in YYYY-MM-DD format
+      });
+
+      if (success) {
+        // The register function now handles login automatically
+        // Navigate based on user role
+        const userDataStr = localStorage.getItem("mirai_user");
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          if (userData.role === Rol.ADMIN) {
+            navigate("/admin/dashboard");
+          } else if (userData.role === Rol.EMPRESA) {
+            navigate("/empresa/dashboard");
+          } else {
+            navigate("/usuario/dashboard");
+          }
+        } else {
+          navigate("/dashboard");
+        }
+      }
     } catch (err) {
+      console.error("Registration error:", err);
       setError("Registration failed. Please try again.");
     } finally {
       setLoading(false);
@@ -321,7 +351,7 @@ const Login: React.FC = () => {
                     rules={[
                       {
                         required: true,
-                        message: "Please enter your full name",
+                        message: "Please enter your first name",
                       },
                     ]}
                   >
@@ -330,13 +360,59 @@ const Login: React.FC = () => {
                         <UserOutlined />
                       </div>
                       <Input
-                        placeholder="Enter your full name"
+                        placeholder="Enter your first name"
                         className="login-input-modern"
-                        autoComplete="name"
+                        autoComplete="given-name"
                       />
                       <div className="input-focus-border"></div>
                     </div>
                   </Form.Item>
+
+                  <div className="form-row">
+                    <Form.Item
+                      name="apellidoPaterno"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter your paternal surname",
+                        },
+                      ]}
+                    >
+                      <div className="login-input-wrapper">
+                        <div className="input-icon">
+                          <UserOutlined />
+                        </div>
+                        <Input
+                          placeholder="Paternal surname"
+                          className="login-input-modern"
+                          autoComplete="family-name"
+                        />
+                        <div className="input-focus-border"></div>
+                      </div>
+                    </Form.Item>
+
+                    <Form.Item
+                      name="apellidoMaterno"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter your maternal surname",
+                        },
+                      ]}
+                    >
+                      <div className="login-input-wrapper">
+                        <div className="input-icon">
+                          <UserOutlined />
+                        </div>
+                        <Input
+                          placeholder="Maternal surname"
+                          className="login-input-modern"
+                          autoComplete="family-name"
+                        />
+                        <div className="input-focus-border"></div>
+                      </div>
+                    </Form.Item>
+                  </div>
 
                   <Form.Item
                     name="email"
@@ -413,38 +489,69 @@ const Login: React.FC = () => {
                     </Form.Item>
                   </div>
 
-                  <Form.Item
-                    name="phone"
-                    rules={[
-                      { required: true, message: "Please enter phone number" },
-                    ]}
-                  >
-                    <div className="login-input-wrapper">
-                      <div className="input-icon">
-                        <PhoneOutlined />
+                  <div className="form-row">
+                    <Form.Item
+                      name="telefono"
+                      rules={[
+                        { required: true, message: "Please enter phone number" },
+                        { 
+                          pattern: /^9\d{8}$/, 
+                          message: "Phone number must start with 9 and have exactly 9 digits" 
+                        },
+                      ]}
+                    >
+                      <div className="login-input-wrapper">
+                        <div className="input-icon">
+                          <PhoneOutlined />
+                        </div>
+                        <Input
+                          placeholder="Phone number (9XXXXXXXX)"
+                          className="login-input-modern"
+                          autoComplete="tel"
+                          maxLength={9}
+                        />
+                        <div className="input-focus-border"></div>
                       </div>
-                      <Input
-                        placeholder="Enter phone number"
-                        className="login-input-modern"
-                        autoComplete="tel"
-                      />
-                      <div className="input-focus-border"></div>
-                    </div>
-                  </Form.Item>
+                    </Form.Item>
 
-                  <Form.Item name="company">
-                    <div className="login-input-wrapper">
-                      <div className="input-icon">
-                        <BankOutlined />
+                    <Form.Item
+                      name="nacimiento"
+                      rules={[
+                        { required: true, message: "Please select your birth date" },
+                        {
+                          validator: (_, value) => {
+                            if (!value) {
+                              return Promise.resolve();
+                            }
+                            
+                            // Convert string date to dayjs for validation
+                            const birthDate = dayjs(value);
+                            const today = dayjs();
+                            const age = today.diff(birthDate, 'year');
+                            
+                            if (age < 18) {
+                              return Promise.reject(new Error('You must be at least 18 years old to register'));
+                            }
+                            return Promise.resolve();
+                          },
+                        },
+                      ]}
+                    >
+                      <div className="login-input-wrapper">
+                        <div className="input-icon">
+                          <CalendarOutlined />
+                        </div>
+                        <Input
+                          type="date"
+                          placeholder="Select your birth date"
+                          className="login-input-modern"
+                          style={{ width: '100%' }}
+                          max={dayjs().subtract(18, 'year').format('YYYY-MM-DD')}
+                        />
+                        <div className="input-focus-border"></div>
                       </div>
-                      <Input
-                        placeholder="Company name (optional)"
-                        className="login-input-modern"
-                        autoComplete="organization"
-                      />
-                      <div className="input-focus-border"></div>
-                    </div>
-                  </Form.Item>
+                    </Form.Item>
+                  </div>
 
                   <Form.Item>
                     <Button

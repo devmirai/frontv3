@@ -4,6 +4,42 @@ export enum Rol {
   ADMIN = "ADMIN",
 }
 
+// DTOs para el backend
+export interface AuthRequest {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  tipo?: string;
+  id?: number;
+  nombre?: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
+  email?: string;
+}
+
+export interface UsuarioCreateDTO {
+  email: string;
+  nombre: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  nacimiento: string;
+  telefono: number;
+  password: string;
+  rol: Rol;
+}
+
+export interface UsuarioResponseDTO {
+  id: number;
+  email: string;
+  nombre: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  rol: Rol;
+}
+
 export enum EstadoPostulacion {
   PENDIENTE = "PENDIENTE",
   EN_EVALUACION = "EN_EVALUACION",

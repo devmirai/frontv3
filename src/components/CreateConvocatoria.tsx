@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -60,28 +60,72 @@ const { Step } = Steps;
 const { Option } = Select;
 
 interface ConvocatoriaFormData {
-  titulo: string;
-  descripcion: string;
-  puesto: string;
+  jobTitle: string;
+  jobDescription: string;
+  technicalRequirements: string;
   fechaPublicacion: dayjs.Dayjs;
   fechaCierre: dayjs.Dayjs;
   dificultad: number;
-  categoria: string;
-  experiencia: string;
-  modalidad: string;
-  ubicacion: string;
-  salario: string;
-  beneficios: string[];
-  estado: boolean;
+  category: number;  // Número que representa el ENUM
+  experienceLevel: number;  // Número que representa el ENUM
+  workMode: number;  // Número que representa el ENUM
+  location: string;
+  salaryMin: number;
+  salaryMax: number;
+  salaryCurrency: string;
+  benefitsPerks: string;
+  isActive: boolean;
+  empresaId: number;
 }
+
+// Mapeo de categorías (usando ENUMs del backend con valores numéricos)
+const CATEGORIES = [
+  { value: 1, label: "Tecnología", enum: "TECHNOLOGY" },
+  { value: 2, label: "Marketing", enum: "MARKETING" },
+  { value: 3, label: "Ventas", enum: "SALES" },
+  { value: 4, label: "Finanzas", enum: "FINANCE" },
+  { value: 5, label: "Recursos Humanos", enum: "HUMAN_RESOURCES" },
+  { value: 6, label: "Operaciones", enum: "OPERATIONS" },
+  { value: 7, label: "Diseño", enum: "DESIGN" },
+  { value: 8, label: "Producto", enum: "PRODUCT" }
+];
+
+// Mapeo de niveles de experiencia (usando ENUMs del backend con valores numéricos)
+const EXPERIENCE_LEVELS = [
+  { value: 1, label: "Sin experiencia", enum: "NO_EXPERIENCE" },
+  { value: 2, label: "Junior (1-2 años)", enum: "JUNIOR" },
+  { value: 3, label: "Semi-Senior (3-5 años)", enum: "MID_LEVEL" },
+  { value: 4, label: "Senior (5+ años)", enum: "SENIOR" },
+  { value: 5, label: "Lead/Expert (8+ años)", enum: "LEAD" }
+];
+
+// Mapeo de modalidades de trabajo (usando ENUMs del backend con valores numéricos)
+const WORK_MODES = [
+  { value: 1, label: "Presencial", enum: "ON_SITE" },
+  { value: 2, label: "Remoto", enum: "REMOTE" },
+  { value: 3, label: "Híbrido", enum: "HYBRID" }
+];
 
 const CreateConvocatoria: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [formData, setFormData] = useState<Partial<ConvocatoriaFormData>>({});
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Sincronizar valores iniciales del formulario
+  useEffect(() => {
+    const initialValues = form.getFieldsValue();
+    setFormData(initialValues);
+  }, [form]);
+
+  // Actualizar formData cada vez que cambie algo en el formulario
+  const handleFormChange = () => {
+    const values = form.getFieldsValue();
+    setFormData(prev => ({ ...prev, ...values }));
+  };
 
   const getDifficultyColor = (difficulty: number): string => {
     if (difficulty <= 3) return "green";
@@ -97,29 +141,100 @@ const CreateConvocatoria: React.FC = () => {
     return "Expert";
   };
 
+  // Validación completa antes del envío
+  const validateAllFields = (allValues: any): boolean => {
+    const errors: string[] = [];
+    
+    if (!allValues.jobTitle || String(allValues.jobTitle).trim() === '') {
+      errors.push("Job Title is required");
+    }
+    
+    if (!allValues.jobDescription || String(allValues.jobDescription).trim() === '') {
+      errors.push("Job Description is required");
+    }
+    
+    if (!allValues.technicalRequirements || String(allValues.technicalRequirements).trim() === '') {
+      errors.push("Technical Requirements is required");
+    }
+    
+    if (!allValues.category || Number(allValues.category) < 1) {
+      errors.push("Category is required");
+    }
+    
+    if (!allValues.experienceLevel || Number(allValues.experienceLevel) < 1) {
+      errors.push("Experience Level is required");
+    }
+    
+    if (!allValues.workMode || Number(allValues.workMode) < 1) {
+      errors.push("Work Mode is required");
+    }
+    
+    if (!allValues.fechaPublicacion) {
+      errors.push("Publication Date is required");
+    }
+    
+    if (!allValues.fechaCierre) {
+      errors.push("Closing Date is required");
+    }
+    
+    if (errors.length > 0) {
+      console.error("Validation errors:", errors);
+      message.error(`Missing required fields: ${errors.join(", ")}`);
+      return false;
+    }
+    
+    return true;
+  };
+
   const onFinish = async (values: ConvocatoriaFormData) => {
+    console.log("onFinish called with values:", values);
+    
     if (!user?.id) {
       message.error("Error: No se pudo identificar el usuario");
       return;
     }
 
+    // Guardar los valores actuales del formulario antes de procesar
+    const currentFormValues = form.getFieldsValue();
+    setFormData(prev => ({ ...prev, ...currentFormValues }));
+    
+    // Combinar TODOS los datos: formData guardado + valores actuales + valores del onFinish
+    const allValues = { 
+      ...formData,           // Datos guardados de pasos anteriores
+      ...currentFormValues,  // Valores actuales del formulario
+      ...values             // Valores del submit
+    };
+    
+    console.log("All combined form values:", allValues);
+
     setLoading(true);
     try {
+      // Validar todos los campos antes de proceder
+      if (!validateAllFields(allValues)) {
+        setLoading(false);
+        return;
+      }
+
       const convocatoriaData = {
-        titulo: values.titulo,
-        descripcion: values.descripcion,
-        puesto: values.puesto,
-        activo: true,
-        fechaPublicacion: values.fechaPublicacion.format("YYYY-MM-DD"),
-        fechaCierre: values.fechaCierre.format("YYYY-MM-DD"),
-        dificultad: values.dificultad,
-        empresa: {
-          id: user.id,
-        },
+        jobTitle: String(allValues.jobTitle || "").trim(),
+        categoryNumber: Number(allValues.category) || 1,
+        jobDescription: String(allValues.jobDescription || "").trim(),
+        technicalRequirements: String(allValues.technicalRequirements || "").trim(),
+        experienceLevelNumber: Number(allValues.experienceLevel) || 2,
+        workModeNumber: Number(allValues.workMode) || 2,
+        location: String(allValues.location || "").trim(),
+        salaryMin: parseFloat(String(allValues.salaryMin || "0")),
+        salaryMax: parseFloat(String(allValues.salaryMax || "0")),
+        salaryCurrency: String(allValues.salaryCurrency || "USD"),
+        benefitsPerks: String(allValues.benefitsPerks || "").trim(),
+        publicationDate: allValues.fechaPublicacion ? allValues.fechaPublicacion.format("YYYY-MM-DD") : dayjs().format("YYYY-MM-DD"),
+        closingDate: allValues.fechaCierre ? allValues.fechaCierre.format("YYYY-MM-DD") : dayjs().add(30, "day").format("YYYY-MM-DD"),
+        dificultad: Number(allValues.dificultad) || 5,
+        empresaId: user.id,
       };
 
-      console.log("Sending convocatoria data:", convocatoriaData);
-      await convocatoriaAPI.create(convocatoriaData);
+      console.log("Final convocatoria data to send:", convocatoriaData);
+      await convocatoriaAPI.createV2(convocatoriaData);
       message.success("¡Convocatoria creada exitosamente!");
       navigate("/empresa/dashboard");
     } catch (error: any) {
@@ -149,7 +264,26 @@ const CreateConvocatoria: React.FC = () => {
     return Promise.resolve();
   };
 
+  // Validación por pasos
+  const getFieldsForStep = (step: number): string[] => {
+    switch (step) {
+      case 0:
+        return ["jobTitle", "category", "jobDescription"];
+      case 1:
+        return ["technicalRequirements", "experienceLevel"];
+      case 2:
+        return ["workMode", "fechaPublicacion", "fechaCierre"];
+      case 3:
+        return ["dificultad"];
+      default:
+        return [];
+    }
+  };
+
   const formValues = Form.useWatch([], form);
+  
+  // Combinar formValues con formData guardado para vista previa completa
+  const previewData = { ...formData, ...formValues };
 
   const steps = [
     {
@@ -176,26 +310,48 @@ const CreateConvocatoria: React.FC = () => {
 
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+      // Guardar valores actuales antes de validar
+      const currentValues = form.getFieldsValue();
+      setFormData(prev => ({ ...prev, ...currentValues }));
+      
+      // Validar solo los campos del paso actual
+      const fieldsToValidate = getFieldsForStep(currentStep);
+      
+      if (fieldsToValidate.length > 0) {
+        form.validateFields(fieldsToValidate).then(() => {
+          setCurrentStep(currentStep + 1);
+        }).catch((errorInfo) => {
+          console.log('Validation failed for step', currentStep, ':', errorInfo);
+          message.error('Please fill in all required fields before continuing');
+        });
+      } else {
+        setCurrentStep(currentStep + 1);
+      }
     }
   };
 
   const prevStep = () => {
     if (currentStep > 0) {
+      // Guardar valores actuales antes de retroceder
+      const currentValues = form.getFieldsValue();
+      setFormData(prev => ({ ...prev, ...currentValues }));
       setCurrentStep(currentStep - 1);
     }
   };
 
   const getFormProgress = () => {
-    const values = form.getFieldsValue();
+    const allValues = { ...formData, ...form.getFieldsValue() };
     const requiredFields = [
-      "titulo",
-      "descripcion",
-      "puesto",
+      "jobTitle",
+      "jobDescription",
+      "technicalRequirements",
       "fechaPublicacion",
       "fechaCierre",
+      "category",
+      "experienceLevel",
+      "workMode",
     ];
-    const filledFields = requiredFields.filter((field) => values[field]);
+    const filledFields = requiredFields.filter((field) => allValues[field]);
     return Math.round((filledFields.length / requiredFields.length) * 100);
   };
 
@@ -273,14 +429,18 @@ const CreateConvocatoria: React.FC = () => {
                     form={form}
                     layout="vertical"
                     onFinish={onFinish}
+                    onValuesChange={handleFormChange}
                     initialValues={{
                       dificultad: 5,
                       fechaPublicacion: dayjs(),
                       fechaCierre: dayjs().add(30, "day"),
-                      estado: true,
-                      categoria: "technology",
-                      experiencia: "mid-level",
-                      modalidad: "remote",
+                      isActive: true,
+                      category: 1,
+                      experienceLevel: 2,
+                      workMode: 2,
+                      salaryMin: 0,
+                      salaryMax: 0,
+                      salaryCurrency: "USD",
                     }}
                     className="modern-form"
                   >
@@ -304,7 +464,7 @@ const CreateConvocatoria: React.FC = () => {
 
                         <div className="form-section">
                           <Form.Item
-                            name="titulo"
+                            name="jobTitle"
                             label={
                               <span className="form-label">
                                 <UserOutlined /> Job Title
@@ -333,7 +493,7 @@ const CreateConvocatoria: React.FC = () => {
                           </Form.Item>
 
                           <Form.Item
-                            name="categoria"
+                            name="category"
                             label={
                               <span className="form-label">
                                 <BulbOutlined /> Category
@@ -351,19 +511,16 @@ const CreateConvocatoria: React.FC = () => {
                               className="modern-select"
                               placeholder="Select job category"
                             >
-                              <Option value="technology">Technology</Option>
-                              <Option value="design">Design</Option>
-                              <Option value="marketing">Marketing</Option>
-                              <Option value="sales">Sales</Option>
-                              <Option value="finance">Finance</Option>
-                              <Option value="operations">Operations</Option>
-                              <Option value="hr">Human Resources</Option>
-                              <Option value="other">Other</Option>
+                              {CATEGORIES.map((cat) => (
+                                <Option key={cat.value} value={cat.value}>
+                                  {cat.label}
+                                </Option>
+                              ))}
                             </Select>
                           </Form.Item>
 
                           <Form.Item
-                            name="descripcion"
+                            name="jobDescription"
                             label={
                               <span className="form-label">
                                 <FileTextOutlined /> Job Description
@@ -417,7 +574,7 @@ const CreateConvocatoria: React.FC = () => {
 
                         <div className="form-section">
                           <Form.Item
-                            name="puesto"
+                            name="technicalRequirements"
                             label={
                               <span className="form-label">
                                 <ThunderboltOutlined /> Technical Requirements
@@ -450,7 +607,7 @@ const CreateConvocatoria: React.FC = () => {
                           </Form.Item>
 
                           <Form.Item
-                            name="experiencia"
+                            name="experienceLevel"
                             label={
                               <span className="form-label">
                                 <StarOutlined /> Experience Level
@@ -468,18 +625,11 @@ const CreateConvocatoria: React.FC = () => {
                               className="modern-select"
                               placeholder="Select required experience"
                             >
-                              <Option value="entry-level">
-                                Entry Level (0-2 years)
-                              </Option>
-                              <Option value="mid-level">
-                                Mid Level (3-5 years)
-                              </Option>
-                              <Option value="senior-level">
-                                Senior Level (6-8 years)
-                              </Option>
-                              <Option value="lead-level">
-                                Lead Level (9+ years)
-                              </Option>
+                              {EXPERIENCE_LEVELS.map((exp) => (
+                                <Option key={exp.value} value={exp.value}>
+                                  {exp.label}
+                                </Option>
+                              ))}
                             </Select>
                           </Form.Item>
                         </div>
@@ -507,7 +657,7 @@ const CreateConvocatoria: React.FC = () => {
                           <Row gutter={[16, 16]}>
                             <Col xs={24} sm={12}>
                               <Form.Item
-                                name="modalidad"
+                                name="workMode"
                                 label={
                                   <span className="form-label">
                                     <GlobalOutlined /> Work Mode
@@ -525,15 +675,17 @@ const CreateConvocatoria: React.FC = () => {
                                   className="modern-select"
                                   placeholder="Select work mode"
                                 >
-                                  <Option value="remote">Remote</Option>
-                                  <Option value="on-site">On-site</Option>
-                                  <Option value="hybrid">Hybrid</Option>
+                                  {WORK_MODES.map((mode) => (
+                                    <Option key={mode.value} value={mode.value}>
+                                      {mode.label}
+                                    </Option>
+                                  ))}
                                 </Select>
                               </Form.Item>
                             </Col>
                             <Col xs={24} sm={12}>
                               <Form.Item
-                                name="ubicacion"
+                                name="location"
                                 label={
                                   <span className="form-label">
                                     <EnvironmentOutlined /> Location
@@ -549,55 +701,78 @@ const CreateConvocatoria: React.FC = () => {
                             </Col>
                           </Row>
 
+                          <Row gutter={[16, 16]}>
+                            <Col xs={24} sm={12}>
+                              <Form.Item
+                                name="salaryMin"
+                                label={
+                                  <span className="form-label">
+                                    <DollarOutlined /> Salary Min
+                                  </span>
+                                }
+                              >
+                                <Input
+                                  type="number"
+                                  placeholder="e.g., 80000"
+                                  size="large"
+                                  className="modern-input"
+                                />
+                              </Form.Item>
+                            </Col>
+                            <Col xs={24} sm={12}>
+                              <Form.Item
+                                name="salaryMax"
+                                label={
+                                  <span className="form-label">
+                                    <DollarOutlined /> Salary Max
+                                  </span>
+                                }
+                              >
+                                <Input
+                                  type="number"
+                                  placeholder="e.g., 120000"
+                                  size="large"
+                                  className="modern-input"
+                                />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+
                           <Form.Item
-                            name="salario"
+                            name="salaryCurrency"
                             label={
                               <span className="form-label">
-                                <DollarOutlined /> Salary Range
+                                <DollarOutlined /> Currency
                               </span>
                             }
                           >
-                            <Input
-                              placeholder="e.g., $80,000 - $120,000 per year"
+                            <Select
                               size="large"
-                              className="modern-input"
-                            />
+                              className="modern-select"
+                              placeholder="Select currency"
+                            >
+                              <Option value="USD">USD - US Dollar</Option>
+                              <Option value="MXN">MXN - Mexican Peso</Option>
+                              <Option value="EUR">EUR - Euro</Option>
+                              <Option value="CAD">CAD - Canadian Dollar</Option>
+                            </Select>
                           </Form.Item>
 
                           <Form.Item
-                            name="beneficios"
+                            name="benefitsPerks"
                             label={
                               <span className="form-label">
                                 <SafetyOutlined /> Benefits & Perks
                               </span>
                             }
                           >
-                            <Select
-                              mode="tags"
-                              size="large"
-                              className="modern-select"
-                              placeholder="Add benefits (health insurance, 401k, etc.)"
-                              tokenSeparators={[","]}
-                            >
-                              <Option value="health-insurance">
-                                Health Insurance
-                              </Option>
-                              <Option value="dental-vision">
-                                Dental & Vision
-                              </Option>
-                              <Option value="401k">401(k) Matching</Option>
-                              <Option value="pto">Paid Time Off</Option>
-                              <Option value="remote-work">Remote Work</Option>
-                              <Option value="flexible-hours">
-                                Flexible Hours
-                              </Option>
-                              <Option value="professional-development">
-                                Professional Development
-                              </Option>
-                              <Option value="stock-options">
-                                Stock Options
-                              </Option>
-                            </Select>
+                            <TextArea
+                              rows={4}
+                              placeholder="Describe benefits like health insurance, PTO, 401k, flexible hours, etc."
+                              className="modern-textarea"
+                              showCount
+                              maxLength={500}
+                            />
                           </Form.Item>
 
                           <Row gutter={[16, 16]}>
@@ -722,19 +897,19 @@ const CreateConvocatoria: React.FC = () => {
 
                               <div className="difficulty-display">
                                 <Badge
-                                  count={`${formValues?.dificultad || 5}/10`}
+                                  count={`${previewData?.dificultad || 5}/10`}
                                   style={{
                                     backgroundColor:
                                       getDifficultyColor(
-                                        formValues?.dificultad || 5,
+                                        previewData?.dificultad || 5,
                                       ) === "green"
                                         ? "#10b981"
                                         : getDifficultyColor(
-                                              formValues?.dificultad || 5,
+                                              previewData?.dificultad || 5,
                                             ) === "blue"
                                           ? "#3b82f6"
                                           : getDifficultyColor(
-                                                formValues?.dificultad || 5,
+                                                previewData?.dificultad || 5,
                                               ) === "orange"
                                             ? "#f59e0b"
                                             : "#ef4444",
@@ -744,7 +919,7 @@ const CreateConvocatoria: React.FC = () => {
                                 <div className="difficulty-info">
                                   <Text className="difficulty-level">
                                     {getDifficultyLabel(
-                                      formValues?.dificultad || 5,
+                                      previewData?.dificultad || 5,
                                     )}{" "}
                                     Level
                                   </Text>
@@ -752,11 +927,11 @@ const CreateConvocatoria: React.FC = () => {
                                     className="difficulty-desc"
                                     type="secondary"
                                   >
-                                    {formValues?.dificultad <= 3
+                                    {previewData?.dificultad <= 3
                                       ? "Basic concepts and fundamentals"
-                                      : formValues?.dificultad <= 6
+                                      : previewData?.dificultad <= 6
                                         ? "Intermediate questions with practical cases"
-                                        : formValues?.dificultad <= 8
+                                        : previewData?.dificultad <= 8
                                           ? "Advanced questions and architecture"
                                           : "Expert-level optimization and complex scenarios"}
                                   </Text>
@@ -766,7 +941,7 @@ const CreateConvocatoria: React.FC = () => {
                           </Form.Item>
 
                           <Form.Item
-                            name="estado"
+                            name="isActive"
                             valuePropName="checked"
                             label={
                               <span className="form-label">
@@ -817,16 +992,41 @@ const CreateConvocatoria: React.FC = () => {
                             Next Step
                           </Button>
                         ) : (
-                          <Button
-                            type="primary"
-                            htmlType="submit"
-                            size="large"
-                            loading={loading}
-                            icon={<SendOutlined />}
-                            className="nav-button submit"
-                          >
-                            Create Job Posting
-                          </Button>
+                          <>
+                            <Button
+                              size="large"
+                              onClick={() => {
+                                const currentValues = form.getFieldsValue();
+                                setFormData(prev => ({ ...prev, ...currentValues }));
+                                const allData = { ...formData, ...currentValues };
+                                console.log("DEBUG - Current form values:", currentValues);
+                                console.log("DEBUG - Saved form data:", formData);
+                                console.log("DEBUG - All combined data:", allData);
+                                message.info("Check console for current form values");
+                              }}
+                              className="nav-button debug"
+                              style={{ marginRight: 8 }}
+                            >
+                              Debug Values
+                            </Button>
+                            <Button
+                              type="primary"
+                              size="large"
+                              loading={loading}
+                              icon={<SendOutlined />}
+                              className="nav-button submit"
+                              onClick={() => {
+                                // Primero guardar los valores actuales
+                                const currentValues = form.getFieldsValue();
+                                setFormData(prev => ({ ...prev, ...currentValues }));
+                                
+                                // Luego enviar el formulario
+                                form.submit();
+                              }}
+                            >
+                              Create Job Posting
+                            </Button>
+                          </>
                         )}
                       </div>
                     </div>
@@ -866,43 +1066,42 @@ const CreateConvocatoria: React.FC = () => {
                               {user?.name || "Your Company"}
                             </Text>
                             <Text className="job-location">
-                              {formValues?.ubicacion || "Location TBD"}
+                              {previewData?.location || "Location TBD"}
                             </Text>
                           </div>
                         </div>
 
                         <Tag color="green" className="job-status-tag">
-                          {formValues?.estado ? "Active" : "Draft"}
+                          {previewData?.isActive ? "Active" : "Draft"}
                         </Tag>
                       </div>
 
                       <Title level={3} className="job-preview-title">
-                        {formValues?.titulo || "Job Title"}
+                        {previewData?.jobTitle || "Job Title"}
                       </Title>
 
                       <div className="job-meta">
                         <div className="meta-item">
                           <TeamOutlined className="meta-icon" />
                           <span>
-                            {formValues?.experiencia?.replace("-", " ") ||
-                              "Experience Level"}
+                            {EXPERIENCE_LEVELS.find(exp => exp.value === previewData?.experienceLevel)?.label || "Experience Level"}
                           </span>
                         </div>
                         <div className="meta-item">
                           <GlobalOutlined className="meta-icon" />
-                          <span>{formValues?.modalidad || "Work Mode"}</span>
+                          <span>{WORK_MODES.find(mode => mode.value === previewData?.workMode)?.label || "Work Mode"}</span>
                         </div>
                         <div className="meta-item">
                           <BulbOutlined className="meta-icon" />
-                          <span>{formValues?.categoria || "Category"}</span>
+                          <span>{CATEGORIES.find(cat => cat.value === previewData?.category)?.label || "Category"}</span>
                         </div>
                       </div>
 
-                      {formValues?.salario && (
+                      {(previewData?.salaryMin || previewData?.salaryMax) && (
                         <div className="salary-section">
                           <DollarOutlined className="salary-icon" />
                           <Text className="salary-text">
-                            {formValues.salario}
+                            {previewData.salaryCurrency || 'USD'} ${previewData.salaryMin?.toLocaleString() || 0} - ${previewData.salaryMax?.toLocaleString() || 0}
                           </Text>
                         </div>
                       )}
@@ -911,7 +1110,7 @@ const CreateConvocatoria: React.FC = () => {
                       <div className="preview-section">
                         <Title level={5}>Job Description</Title>
                         <Text className="preview-text">
-                          {formValues?.descripcion ||
+                          {previewData?.jobDescription ||
                             "Job description will appear here..."}
                         </Text>
                       </div>
@@ -920,25 +1119,20 @@ const CreateConvocatoria: React.FC = () => {
                       <div className="preview-section">
                         <Title level={5}>Requirements</Title>
                         <Text className="preview-text">
-                          {formValues?.puesto ||
+                          {previewData?.technicalRequirements ||
                             "Technical requirements will appear here..."}
                         </Text>
                       </div>
 
                       {/* Benefits */}
-                      {formValues?.beneficios &&
-                        formValues.beneficios.length > 0 && (
+                      {previewData?.benefitsPerks && (
                           <div className="preview-section">
                             <Title level={5}>Benefits & Perks</Title>
-                            <div className="benefits-tags">
-                              {formValues.beneficios.map((benefit, index) => (
-                                <Tag key={index} className="benefit-tag">
-                                  {benefit.replace("-", " ")}
-                                </Tag>
-                              ))}
-                            </div>
+                            <Text className="preview-text">
+                              {previewData.benefitsPerks}
+                            </Text>
                           </div>
-                        )}
+                      )}
 
                       {/* AI Interview Info */}
                       <div className="ai-interview-preview">
@@ -952,31 +1146,31 @@ const CreateConvocatoria: React.FC = () => {
                           Candidates will participate in an intelligent
                           interview with personalized questions and real-time
                           evaluation at difficulty level{" "}
-                          {formValues?.dificultad || 5}/10.
+                          {previewData?.dificultad || 5}/10.
                         </Text>
                         <div className="difficulty-preview">
                           <Tag
                             color={getDifficultyColor(
-                              formValues?.dificultad || 5,
+                              previewData?.dificultad || 5,
                             )}
                             className="difficulty-tag"
                           >
-                            {getDifficultyLabel(formValues?.dificultad || 5)}{" "}
+                            {getDifficultyLabel(previewData?.dificultad || 5)}{" "}
                             Level
                           </Tag>
                         </div>
                       </div>
 
                       {/* Timeline */}
-                      {formValues?.fechaPublicacion &&
-                        formValues?.fechaCierre && (
+                      {previewData?.fechaPublicacion &&
+                        previewData?.fechaCierre && (
                           <div className="timeline-preview">
                             <Title level={5}>Application Timeline</Title>
                             <div className="timeline-item">
                               <CalendarOutlined className="timeline-icon" />
                               <span>
                                 Opens:{" "}
-                                {formValues.fechaPublicacion.format(
+                                {previewData.fechaPublicacion.format(
                                   "MMM DD, YYYY",
                                 )}
                               </span>
@@ -985,7 +1179,7 @@ const CreateConvocatoria: React.FC = () => {
                               <ClockCircleOutlined className="timeline-icon" />
                               <span>
                                 Closes:{" "}
-                                {formValues.fechaCierre.format("MMM DD, YYYY")}
+                                {previewData.fechaCierre.format("MMM DD, YYYY")}
                               </span>
                             </div>
                           </div>

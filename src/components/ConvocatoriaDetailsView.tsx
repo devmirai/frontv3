@@ -61,8 +61,6 @@ import {
 import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { convocatoriaAPI, postulacionAPI } from "../services/api";
-import { mockJobs, mockApplications } from "../data/mockData";
-import { getApplicationsByJob } from "../data/mockDataUtils";
 import type { Convocatoria, Postulacion } from "../types/api";
 import dayjs from "dayjs";
 
@@ -385,27 +383,30 @@ const ConvocatoriaDetailsView: React.FC = () => {
 
       const jobId = Number.parseInt(id);
 
-      // Buscar convocatoria en datos mock
-      const mockConvocatoria = mockJobs.find((job) => job.id === jobId);
-      if (mockConvocatoria) {
-        setConvocatoria(mockConvocatoria);
+      // Load job posting from backend
+      const jobResponse = await convocatoriaAPI.getById(jobId);
+      const jobData = jobResponse.data;
+      
+      if (jobData) {
+        setConvocatoria(jobData);
 
-        // Buscar postulaciones para esta convocatoria
-        const mockPostulaciones = getApplicationsByJob(jobId);
-        setPostulaciones(mockPostulaciones);
+        // Load applications for this job posting
+        const applicationsResponse = await postulacionAPI.getByConvocatoria(jobId);
+        const applications = applicationsResponse.data || [];
+        setPostulaciones(applications);
 
         console.log(
-          `📊 [ConvocatoriaDetailsView] Mock data loaded: job ${jobId}, ${mockPostulaciones.length} applications`,
+          `📊 [ConvocatoriaDetailsView] Backend data loaded: job ${jobId}, ${applications.length} applications`,
         );
       } else {
         console.log(
-          `⚠️ [ConvocatoriaDetailsView] Job ${jobId} not found in mock data`,
+          `⚠️ [ConvocatoriaDetailsView] Job ${jobId} not found`,
         );
         message.error("Job posting not found");
       }
     } catch (error: any) {
       console.error("Error loading convocatoria details:", error);
-      message.error("Error loading job posting details");
+      message.error("Error loading job posting details. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }

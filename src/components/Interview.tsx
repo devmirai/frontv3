@@ -34,8 +34,6 @@ import { motion } from "framer-motion"
 import { useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { preguntaAPI, evaluacionAPI, postulacionAPI } from "../services/api"
-import { generateMockQuestions } from "../data/mockDataUtils"
-import { mockApplications } from "../data/mockData"
 import {
   type Pregunta,
   type Postulacion,
@@ -112,67 +110,46 @@ const Interview: React.FC = () => {
     try {
       setLoading(true)
 
-      // 🔧 SIEMPRE usar datos mock para pruebas de diseño
-      console.log('🔧 [Interview] Usando datos mock para carga de entrevista');
+      console.log('� [Interview] Loading interview data from backend');
       
       const postulacionId = Number.parseInt(id);
       
-      // Buscar postulación en datos mock
-      const mockPostulacion = mockApplications.find(app => app.id === postulacionId);
+      // Load application data from backend
+      const response = await postulacionAPI.getById(postulacionId);
+      const postulacionData = response.data;
       
-      if (!mockPostulacion) {
-        throw new Error(`Postulación ${postulacionId} no encontrada en datos mock`);
+      if (!postulacionData) {
+        throw new Error(`Application ${postulacionId} not found`);
       }
       
-      setPostulacion(mockPostulacion);
+      setPostulacion(postulacionData);
 
       // Check if this is a results view
       if (window.location.pathname.includes("/results")) {
-        console.log('🔧 [Interview] Mostrando resultados mock para entrevista completada');
-        // Para entrevistas completadas, mostrar resultados mock
-        const mockResults = {
-          puntajeFinal: 85.5,
-          resumenPorCriterio: {
-            claridad_estructura: 80,
-            dominio_tecnico: 90,
-            pertinencia: 85,
-            comunicacion_seguridad: 87
-          },
-          evaluacionesPorPregunta: [
-            {
-              pregunta: { texto: "Explain the concept of React hooks and their benefits" },
-              evaluacion: { puntuacionFinal: 8.5 },
-              respuesta: "Sample answer about React hooks...",
-              criterios: {
-                claridad_estructura: 8,
-                dominio_tecnico: 9,
-                pertinencia: 8,
-                comunicacion_seguridad: 9
-              }
-            },
-            {
-              pregunta: { texto: "How would you optimize a React application's performance?" },
-              evaluacion: { puntuacionFinal: 8.2 },
-              respuesta: "Sample answer about React optimization...",
-              criterios: {
-                claridad_estructura: 8,
-                dominio_tecnico: 8,
-                pertinencia: 9,
-                comunicacion_seguridad: 8
-              }
-            }
-          ]
-        };
-        setConsolidatedResults(mockResults);
-        setShowResults(true);
-        setInterviewCompleted(true);
-        return;
+        console.log('� [Interview] Loading results from backend');
+        
+        try {
+          const resultsResponse = await evaluacionAPI.getResultados(postulacionId);
+          const results = resultsResponse.data;
+          
+          if (results) {
+            setConsolidatedResults(results);
+            setShowResults(true);
+            setInterviewCompleted(true);
+            return;
+          }
+        } catch (resultsError) {
+          console.error("Error loading results:", resultsError);
+          message.error("Failed to load interview results.");
+          setTimeout(() => navigate("/usuario/dashboard"), 2000);
+          return;
+        }
       }
 
       // For active interview, load questions
-      await generateQuestions(mockPostulacion);
+      await generateQuestions(postulacionData);
       
-      console.log(`📊 [Interview] Mock interview data loaded successfully`);
+      console.log(`📊 [Interview] Interview data loaded successfully`);
     } catch (error: any) {
       console.error("Error loading interview data:", error)
       message.error("Failed to load interview data. Please try again.")
@@ -249,34 +226,7 @@ const Interview: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Error generating questions:", error)
-      
-      // 🔧 FALLBACK: Si falla la API, usar preguntas mock para que siempre haya preguntas disponibles
-      console.log('🔧 Usando preguntas mock como fallback para pruebas de diseño');
-      
-      try {
-        const jobTitle = postulacionData.convocatoria?.titulo || 'Software Developer';
-        const jobLevel = postulacionData.convocatoria?.dificultad || 'Mid-Level';
-        
-        const mockQuestions = generateMockQuestions(jobTitle, jobLevel);
-        const formattedMockQuestions: Pregunta[] = mockQuestions.map((q, index) => ({
-          id: index + 1,
-          pregunta: q.texto,
-          tipo: q.tipo,
-          dificultad: q.dificultad.toString(),
-          categoria: q.tipo,
-          postulacion: postulacionData,
-        }));
-
-        setQuestions(formattedMockQuestions);
-        setAnswers(new Array(formattedMockQuestions.length).fill(""));
-        setCurrentQuestion(0);
-        
-        console.log(`📊 Mock questions loaded: ${formattedMockQuestions.length} questions`);
-      } catch (mockError) {
-        console.error("Error loading mock questions:", mockError);
-        message.error("Error loading interview questions. Please try again.");
-        setQuestions([]);
-      }
+      throw new Error("Failed to generate questions for interview");
     }
   }
 

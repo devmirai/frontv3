@@ -12,8 +12,6 @@ import { motion } from "framer-motion"
 import { useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { preguntaAPI, postulacionAPI } from "../services/api"
-import { generateMockQuestions } from "../data/mockDataUtils"
-import { mockApplications } from "../data/mockData"
 import { type Postulacion, EstadoPostulacion } from "../types/api"
 import ThemeToggle from "./ThemeToggle"
 
@@ -41,25 +39,25 @@ const InterviewLoading: React.FC = () => {
       setLoadingProgress(10)
       setLoadingMessage("Loading interview data...")
 
-      // 🔧 SIEMPRE usar datos mock para pruebas de diseño
-      console.log('🔧 [InterviewLoading] Usando datos mock para inicialización');
+      console.log('� [InterviewLoading] Loading interview data from backend');
       
       const postulacionId = Number.parseInt(id);
       
-      // Buscar postulación en datos mock
-      const mockPostulacion = mockApplications.find(app => app.id === postulacionId);
+      // Load application data from backend
+      const response = await postulacionAPI.getById(postulacionId);
+      const postulacionData = response.data;
       
-      if (!mockPostulacion) {
-        throw new Error(`Postulación ${postulacionId} no encontrada en datos mock`);
+      if (!postulacionData) {
+        throw new Error(`Application ${postulacionId} not found`);
       }
       
-      setPostulacion(mockPostulacion);
+      setPostulacion(postulacionData);
       setLoadingProgress(30)
       setLoadingMessage("Validating interview status...")
 
       // Check if interview is already completed
-      if (mockPostulacion.estado === EstadoPostulacion.COMPLETADA) {
-        console.log('🔧 [InterviewLoading] Interview already completed, redirecting to results');
+      if (postulacionData.estado === EstadoPostulacion.COMPLETADA) {
+        console.log('� [InterviewLoading] Interview already completed, redirecting to results');
         setLoadingProgress(100)
         setLoadingMessage("Loading results...")
         setTimeout(() => {
@@ -72,7 +70,7 @@ const InterviewLoading: React.FC = () => {
       setLoadingMessage("Preparing interview questions...")
 
       // Generate or load questions
-      await generateQuestions(mockPostulacion);
+      await generateQuestions(postulacionData);
       
       setLoadingProgress(80)
       setLoadingMessage("Setting up interview environment...")
@@ -127,15 +125,7 @@ const InterviewLoading: React.FC = () => {
       console.log("Questions generated successfully")
     } catch (error: any) {
       console.error("Error generating questions:", error)
-      
-      // 🔧 FALLBACK: Si falla la API, usar preguntas mock para que siempre haya preguntas disponibles
-      console.log('🔧 Usando preguntas mock como fallback para pruebas de diseño');
-      
-      const jobTitle = postulacionData.convocatoria?.titulo || 'Software Developer';
-      const jobLevel = postulacionData.convocatoria?.dificultad || 'Mid-Level';
-      
-      const mockQuestions = generateMockQuestions(jobTitle, jobLevel);
-      console.log(`📊 Mock questions prepared: ${mockQuestions.length} questions`);
+      throw new Error("Failed to generate questions for interview");
     }
   }
 
