@@ -81,8 +81,16 @@ export interface Convocatoria {
   dificultad?: string
   fechaPublicacion: string
   fechaCierre: string
+  // Legacy field for backward compatibility
   activo: boolean
   empresa?: Empresa
+  // New v2 API fields
+  publicationDate?: string
+  closingDate?: string
+  formattedSalaryRange?: string
+  isActive?: boolean
+  daysUntilClosing?: number
+  status?: string
 }
 
 export interface Postulacion {
@@ -91,6 +99,11 @@ export interface Postulacion {
   estado: EstadoPostulacion
   usuario?: Usuario
   convocatoria?: Convocatoria
+  convocatoriaId?: number
+  puntuacion?: number
+  // New fields from v2 API
+  preguntasGeneradas?: boolean
+  entrevistaSessionId?: number
 }
 
 export interface Pregunta {
@@ -100,6 +113,14 @@ export interface Pregunta {
   dificultad: string
   categoria: string
   postulacion?: Postulacion
+  // New fields from V2 API
+  score?: number
+  typeKey?: string
+  // Progress tracking fields
+  respondida?: boolean
+  evaluada?: boolean
+  respuesta?: string | null
+  fechaRespuesta?: string | null
 }
 
 export interface Evaluacion {

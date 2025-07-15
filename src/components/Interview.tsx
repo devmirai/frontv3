@@ -31,9 +31,9 @@ import {
   TrophyOutlined,
 } from "@ant-design/icons"
 import { motion } from "framer-motion"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, useLocation } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
-import { preguntaAPI, evaluacionAPI, postulacionAPI } from "../services/api"
+import { preguntaAPI, evaluacionAPI, postulacionAPI, convocatoriaAPI, entrevistaAPI } from "../services/api"
 import {
   type Pregunta,
   type Postulacion,
@@ -60,10 +60,11 @@ import ThemeToggle from "./ThemeToggle"
 import PrintReport from "./PrintReport"
 
 const { Header, Content } = Layout
-const { Title, Paragraph } = Typography
+const { Title, Paragraph, Text } = Typography
 const { TextArea } = Input
 
 const Interview: React.FC = () => {
+  // Core interview state
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [questions, setQuestions] = useState<Pregunta[]>([])
   const [answers, setAnswers] = useState<string[]>([])
@@ -76,16 +77,34 @@ const Interview: React.FC = () => {
   const [showResults, setShowResults] = useState(false)
   const [interviewCompleted, setInterviewCompleted] = useState(false)
   const [consolidatedResults, setConsolidatedResults] = useState<any>(null)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  
+  // V2 Flow state - Pasos 1-12
+  const [currentStep, setCurrentStep] = useState(3) // Start directly at preparation phase
+  const [job, setJob] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false)
+  
   const navigate = useNavigate()
   const { id } = useParams()
   const { user } = useAuth()
+  const location = useLocation()
 
   // Add a ref to track if we've initiated question generation
   const questionGenerationInitiated = useRef(false);
 
   useEffect(() => {
-    loadInterviewData()
-  }, [id])
+    // Extract session ID from URL params
+    const searchParams = new URLSearchParams(location.search);
+    const sessionParam = searchParams.get('session');
+    if (sessionParam) {
+      setSessionId(sessionParam);
+      console.log('📝 [Interview] Session ID extracted from URL:', sessionParam);
+    }
+    
+    loadInterviewData();
+  }, [id, location.search])
 
   useEffect(() => {
     if (!showResults && questions.length > 0 && !interviewCompleted) {
@@ -104,132 +123,215 @@ const Interview: React.FC = () => {
     }
   }, [showResults, questions.length, interviewCompleted])
 
+  // Auto-generate questions when currentStep is 4 and no questions exist
+  useEffect(() => {
+    if (currentStep === 4 && questions.length === 0 && id && !questionGenerationInitiated.current && !isGeneratingQuestions) {
+      questionGenerationInitiated.current = true;
+      console.log('🤖 [Interview] Auto-generating questions for step 4');
+      handleGenerateQuestions(Number(id));
+    }
+  }, [currentStep, questions.length, id, isGeneratingQuestions]);
+
+  // Sync currentAnswer with saved responses when currentQuestion changes
+  useEffect(() => {
+    if (questions.length > 0 && currentQuestion >= 0 && currentQuestion < answers.length) {
+      const savedAnswer = answers[currentQuestion] || "";
+      setCurrentAnswer(savedAnswer);
+      console.log('📝 [Interview] Synced to question', currentQuestion + 1, '- Answer length:', savedAnswer.length);
+    }
+  }, [currentQuestion, questions.length, answers]);
+
   const loadInterviewData = async () => {
     if (!id) return
 
     try {
-      setLoading(true)
-
-      console.log('� [Interview] Loading interview data from backend');
+      setLoading(true);
       
-      const postulacionId = Number.parseInt(id);
+      console.log('📝 [Interview] Loading interview data, ID:', id, 'Session ID:', sessionId);
       
-      // Load application data from backend
-      const response = await postulacionAPI.getById(postulacionId);
-      const postulacionData = response.data;
+      // The ID now refers to postulacion ID, not convocatoria ID
+      const postulacionId = Number(id);
       
-      if (!postulacionData) {
-        throw new Error(`Application ${postulacionId} not found`);
-      }
+      // Step 1: Get postulation details to get job info
+      const postulacionResponse = await postulacionAPI.getById(postulacionId);
+      const postulacionData = postulacionResponse.data;
+      console.log('📝 [Interview] Postulation data loaded:', postulacionData);
       
       setPostulacion(postulacionData);
+      
+      // Extract job data from postulation
+      const jobData = postulacionData.convocatoria;
+      console.log('📝 [Interview] Job data from postulation:', jobData);
+      setJob(jobData);
 
-      // Check if this is a results view
-      if (window.location.pathname.includes("/results")) {
-        console.log('� [Interview] Loading results from backend');
+      // Always check if we have questions already generated (regardless of sessionId)
+      try {
+        const questionsResponse = await preguntaAPI.getByPostulacion(postulacionId);
+        const questionsData = questionsResponse.data;
+        console.log('📝 [Interview] Questions loaded for postulation:', postulacionId, questionsData);
         
-        try {
-          const resultsResponse = await evaluacionAPI.getResultados(postulacionId);
-          const results = resultsResponse.data;
+        if (questionsData && questionsData.length > 0) {
+          // Map the API response to match our Pregunta interface
+          const mappedQuestions: Pregunta[] = questionsData.map((q: any) => ({
+            id: q.id,
+            pregunta: q.textoPregunta, // Map textoPregunta to pregunta
+            tipo: q.tipoLegible || q.tipo, // Use readable type first, then fallback
+            dificultad: q.dificultad || "5",
+            categoria: q.tipoLegible || q.tipo,
+            postulacion: { id: postulacionId },
+            // Keep original fields for reference
+            numero: q.numero,
+            typeKey: q.tipo,
+            // Progress tracking fields from the API
+            respondida: q.respondida || false,
+            evaluada: q.evaluada || false,
+            respuesta: q.respuesta || null,
+            fechaRespuesta: q.fechaRespuesta || null,
+          }));
           
+          // Pre-fill answers array with existing responses
+          const answersArray = mappedQuestions.map(q => q.respuesta || "");
+          
+          // Find the first unanswered question to continue from
+          const firstUnansweredIndex = mappedQuestions.findIndex(q => !q.respondida);
+          const startingQuestion = firstUnansweredIndex >= 0 ? firstUnansweredIndex : 0;
+          
+          setQuestions(mappedQuestions);
+          setAnswers(answersArray);
+          setCurrentQuestion(startingQuestion);
+          setCurrentStep(6); // Ready to answer questions
+          setLoading(false); // Questions already exist, stop loading
+          console.log('✅ [Interview] Ready to start answering questions with mapped questions:', mappedQuestions.length);
+          console.log('📝 [Interview] Continuing from question:', startingQuestion + 1, 'of', mappedQuestions.length);
+          console.log('📝 [Interview] Sample mapped question:', {
+            question: mappedQuestions[0]?.pregunta,
+            type: mappedQuestions[0]?.tipo,
+            originalText: questionsData[0]?.textoPregunta,
+            answered: mappedQuestions[0]?.respondida,
+            response: mappedQuestions[0]?.respuesta ? 'Has response' : 'No response'
+          });
+          return; // Exit early since we have questions
+        } else {
+          console.log('📝 [Interview] No questions found, will generate new ones');
+        }
+      } catch (error) {
+        console.log('📝 [Interview] Error loading questions, will generate new ones:', error);
+      }
+
+      // If sessionId is available, check other interview progress
+      if (sessionId) {
+        // Check if interview is already completed
+        try {
+          const resultsResponse = await entrevistaAPI.getResultados(sessionId);
+          const results = resultsResponse.data;
           if (results) {
+            console.log('📝 [Interview] Interview already completed, showing results');
             setConsolidatedResults(results);
             setShowResults(true);
             setInterviewCompleted(true);
+            setCurrentStep(12);
+            setLoading(false); // Results ready, stop loading
             return;
           }
-        } catch (resultsError) {
-          console.error("Error loading results:", resultsError);
-          message.error("Failed to load interview results.");
-          setTimeout(() => navigate("/usuario/dashboard"), 2000);
-          return;
+        } catch (error) {
+          console.log('📝 [Interview] No results found, interview not completed yet');
         }
       }
-
-      // For active interview, load questions
-      await generateQuestions(postulacionData);
       
-      console.log(`📊 [Interview] Interview data loaded successfully`);
+      // If we reach here, we need to generate questions
+      console.log('📝 [Interview] Setting step to 4 for automatic question generation');
+      setCurrentStep(4);
+      setLoading(false); // Let the useEffect handle loading during question generation
+
+      console.log(`📊 [Interview] Interview data loaded successfully, Current Step: 4`);
     } catch (error: any) {
-      console.error("Error loading interview data:", error)
-      message.error("Failed to load interview data. Please try again.")
-      setTimeout(() => navigate("/usuario/dashboard"), 2000)
-    } finally {
-      setLoading(false)
+      console.error("❌ [Interview] Error loading interview data:", error);
+      setError('No se pudo cargar la información de la entrevista');
+      message.error("Failed to load interview data. Please try again.");
+      setTimeout(() => navigate("/usuario/dashboard"), 2000);
+      setLoading(false);
     }
   }
 
-  const generateQuestions = async (postulacionData: Postulacion) => {
-    // If we've already initiated question generation in this session, skip
-    if (questionGenerationInitiated.current) {
-      console.log("Question generation already initiated, skipping")
-      return
+  // Paso 4: Generar preguntas con postulacion ID
+  const handleGenerateQuestions = async (postulacionId?: number) => {
+    const targetPostulacionId = postulacionId || Number(id);
+    if (!targetPostulacionId) {
+      message.error('ID de postulación no disponible');
+      questionGenerationInitiated.current = false; // Reset flag on error
+      return;
     }
-    
-    // Mark that we've initiated question generation
-    questionGenerationInitiated.current = true;
-    
+
+    setIsGeneratingQuestions(true);
     try {
-      if (!postulacionData.id) {
-        throw new Error("Postulation ID is missing")
-      }
-
-      // Check if questions already exist for this postulation
-      try {
-        const existingResponse = await preguntaAPI.getByPostulacion(postulacionData.id)
-        const existingQuestionsData = existingResponse.data || []
-        
-        if (existingQuestionsData.length > 0) {
-          console.log("Using existing questions", existingQuestionsData)
-          
-          // Map existing questions to ensure they have the expected structure
-          const existingQuestions = existingQuestionsData.map(q => ({
-            id: q.id,
-            pregunta: q.textoPregunta || q.pregunta || q.texto || q.question || "Question not available",
-            tipo: q.tipoLegible || q.tipo || q.type || "Technical",
-            dificultad: q.dificultad || 5,
-            categoria: q.categoria || q.tipo || "Technical",
-            postulacion: postulacionData,
-          }))
-          
-          setQuestions(existingQuestions)
-          setAnswers(new Array(existingQuestions.length).fill(""))
-          setCurrentQuestion(0)
-          return
-        }
-      } catch (error) {
-        console.log("No existing questions found, will generate new ones")
-      }
-
-      // Mark questions as being generated BEFORE generating them
-      await postulacionAPI.marcarPreguntasGeneradas(postulacionData.id, true)
-
-      // Only generate new questions if none exist
-      console.log(`Generating new questions for postulation ${postulacionData.id}`)
-      const response = await preguntaAPI.generar({ idPostulacion: postulacionData.id })
-
-      if (response.data && response.data.success && Array.isArray(response.data.questions)) {
-        const generatedQuestions: Pregunta[] = response.data.questions.map((q: any, index: number) => ({
+      console.log('📝 [Interview] Step 4: Generating questions for postulation', targetPostulacionId);
+      
+      const response = await preguntaAPI.generar({ idPostulacion: targetPostulacionId });
+      const questionsData = response.data;
+      
+      if (questionsData && questionsData.success && Array.isArray(questionsData.questions)) {
+        const generatedQuestions: Pregunta[] = questionsData.questions.map((q: any, index: number) => ({
           id: q.id || index + 1,
-          pregunta: q.question,
-          tipo: q.typeReadable || q.type || "Technical",
-          dificultad: q.score ? Math.ceil(q.score / 1.5).toString() : "5",
-          categoria: q.type || "Technical",
-          postulacion: postulacionData,
-        }))
+          pregunta: q.question, // Map "question" field to "pregunta"
+          tipo: q.typeReadable || q.type || "Technical", // Use readable type first, then fallback
+          dificultad: q.score ? Math.ceil(q.score / 2).toString() : "5", // Convert score to difficulty (1-10 scale)
+          categoria: q.typeReadable || q.type || "Technical", // Use readable category
+          postulacion: { id: targetPostulacionId }, // Set the postulation reference
+          // Additional fields from new API format
+          score: q.score,
+          typeKey: q.type, // Keep original type key for reference
+          // New progress tracking fields
+          respondida: q.respondida || false,
+          evaluada: q.evaluada || false,
+          respuesta: q.respuesta || null,
+          fechaRespuesta: q.fechaRespuesta || null,
+        }));
 
-        setQuestions(generatedQuestions)
-        setAnswers(new Array(generatedQuestions.length).fill(""))
-        setCurrentQuestion(0)
+        // Pre-fill answers array with existing responses
+        const answersArray = generatedQuestions.map(q => q.respuesta || "");
+        
+        // Find the first unanswered question to continue from
+        const firstUnansweredIndex = generatedQuestions.findIndex(q => !q.respondida);
+        const startingQuestion = firstUnansweredIndex >= 0 ? firstUnansweredIndex : 0;
+
+        setQuestions(generatedQuestions);
+        setAnswers(answersArray);
+        setCurrentQuestion(startingQuestion);
+        setCurrentStep(6); // Ready to answer questions
+        
+        console.log('✅ [Interview] Questions generated successfully:', generatedQuestions.length);
+        console.log('📝 [Interview] Continuing from question:', startingQuestion + 1, 'of', generatedQuestions.length);
+        console.log('📝 [Interview] Sample question:', {
+          question: generatedQuestions[0]?.pregunta,
+          type: generatedQuestions[0]?.tipo,
+          score: generatedQuestions[0]?.score,
+          answered: generatedQuestions[0]?.respondida,
+          response: generatedQuestions[0]?.respuesta ? 'Has response' : 'No response'
+        });
+        console.log('📊 [Interview] Progress summary:', {
+          totalQuestions: generatedQuestions.length,
+          answeredQuestions: generatedQuestions.filter(q => q.respondida).length,
+          startingFrom: startingQuestion + 1,
+          progressPercentage: questionsData.progresoRespuestas || 0
+        });
+        
+        // Questions are ready, stop loading
+        setLoading(false);
+        
       } else {
-        throw new Error("Invalid response format from question generation API")
+        throw new Error("Invalid response format from question generation API");
       }
     } catch (error: any) {
-      console.error("Error generating questions:", error)
-      throw new Error("Failed to generate questions for interview");
+      console.error('❌ [Interview] Error generating questions:', error);
+      message.error('Error al generar las preguntas');
+      setLoading(false); // Stop loading on error too
+      questionGenerationInitiated.current = false; // Reset flag on error
+    } finally {
+      setIsGeneratingQuestions(false);
     }
   }
 
+  // Cargar resultados con postulacion ID
   const loadResults = async (postulacionId: number) => {
     try {
       const evaluationResponse = await evaluacionAPI.getResultados(postulacionId)
@@ -244,30 +346,34 @@ const Interview: React.FC = () => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-  }
+  };
 
+  // Paso 7-8: Responder preguntas y evaluar respuestas
   const handleNextQuestion = async () => {
     if (!currentAnswer.trim()) {
-      message.warning("Please provide an answer before proceeding.")
+      message.warning("Por favor proporciona una respuesta antes de continuar.")
       return
     }
 
-    if (!questions[currentQuestion] || !postulacion?.id) {
-      message.error("Interview data not available")
+    if (!questions[currentQuestion] || !id) {
+      message.error("Datos de la entrevista no disponibles")
       return
     }
 
     setIsSubmitting(true)
 
     try {
+      console.log(`📝 [Interview] Step 7-8: Answering question ${currentQuestion + 1}/${questions.length}`);
+      
       const newAnswers = [...answers]
       newAnswers[currentQuestion] = currentAnswer.trim()
       setAnswers(newAnswers)
 
+      // Paso 8: Evaluar respuesta - usar postulation ID  
       const evaluationRequest = {
         preguntaId: questions[currentQuestion].id!,
         answer: currentAnswer.trim(),
-        postulacionId: postulacion.id,
+        postulacionId: Number(id), // Usar postulation ID correctamente
       }
 
       const response = await evaluacionAPI.evaluar(evaluationRequest)
@@ -275,49 +381,88 @@ const Interview: React.FC = () => {
       if (response.data) {
         setEvaluations((prev) => [...prev, response.data])
 
+        // Paso 9: Actualizar progreso (opcional)
+        if (sessionId) {
+          const progressStep = 7 + ((currentQuestion + 1) / questions.length) * 2; // Steps 7-9
+          await entrevistaAPI.actualizarProgreso(sessionId, { step: Math.floor(progressStep) });
+        }
+
         if (currentQuestion < questions.length - 1) {
           setCurrentQuestion((prev) => prev + 1)
           setCurrentAnswer("")
-          message.success("Answer submitted successfully! Moving to next question...")
+          message.success("¡Respuesta enviada exitosamente! Pasando a la siguiente pregunta...")
         } else {
+          // All questions answered, proceed to step 10-12
           await handleSubmitInterview()
         }
       } else {
         throw new Error("Invalid evaluation response")
       }
     } catch (error: any) {
-      console.error("Error submitting answer:", error)
-      message.error("Error evaluating your answer: " + (error.response?.data?.message || "Please try again"))
+      console.error("❌ [Interview] Error submitting answer:", error)
+      message.error("Error al evaluar tu respuesta: " + (error.response?.data?.message || "Por favor intenta de nuevo"))
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  // Pasos 10-12: Finalizar entrevista y mostrar resultados
   const handleSubmitInterview = async () => {
     try {
+      console.log('📝 [Interview] Steps 10-12: Finalizing interview');
       setInterviewCompleted(true)
 
-      // Use the new specific endpoint to complete the interview
-      if (postulacion?.id) {
-        await postulacionAPI.completarEntrevista(postulacion.id)
+      // Paso 10: Finalizar entrevista v2
+      if (sessionId) {
+        await entrevistaAPI.finalizarV2(sessionId);
+        console.log('✅ [Interview] Interview finalized via v2 API');
       }
 
-      message.success("Interview completed successfully! Redirecting to results...", 2)
+      // Paso 12: Obtener resultados
+      if (sessionId) {
+        const resultsResponse = await entrevistaAPI.getResultados(sessionId);
+        setConsolidatedResults(resultsResponse.data);
+        setShowResults(true);
+        setCurrentStep(12);
+        console.log('✅ [Interview] Results loaded successfully');
+      }
+
+      message.success("¡Entrevista completada exitosamente!", 2)
       
-      // Ensure we have the correct ID for navigation
-      const resultId = id || postulacion?.id
-      
-      // Navigate immediately rather than waiting
-      navigate(`/usuario/interview/${resultId}/results`, { replace: true })
     } catch (error) {
-      console.error("Error completing interview:", error)
-      message.error("Error completing interview. Your answers were saved.", 2)
+      console.error("❌ [Interview] Error completing interview:", error)
+      message.error("Error al completar la entrevista. Tus respuestas fueron guardadas.", 2)
       
-      // Still navigate even if there's an error
-      const resultId = id || postulacion?.id
-      navigate(`/usuario/interview/${resultId}/results`, { replace: true })
+      // Still show results even if there's an error
+      setShowResults(true);
+      setCurrentStep(12);
     }
   }
+
+  // Navigation functions for moving between questions without submitting
+  const handlePreviousQuestion = () => {
+    if (currentQuestion > 0) {
+      // Save current answer before moving
+      const newAnswers = [...answers];
+      newAnswers[currentQuestion] = currentAnswer;
+      setAnswers(newAnswers);
+      
+      setCurrentQuestion(currentQuestion - 1);
+      console.log('📝 [Interview] Moved to previous question:', currentQuestion);
+    }
+  };
+
+  const handleGoToQuestion = (questionIndex: number) => {
+    if (questionIndex >= 0 && questionIndex < questions.length) {
+      // Save current answer before moving
+      const newAnswers = [...answers];
+      newAnswers[currentQuestion] = currentAnswer;
+      setAnswers(newAnswers);
+      
+      setCurrentQuestion(questionIndex);
+      console.log('📝 [Interview] Moved to question:', questionIndex + 1);
+    }
+  };
 
   if (loading) {
     return (
@@ -332,26 +477,64 @@ const Interview: React.FC = () => {
               <RobotOutlined />
             </div>
             <Title level={2} className="loading-title">
-              Preparing Your Interview
+              Preparing Your AI Interview
             </Title>
             <Paragraph className="loading-message">
-              mirAI is generating personalized questions based on the job requirements.
-              <br />
-              <strong>This process may take a few moments.</strong>
+              Preparing interview questions...
             </Paragraph>
             <div className="loading-progress">
-              <Progress percent={75} strokeColor="#6366f1" showInfo={false} />
+              <Progress percent={50} strokeColor="#6366f1" showInfo={true} format={() => '50% Complete'} />
+            </div>
+            <div className="loading-details">
+              <div className="detail-item">
+                <Text strong>Position:</Text>
+                <Text>{postulacion?.convocatoria?.titulo || 'Loading...'}</Text>
+              </div>
+              <div className="detail-item">
+                <Text strong>Company:</Text>
+                <Text>{postulacion?.convocatoria?.empresa?.nombre || 'Loading...'}</Text>
+              </div>
             </div>
             <div className="loading-tips">
               <div className="loading-tips-title">
                 <InfoCircleOutlined />
-                <span>Did you know?</span>
+                <span>Interview Tips</span>
               </div>
               <Paragraph className="loading-tips-text">
-                Our AI analyzes the position details to create the most relevant questions for your interview. Take a
-                moment to prepare yourself mentally!
+                Our AI will evaluate your responses based on clarity, technical knowledge, problem-solving approach, and communication skills. Take your time to provide thoughtful, detailed answers.
               </Paragraph>
             </div>
+          </motion.div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="error-screen">
+        <div className="error-content">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="error-icon">
+              <InfoCircleOutlined style={{ color: '#ff4d4f', fontSize: '48px' }} />
+            </div>
+            <Title level={2} className="error-title">
+              Error al Cargar la Entrevista
+            </Title>
+            <Paragraph className="error-message">
+              {error}
+            </Paragraph>
+            <Button 
+              type="primary" 
+              onClick={() => navigate('/usuario/dashboard')}
+              style={{ marginTop: '16px' }}
+            >
+              Volver al Dashboard
+            </Button>
           </motion.div>
         </div>
       </div>
@@ -698,36 +881,121 @@ const Interview: React.FC = () => {
     )
   }
 
-  // Loading state for question generation
-  if (!showResults && questions.length === 0) {
+  const currentQ = questions[currentQuestion]
+  
+  // Calculate progress based on actually answered questions
+  const answeredCount = questions.filter((q, index) => 
+    q.respondida || (answers[index] && answers[index].trim().length > 0)
+  ).length;
+  const progress = questions.length > 0 ? (answeredCount / questions.length) * 100 : 0;
+
+  // Debug: Log current question state
+  console.log('🔍 [Interview Debug] Current state:', {
+    questionsLength: questions.length,
+    currentQuestion: currentQuestion + 1,
+    totalQuestions: questions.length,
+    answeredCount: answeredCount,
+    progressPercentage: Math.round(progress),
+    currentQ: currentQ ? { 
+      id: currentQ.id,
+      pregunta: currentQ.pregunta?.substring(0, 50) + '...', 
+      tipo: currentQ.tipo,
+      answered: currentQ.respondida,
+      hasResponse: !!currentQ.respuesta
+    } : null,
+    currentAnswerLength: currentAnswer.length,
+    answersArray: answers.map((ans, idx) => ({
+      questionIndex: idx + 1,
+      answerLength: ans.length,
+      hasAnswer: ans.length > 0,
+      questionAnswered: questions[idx]?.respondida || false
+    })),
+    isGeneratingQuestions,
+    loading,
+    currentStep
+  });
+
+  // Show loading state when generating questions
+  if (isGeneratingQuestions) {
     return (
-      <div className="loading-screen">
-        <div className="loading-content">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="loading-icon">
-              <RobotOutlined />
-            </div>
-            <Title level={2} className="loading-title">
-              Loading Interview Questions
-            </Title>
-            <Paragraph className="loading-message">
-              Preparing your personalized interview experience...
-            </Paragraph>
-            <div className="loading-progress">
-              <Progress percent={50} strokeColor="#6366f1" showInfo={false} />
-            </div>
-          </motion.div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="text-center p-8">
+          <Spin size="large" />
+          <Title level={4} className="mt-4">Generating your interview questions...</Title>
+          <Paragraph className="text-gray-600">
+            mirAI is creating personalized questions based on the job requirements.
+          </Paragraph>
+        </Card>
       </div>
     )
   }
 
-  const currentQ = questions[currentQuestion]
-  const progress = ((currentQuestion + 1) / questions.length) * 100
+  // Show error state when no questions are available
+  if (!loading && !isGeneratingQuestions && questions.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="text-center p-8">
+          <Title level={4}>No questions available</Title>
+          <Paragraph className="text-gray-600">
+            Unable to load interview questions. Please try again.
+          </Paragraph>
+          <Button 
+            type="primary" 
+            onClick={() => navigate("/usuario/dashboard")}
+            className="btn-gradient"
+          >
+            Return to Dashboard
+          </Button>
+        </Card>
+      </div>
+    )
+  }
+
+  // Get specific tips for current question type
+  const getQuestionTypeTips = () => {
+    const tipsByType: Record<string, { tip: string; practice: string }> = {
+      'technical_knowledge': {
+        tip: '💻 Focus on specific technologies, frameworks, and best practices. Provide concrete examples from your experience.',
+        practice: '⚡ Mention specific tools, versions, and implementation details to demonstrate deep technical knowledge.'
+      },
+      'experience': {
+        tip: '📈 Share specific projects and roles. Use the STAR method (Situation, Task, Action, Result) to structure your answer.',
+        practice: '🎯 Quantify your achievements with metrics, timelines, and measurable outcomes whenever possible.'
+      },
+      'problem_solving': {
+        tip: '🧩 Break down your approach step-by-step. Explain your thought process and reasoning clearly.',
+        practice: '🔍 Consider multiple solutions, explain trade-offs, and mention how you would validate your approach.'
+      },
+      'tools': {
+        tip: '🛠️ Be specific about which tools you\'ve used, for how long, and in what contexts (personal, professional, team).',
+        practice: '⚙️ Mention integrations, configurations, and how these tools improved your workflow or project outcomes.'
+      },
+      'methodology': {
+        tip: '📋 Explain the methodologies you prefer and why. Give examples of how you\'ve applied them in real projects.',
+        practice: '🔄 Discuss adaptability - how you adjust methodologies based on team size, project requirements, or constraints.'
+      },
+      'teamwork': {
+        tip: '👥 Share specific examples of collaboration, communication strategies, and conflict resolution.',
+        practice: '🤝 Highlight leadership moments, mentoring experiences, and how you contribute to team culture.'
+      },
+      'challenge': {
+        tip: '⛰️ Describe the challenge clearly, your approach to solving it, and the lessons learned.',
+        practice: '💪 Focus on your problem-solving process, resilience, and how the experience made you a better professional.'
+      },
+      'best_practices': {
+        tip: '✅ Discuss coding standards, code review processes, testing strategies, and quality assurance methods.',
+        practice: '📊 Mention specific tools for code quality, monitoring, documentation, and how you ensure maintainability.'
+      }
+    };
+
+    const questionTypeKey = currentQ?.typeKey || currentQ?.tipo?.toLowerCase().replace(/\s+/g, '_') || '';
+    return tipsByType[questionTypeKey] || {
+      tip: '💡 Be specific and provide concrete examples when possible. The AI evaluates clarity, technical accuracy, relevance, and communication skills.',
+      practice: '⭐ Structure your answers clearly, explain your reasoning, and don\'t hesitate to mention alternative approaches or trade-offs.'
+    };
+  };
+
+  const currentQuestionTips = getQuestionTypeTips();
 
   return (
     <Layout className="main-layout min-h-screen">
@@ -773,7 +1041,7 @@ const Interview: React.FC = () => {
               <Row justify="space-between" align="middle" className="mb-6">
                 <Col>
                   <Title level={4} className="mb-0">
-                    Question {currentQuestion + 1} of {questions.length}
+                    Question {questions.length > 0 ? currentQuestion + 1 : 0} of {questions.length}
                   </Title>
                   <Paragraph className="text-gray-600 dark:text-gray-400 mb-0">
                     {postulacion?.convocatoria?.titulo} - {postulacion?.convocatoria?.empresa?.nombre}
@@ -781,10 +1049,15 @@ const Interview: React.FC = () => {
                 </Col>
                 <Col>
                   <Space size="middle">
-                    <Tag color="blue" className="px-3 py-1">
+                    <Tag color="blue" className="px-3 py-1 text-sm font-medium">
                       {currentQ?.tipo || "Technical"}
                     </Tag>
-                    <Tag color="orange" className="px-3 py-1">
+                    {currentQ?.score && (
+                      <Tag color="purple" className="px-3 py-1 text-sm font-medium">
+                        Score: {currentQ.score}
+                      </Tag>
+                    )}
+                    <Tag color="orange" className="px-3 py-1 text-sm font-medium">
                       Difficulty: {currentQ?.dificultad || 5}/10
                     </Tag>
                   </Space>
@@ -797,8 +1070,53 @@ const Interview: React.FC = () => {
                   "100%": "#8b5cf6",
                 }}
                 strokeWidth={8}
-                className="mb-0"
+                className="mb-4"
               />
+              
+              {/* Question Status Indicators */}
+              <div className="question-indicators">
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {questions.map((question, index) => {
+                    const isAnswered = question.respondida || (answers[index] && answers[index].trim().length > 0);
+                    const isCurrent = index === currentQuestion;
+                    
+                    return (
+                      <button
+                        key={question.id || index}
+                        onClick={() => handleGoToQuestion(index)}
+                        className={`
+                          w-8 h-8 rounded-full text-xs font-medium border-2 transition-all duration-200
+                          ${isCurrent 
+                            ? 'bg-blue-500 text-white border-blue-500 scale-110' 
+                            : isAnswered 
+                              ? 'bg-green-500 text-white border-green-500 hover:scale-105' 
+                              : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:border-blue-300 hover:scale-105'
+                          }
+                        `}
+                        title={`Question ${index + 1} - ${isAnswered ? 'Answered' : 'Not answered'} ${isCurrent ? '(Current)' : ''}`}
+                      >
+                        {index + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex justify-center mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-1">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span>Answered</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                      <span>Current</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <div className="w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                      <span>Pending</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </Card>
           </motion.div>
 
@@ -820,7 +1138,9 @@ const Interview: React.FC = () => {
                     <Title level={5} className="mb-3 text-indigo-800 dark:text-indigo-300">
                       mirAI asks:
                     </Title>
-                    <Paragraph className="text-lg mb-0 leading-relaxed">{currentQ?.pregunta}</Paragraph>
+                    <Paragraph className="text-lg mb-0 leading-relaxed">
+                      {currentQ?.pregunta || "Loading question..."}
+                    </Paragraph>
                   </div>
                   <div className="mt-3 flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                     <RobotOutlined className="text-indigo-500" />
@@ -863,32 +1183,63 @@ const Interview: React.FC = () => {
 
                 {/* Action Buttons */}
                 <div className="flex justify-between items-center pt-4">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    Question {currentQuestion + 1} of {questions.length}
+                  <div className="flex items-center space-x-4">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      Question {currentQuestion + 1} of {questions.length}
+                    </div>
+                    {currentQuestion > 0 && (
+                      <Button
+                        type="default"
+                        size="large"
+                        icon={<ArrowLeftOutlined />}
+                        onClick={handlePreviousQuestion}
+                        className="px-6 h-12"
+                      >
+                        Previous
+                      </Button>
+                    )}
                   </div>
-                  <Button
-                    type="primary"
-                    size="large"
-                    icon={
-                      isSubmitting ? (
-                        <LoadingOutlined />
-                      ) : currentQuestion === questions.length - 1 ? (
-                        <CheckCircleOutlined />
-                      ) : (
-                        <SendOutlined />
-                      )
-                    }
-                    onClick={handleNextQuestion}
-                    loading={isSubmitting}
-                    className="btn-gradient px-8 h-12 text-lg font-medium"
-                    disabled={!currentAnswer.trim()}
-                  >
-                    {isSubmitting
-                      ? "Analyzing Answer..."
-                      : currentQuestion === questions.length - 1
-                        ? "Complete Interview"
-                        : "Next Question"}
-                  </Button>
+                  <div className="flex items-center space-x-3">
+                    {currentQuestion < questions.length - 1 && (
+                      <Button
+                        type="default"
+                        size="large"
+                        onClick={() => {
+                          // Save current answer and move to next question without submitting
+                          const newAnswers = [...answers];
+                          newAnswers[currentQuestion] = currentAnswer;
+                          setAnswers(newAnswers);
+                          setCurrentQuestion(currentQuestion + 1);
+                        }}
+                        className="px-6 h-12"
+                      >
+                        Skip & Continue
+                      </Button>
+                    )}
+                    <Button
+                      type="primary"
+                      size="large"
+                      icon={
+                        isSubmitting ? (
+                          <LoadingOutlined />
+                        ) : currentQuestion === questions.length - 1 ? (
+                          <CheckCircleOutlined />
+                        ) : (
+                          <SendOutlined />
+                        )
+                      }
+                      onClick={handleNextQuestion}
+                      loading={isSubmitting}
+                      className="btn-gradient px-8 h-12 text-lg font-medium"
+                      disabled={!currentAnswer.trim()}
+                    >
+                      {isSubmitting
+                        ? "Analyzing Answer..."
+                        : currentQuestion === questions.length - 1
+                          ? "Complete Interview"
+                          : "Submit & Next"}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </Card>
@@ -906,12 +1257,11 @@ const Interview: React.FC = () => {
                   <div className="flex items-center space-x-3 mb-4">
                     <RobotOutlined className="text-indigo-600 text-xl" />
                     <Title level={5} className="mb-0 text-indigo-800 dark:text-indigo-300">
-                      mirAI Tips
+                      mirAI Tips for {currentQ?.tipo || 'this question'}
                     </Title>
                   </div>
                   <Paragraph className="text-indigo-700 dark:text-indigo-400 mb-0">
-                    💡 Be specific and provide concrete examples when possible. The AI evaluates clarity, technical
-                    accuracy, relevance, and communication skills.
+                    {currentQuestionTips.tip}
                   </Paragraph>
                 </Card>
               </Col>
@@ -924,8 +1274,7 @@ const Interview: React.FC = () => {
                     </Title>
                   </div>
                   <Paragraph className="text-green-700 dark:text-green-400 mb-0">
-                    ⭐ Structure your answers clearly, explain your reasoning, and don't hesitate to mention alternative
-                    approaches or trade-offs.
+                    {currentQuestionTips.practice}
                   </Paragraph>
                 </Card>
               </Col>

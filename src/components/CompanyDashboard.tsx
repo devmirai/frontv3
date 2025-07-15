@@ -172,16 +172,51 @@ const CompanyDashboard: React.FC = () => {
     try {
       setLoading(true);
 
-      console.log("� [CompanyDashboard] Loading data from backend");
+      console.log("📊 [CompanyDashboard] Loading data from backend");
 
-      // Load company job postings from backend
-      const convocatoriasResponse = await convocatoriaAPI.getByEmpresa(user.id);
-      const companyJobs = convocatoriasResponse.data || [];
-      setConvocatorias(companyJobs);
+      // Load company job postings from backend using v2 API
+      const convocatoriasResponse = await convocatoriaAPI.getByEmpresaV2(user.id);
+      console.log("API Response:", convocatoriasResponse.data);
+      
+      // Handle the new API v2 response structure
+      const responseData = convocatoriasResponse.data;
+      const companyJobs = Array.isArray(responseData?.data) ? responseData.data : [];
+      
+      // Transform the API response to match our interface
+      const transformedJobs = companyJobs.map((job: any) => ({
+        id: job.id,
+        titulo: job.jobTitle,
+        descripcion: job.jobDescription,
+        puesto: job.category,
+        categoria: job.category,
+        dificultad: job.dificultad?.toString(),
+        fechaPublicacion: job.publicationDate,
+        fechaCierre: job.closingDate,
+        activo: job.activo,
+        // V2 API fields
+        publicationDate: job.publicationDate,
+        closingDate: job.closingDate,
+        formattedSalaryRange: job.formattedSalaryRange,
+        isActive: job.isActive,
+        daysUntilClosing: job.daysUntilClosing,
+        status: job.status,
+        // Additional V2 fields
+        experienceLevel: job.experienceLevel,
+        workMode: job.workMode,
+        location: job.location,
+        technicalRequirements: job.technicalRequirements,
+        benefitsPerks: job.benefitsPerks,
+        empresa: {
+          id: job.empresaId,
+          nombre: job.empresaNombre
+        }
+      }));
+      
+      setConvocatorias(transformedJobs);
 
       // Load all applications for company job postings
       const allPostulaciones: Postulacion[] = [];
-      for (const convocatoria of companyJobs) {
+      for (const convocatoria of transformedJobs) {
         if (convocatoria.id) {
           try {
             const postulacionesResponse = await postulacionAPI.getByConvocatoria(convocatoria.id);
@@ -307,11 +342,6 @@ const CompanyDashboard: React.FC = () => {
           navigate(`/empresa/convocatoria/${record.id}/candidates`),
       },
       {
-        key: "edit",
-        label: "Edit",
-        icon: <EditOutlined />,
-      },
-      {
         key: "delete",
         label: "Delete",
         icon: <DeleteOutlined />,
@@ -352,26 +382,83 @@ const CompanyDashboard: React.FC = () => {
       title: "Job Posting",
       dataIndex: "titulo",
       key: "titulo",
+      width: 280,
       render: (text: string, record: Convocatoria) => (
         <div>
-          <div className="font-medium text-gray-800 dark:text-gray-200">
+          <div className="font-medium text-gray-800 dark:text-gray-200 mb-1">
             {text}
           </div>
           <div className="text-sm text-gray-500 dark:text-gray-400">
             {record.puesto}
           </div>
+          {record.formattedSalaryRange && (
+            <div className="text-xs text-green-600 dark:text-green-400 font-medium mt-1">
+              {record.formattedSalaryRange}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: "Category & Experience",
+      key: "categoryInfo",
+      width: 180,
+      render: (_: any, record: any) => (
+        <div>
+          <div className="text-sm font-medium text-gray-800 dark:text-gray-200">
+            {record.categoria}
+          </div>
+          {record.experienceLevel && (
+            <div className="text-xs text-blue-600 dark:text-blue-400">
+              {record.experienceLevel}
+            </div>
+          )}
+          {record.workMode && (
+            <div className="text-xs text-purple-600 dark:text-purple-400">
+              {record.workMode}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: "Location",
+      key: "location",
+      width: 150,
+      render: (_: any, record: any) => (
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          {record.location || "Not specified"}
         </div>
       ),
     },
     {
       title: "Status",
-      dataIndex: "activo",
-      key: "activo",
-      render: (activo: boolean) => getStatusTag(activo ? "ACTIVA" : "CERRADA"),
+      dataIndex: "status",
+      key: "status",
+      width: 140,
+      render: (status: string, record: any) => {
+        const isActive = record.isActive;
+        const daysLeft = record.daysUntilClosing;
+        
+        if (!isActive) {
+          return <Tag color="red">CLOSED</Tag>;
+        }
+        
+        if (daysLeft <= 3 && daysLeft > 0) {
+          return <Tag color="orange">CLOSING SOON ({daysLeft}d)</Tag>;
+        }
+        
+        if (daysLeft <= 0) {
+          return <Tag color="red">EXPIRED</Tag>;
+        }
+        
+        return <Tag color="green">ACTIVE ({daysLeft}d left)</Tag>;
+      },
     },
     {
       title: "Applications",
       key: "applications",
+      width: 120,
       render: (_: any, record: Convocatoria) => {
         const count = postulaciones.filter(
           (p) => p.convocatoria?.id === record.id,
@@ -379,29 +466,56 @@ const CompanyDashboard: React.FC = () => {
         const completed = postulaciones.filter(
           (p) => p.convocatoria?.id === record.id && p.estado === "COMPLETADA",
         ).length;
+        const pending = postulaciones.filter(
+          (p) => p.convocatoria?.id === record.id && p.estado === "PENDIENTE",
+        ).length;
         return (
           <div>
-            <span className="font-medium">{count}</span>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="font-medium text-lg">{count}</div>
+            <div className="text-xs text-green-600 dark:text-green-400">
               {completed} completed
+            </div>
+            <div className="text-xs text-orange-600 dark:text-orange-400">
+              {pending} pending
             </div>
           </div>
         );
       },
     },
     {
-      title: "End Date",
-      dataIndex: "fechaCierre",
-      key: "fechaCierre",
+      title: "Publication Date",
+      dataIndex: "publicationDate",
+      key: "publicationDate",
+      width: 130,
       render: (date: string) => (
-        <span className="text-gray-600 dark:text-gray-400">
+        <div className="text-sm text-gray-600 dark:text-gray-400">
           {dayjs(date).format("MMM DD, YYYY")}
-        </span>
+        </div>
+      ),
+    },
+    {
+      title: "End Date",
+      dataIndex: "closingDate",
+      key: "closingDate",
+      width: 130,
+      render: (date: string, record: any) => (
+        <div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            {dayjs(date).format("MMM DD, YYYY")}
+          </div>
+          {record.daysUntilClosing <= 7 && record.daysUntilClosing > 0 && (
+            <div className="text-xs text-orange-500 font-medium">
+              {record.daysUntilClosing} days left
+            </div>
+          )}
+        </div>
       ),
     },
     {
       title: "Actions",
       key: "actions",
+      width: 100,
+      fixed: 'right' as const,
       render: (_: any, record: Convocatoria) => (
         <Dropdown menu={actionMenu(record)} trigger={["click"]}>
           <Button type="text" icon={<MoreOutlined />} />
@@ -725,9 +839,15 @@ const CompanyDashboard: React.FC = () => {
                   columns={convocatoriaColumns}
                   dataSource={convocatorias}
                   loading={loading}
-                  pagination={false}
+                  pagination={{
+                    pageSize: 10,
+                    showSizeChanger: true,
+                    showQuickJumper: true,
+                    showTotal: (total, range) =>
+                      `${range[0]}-${range[1]} of ${total} items`,
+                  }}
                   className="enhanced-table"
-                  scroll={{ x: 800 }}
+                  scroll={{ x: 1200, y: 400 }}
                   rowKey="id"
                   size="middle"
                 />
@@ -1106,89 +1226,156 @@ const CompanyDashboard: React.FC = () => {
           {/* Jobs Grid */}
           <div className="jobs-grid">
             {convocatorias.length > 0 ? (
-              convocatorias.map((job) => (
+              convocatorias.map((job: any) => (
                 <div key={job.id} className="job-card">
                   <div className="job-card-header">
                     <div className="job-title-section">
                       <Title level={4} className="job-title">
                         {job.titulo}
                       </Title>
-                      <Tag
-                        color={job.activo ? "green" : "orange"}
-                        className="job-status-tag"
-                      >
-                        {job.activo ? "Active" : "Inactive"}
-                      </Tag>
+                      <div className="job-category-info">
+                        <Tag color="blue" className="category-tag">
+                          {job.categoria}
+                        </Tag>
+                        {job.experienceLevel && (
+                          <Tag color="purple" className="experience-tag">
+                            {job.experienceLevel}
+                          </Tag>
+                        )}
+                        {job.workMode && (
+                          <Tag color="cyan" className="workmode-tag">
+                            {job.workMode}
+                          </Tag>
+                        )}
+                      </div>
+                      {job.formattedSalaryRange && (
+                        <div className="salary-range">
+                          💰 {job.formattedSalaryRange}
+                        </div>
+                      )}
+                      {job.location && (
+                        <div className="job-location">
+                          📍 {job.location}
+                        </div>
+                      )}
                     </div>
-                    <Dropdown
-                      menu={{
-                        items: [
-                          {
-                            key: "view",
-                            label: "View Details",
-                            icon: <EyeOutlined />,
-                            onClick: () =>
-                              navigate(`/empresa/convocatoria/${job.id}`),
-                          },
-                          {
-                            key: "candidates",
-                            label: "View Candidates",
-                            icon: <TeamOutlined />,
-                            onClick: () =>
-                              navigate(
-                                `/empresa/convocatoria/${job.id}/candidates`,
-                              ),
-                          },
-                          {
-                            key: "edit",
-                            label: "Edit Job",
-                            icon: <EditOutlined />,
-                          },
-                          {
-                            key: "divider",
-                            type: "divider",
-                          },
-                          {
-                            key: "delete",
-                            label: "Delete Job",
-                            icon: <DeleteOutlined />,
-                            danger: true,
-                          },
-                        ],
-                      }}
-                      trigger={["click"]}
-                    >
-                      <Button
-                        type="text"
-                        icon={<MoreOutlined />}
-                        className="job-actions-button"
-                      />
-                    </Dropdown>
+                    <div className="job-status-section">
+                      {(() => {
+                        const isActive = job.isActive;
+                        const daysLeft = job.daysUntilClosing;
+                        
+                        if (!isActive) {
+                          return <Tag color="red" className="job-status-tag">CLOSED</Tag>;
+                        }
+                        
+                        if (daysLeft !== undefined && daysLeft <= 3 && daysLeft > 0) {
+                          return <Tag color="orange" className="job-status-tag">CLOSING SOON ({daysLeft}d)</Tag>;
+                        }
+                        
+                        if (daysLeft !== undefined && daysLeft <= 0) {
+                          return <Tag color="red" className="job-status-tag">EXPIRED</Tag>;
+                        }
+                        
+                        return <Tag color="green" className="job-status-tag">ACTIVE {daysLeft !== undefined ? `(${daysLeft}d left)` : ''}</Tag>;
+                      })()}
+                      <Dropdown
+                        menu={{
+                          items: [
+                            {
+                              key: "view",
+                              label: "View Details",
+                              icon: <EyeOutlined />,
+                              onClick: () =>
+                                navigate(`/empresa/convocatoria/${job.id}`),
+                            },
+                            {
+                              key: "candidates",
+                              label: "View Candidates",
+                              icon: <TeamOutlined />,
+                              onClick: () =>
+                                navigate(
+                                  `/empresa/convocatoria/${job.id}/candidates`,
+                                ),
+                            },
+                            {
+                              key: "divider",
+                              type: "divider",
+                            },
+                            {
+                              key: "delete",
+                              label: "Delete Job",
+                              icon: <DeleteOutlined />,
+                              danger: true,
+                            },
+                          ],
+                        }}
+                        trigger={["click"]}
+                      >
+                        <Button
+                          type="text"
+                          icon={<MoreOutlined />}
+                          className="job-actions-button"
+                        />
+                      </Dropdown>
+                    </div>
                   </div>
 
                   <div className="job-description">
                     <Text type="secondary" className="job-desc-text">
-                      {job.descripcion?.substring(0, 150)}...
+                      {job.descripcion?.substring(0, 180)}...
                     </Text>
                   </div>
 
+                  {/* Enhanced Technical Requirements and Benefits */}
+                  {(job.technicalRequirements || job.benefitsPerks) && (
+                    <div className="job-additional-info">
+                      {job.technicalRequirements && (
+                        <div className="tech-requirements">
+                          <Text strong className="info-label">🔧 Tech Requirements:</Text>
+                          <Text className="info-text">
+                            {job.technicalRequirements.substring(0, 100)}...
+                          </Text>
+                        </div>
+                      )}
+                      {job.benefitsPerks && (
+                        <div className="benefits-perks">
+                          <Text strong className="info-label">✨ Benefits:</Text>
+                          <Text className="info-text">
+                            {job.benefitsPerks.substring(0, 100)}...
+                          </Text>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div className="job-meta">
-                    <div className="meta-item">
-                      <CalendarOutlined className="meta-icon" />
-                      <span>
-                        Posted:{" "}
-                        {dayjs(job.fechaPublicacion).format("MMM DD, YYYY")}
-                      </span>
+                    <div className="meta-row">
+                      <div className="meta-item">
+                        <CalendarOutlined className="meta-icon" />
+                        <span>
+                          Published: {dayjs(job.publicationDate).format("MMM DD, YYYY")}
+                        </span>
+                      </div>
+                      <div className="meta-item">
+                        <ClockCircleOutlined className="meta-icon" />
+                        <span>
+                          Closes: {dayjs(job.closingDate).format("MMM DD, YYYY")}
+                          {job.daysUntilClosing !== undefined && job.daysUntilClosing <= 7 && job.daysUntilClosing > 0 && (
+                            <span className="urgent-text"> ({job.daysUntilClosing} days left)</span>
+                          )}
+                        </span>
+                      </div>
                     </div>
-                    <div className="meta-item">
-                      <ClockCircleOutlined className="meta-icon" />
-                      <span>
-                        Closes: {dayjs(job.fechaCierre).format("MMM DD, YYYY")}
-                      </span>
-                    </div>
-                    <div className="meta-item">
-                      <StarOutlined className="meta-icon" />
-                      <span>Difficulty: {job.dificultad}/10</span>
+                    <div className="meta-row">
+                      <div className="meta-item">
+                        <StarOutlined className="meta-icon" />
+                        <span>Difficulty: {job.dificultad}/10</span>
+                      </div>
+                      {job.puesto && (
+                        <div className="meta-item">
+                          <span>Position: {job.puesto}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -1201,7 +1388,17 @@ const CompanyDashboard: React.FC = () => {
                           ).length
                         }
                       </div>
-                      <div className="stat-label">Applications</div>
+                      <div className="stat-label">Total Applications</div>
+                    </div>
+                    <div className="stat-item">
+                      <div className="stat-number">
+                        {
+                          postulaciones.filter(
+                            (p) => p.convocatoriaId === job.id && p.estado === "PENDIENTE",
+                          ).length
+                        }
+                      </div>
+                      <div className="stat-label">Pending</div>
                     </div>
                     <div className="stat-item">
                       <div className="stat-number">
@@ -1237,7 +1434,7 @@ const CompanyDashboard: React.FC = () => {
                         navigate(`/empresa/convocatoria/${job.id}`)
                       }
                     >
-                      View
+                      View Details
                     </Button>
                     <Button
                       size="small"
@@ -1247,7 +1444,7 @@ const CompanyDashboard: React.FC = () => {
                         navigate(`/empresa/convocatoria/${job.id}/candidates`)
                       }
                     >
-                      Candidates
+                      View Candidates
                     </Button>
                   </div>
                 </div>

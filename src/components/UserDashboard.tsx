@@ -54,7 +54,7 @@ import {
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { convocatoriaAPI, postulacionAPI } from "../services/api";
+import { convocatoriaAPI, postulacionAPI, preguntaAPI } from "../services/api";
 import type { Convocatoria, Postulacion } from "../types/api";
 import { EstadoPostulacion } from "../types/api";
 import ThemeToggle from "./ThemeToggle";
@@ -86,6 +86,11 @@ const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
+  // Early return if user is not loaded yet
+  if (!user) {
+    return <div>Loading...</div>;
+  }
+
   const menuItems = [
     {
       key: "dashboard",
@@ -95,12 +100,12 @@ const UserDashboard: React.FC = () => {
     },
     {
       key: "divider-1",
-      type: "divider",
+      type: "divider" as const,
     },
     {
       key: "job-search",
       label: "Job Search",
-      type: "group",
+      type: "group" as const,
       children: [
         {
           key: "applications",
@@ -126,12 +131,12 @@ const UserDashboard: React.FC = () => {
     },
     {
       key: "divider-2",
-      type: "divider",
+      type: "divider" as const,
     },
     {
       key: "career",
       label: "Career",
-      type: "group",
+      type: "group" as const,
       children: [
         {
           key: "interviews",
@@ -149,12 +154,12 @@ const UserDashboard: React.FC = () => {
     },
     {
       key: "divider-3",
-      type: "divider",
+      type: "divider" as const,
     },
     {
       key: "account",
       label: "Account",
-      type: "group",
+      type: "group" as const,
       children: [
         {
           key: "profile",
@@ -199,21 +204,94 @@ const UserDashboard: React.FC = () => {
     try {
       setLoading(true);
 
-      console.log("📊 Loading dashboard data from backend...");
+      console.log("📊 [UserDashboard] Loading dashboard data from backend v2 API...");
 
-      // Load active job postings from backend
-      const convocatoriasResponse = await convocatoriaAPI.getActivas();
-      const activeJobs = convocatoriasResponse.data || [];
-      setAvailableJobs(activeJobs);
+      // Load active job postings from backend using v2 API
+      const convocatoriasResponse = await convocatoriaAPI.getActivasV2();
+      console.log("V2 API Response:", convocatoriasResponse.data);
+      
+      // Handle the new API v2 response structure
+      const convocatoriasData = convocatoriasResponse.data;
+      const activeJobsData = Array.isArray(convocatoriasData?.data) ? convocatoriasData.data : [];
+      
+      // Transform the API response to match our interface
+      const transformedJobs = activeJobsData.map((job: any) => ({
+        id: job.id,
+        titulo: job.jobTitle,
+        descripcion: job.jobDescription,
+        puesto: job.category,
+        categoria: job.category,
+        dificultad: job.dificultad?.toString(),
+        fechaPublicacion: job.publicationDate,
+        fechaCierre: job.closingDate,
+        activo: job.activo,
+        // V2 API fields
+        publicationDate: job.publicationDate,
+        closingDate: job.closingDate,
+        formattedSalaryRange: job.formattedSalaryRange,
+        isActive: job.active,
+        daysUntilClosing: job.daysUntilClosing,
+        status: job.status,
+        // Additional V2 fields
+        experienceLevel: job.experienceLevel,
+        workMode: job.workMode,
+        location: job.location,
+        technicalRequirements: job.technicalRequirements,
+        benefitsPerks: job.benefitsPerks,
+        salaryMin: job.salaryMin,
+        salaryMax: job.salaryMax,
+        salaryCurrency: job.salaryCurrency,
+        empresa: {
+          id: job.empresaId,
+          nombre: job.empresaNombre
+        }
+      }));
+      
+      setAvailableJobs(transformedJobs);
 
-      // Load user's applications from backend
-      const postulacionesResponse = await postulacionAPI.getByUsuario(user.id);
-      const userApplications = postulacionesResponse.data || [];
-      setMyApplications(userApplications);
+      // Load user's applications from backend using JWT-based endpoint
+      const postulacionesResponse = await postulacionAPI.getMisPostulaciones();
+      console.log("📊 [UserDashboard] Raw postulaciones response:", postulacionesResponse.data);
+      
+      // Handle the new API response structure
+      const postulacionesData = postulacionesResponse.data;
+      const userApplicationsData = Array.isArray(postulacionesData?.data) ? postulacionesData.data : [];
+      
+      // Transform the API response to match our Postulacion interface
+      const transformedApplications = userApplicationsData.map((app: any) => ({
+        id: app.id,
+        fechaPostulacion: app.fechaPostulacion || new Date().toISOString().split('T')[0], // Use current date if not provided
+        estado: app.estado,
+        preguntasGeneradas: app.preguntasGeneradas,
+        entrevistaSessionId: app.entrevistaSessionId,
+        usuario: app.usuario,
+        convocatoria: {
+          id: app.convocatoria.id,
+          titulo: app.convocatoria.jobTitle,
+          descripcion: app.convocatoria.jobDescription || '',
+          puesto: app.convocatoria.category,
+          categoria: app.convocatoria.category,
+          fechaCierre: app.convocatoria.closingDate,
+          activo: app.convocatoria.activo,
+          // Additional v2 fields from the new API
+          salaryRange: app.convocatoria.salaryRange,
+          experienceLevel: app.convocatoria.experienceLevel,
+          workMode: app.convocatoria.workMode,
+          location: app.convocatoria.location,
+          empresa: {
+            id: app.convocatoria.empresaId,
+            nombre: app.convocatoria.empresaNombre
+          }
+        }
+      }));
+      
+      setMyApplications(transformedApplications);
 
       console.log(
-        `📊 Backend data loaded: ${activeJobs.length} active jobs, ${userApplications.length} applications`,
+        `📊 [UserDashboard] Backend data loaded: ${transformedJobs.length} active jobs, ${transformedApplications.length} applications`,
+        transformedApplications
       );
+
     } catch (error: any) {
       console.error("Error loading dashboard data:", error);
       message.error("Error loading dashboard data. Please check your connection and try again.");
@@ -306,27 +384,129 @@ const UserDashboard: React.FC = () => {
     ],
   };
 
-  // Interview start function - uses backend API to start interview
+  // Combined function for Steps 2-3: Create postulation and start interview immediately
+  const handleApplyAndStartInterview = async (job: any) => {
+    if (!user?.id) {
+      message.error('User information not available');
+      return;
+    }
+
+    try {
+      console.log('🎯 [UserDashboard] Step 1: Creating postulation for job:', job.id);
+      
+      if (!job.id) {
+        throw new Error("Job ID is missing");
+      }
+
+      // Step 1: Create postulation first
+      const postulacionData = {
+        usuario: {
+          id: user.id
+        },
+        convocatoria: {
+          id: job.id
+        }
+      };
+
+      const postulacionResponse = await postulacionAPI.create(postulacionData);
+      const postulacion = postulacionResponse.data;
+      const postulacionId = postulacion.data.id; // Extract ID from nested data object
+      
+      console.log('✅ [UserDashboard] Step 1: Postulation created:', postulacionId);
+      
+      // Step 2: Start interview with the postulation ID
+      console.log('🎯 [UserDashboard] Step 2: Starting interview with postulation:', postulacionId);
+      const interviewResponse = await postulacionAPI.iniciarEntrevista(postulacionId);
+      const { sessionId } = interviewResponse.data;
+      
+      console.log('✅ [UserDashboard] Step 2: Interview started:', sessionId);
+      message.success("Application submitted and interview started! Redirecting...");
+
+      // Reload dashboard data to show the new application
+      await loadDashboardData();
+
+      // Navigate to the interview with the postulation ID
+      navigate(`/usuario/interview/${postulacionId}?session=${sessionId}`);
+      
+    } catch (error: any) {
+      console.error("❌ [UserDashboard] Error in application process:", error);
+      
+      if (error.response?.status === 409) {
+        message.error("You have already applied to this position.");
+      } else if (error.response?.status === 400) {
+        message.error("Invalid application data. Please try again.");
+      } else {
+        message.error("Failed to submit application. Please try again.");
+      }
+    }
+  }
+
+  // Interview start function - uses backend API to start interview (Step 3)
   const handleStartInterview = async (postulacionId: number) => {
     try {
       setStartingInterview(postulacionId);
 
-      console.log('� [UserDashboard] Starting interview via backend API');
+      console.log('🎯 [UserDashboard] Step 3: Starting interview via backend API');
       
-      // Start interview using backend API
-      await postulacionAPI.iniciarEntrevista(postulacionId);
+      // Step 3: Start interview using backend API and get session_id
+      const response = await postulacionAPI.iniciarEntrevista(postulacionId);
+      const sessionId = response.data?.sessionId || response.data?.session_id;
       
-      console.log(`� [UserDashboard] Interview started successfully: ${postulacionId}`);
+      console.log(`✅ [UserDashboard] Interview started successfully: ${postulacionId}, Session: ${sessionId}`);
       message.success("Interview started successfully!");
       
       // Reload data to update the state
       await loadDashboardData();
       
-      // Navigate to the interview
-      navigate(`/usuario/interview/${postulacionId}`);
+      // Navigate to the interview with session info
+      if (sessionId) {
+        navigate(`/usuario/interview/${postulacionId}?session=${sessionId}`);
+      } else {
+        navigate(`/usuario/interview/${postulacionId}`);
+      }
     } catch (error: any) {
       console.error("Error starting interview:", error);
       message.error("Failed to start interview. Please try again.");
+    } finally {
+      setStartingInterview(null);
+    }
+  };
+
+  // Continue Interview function - generates questions again for existing interviews (Step 4)
+  const handleContinueInterview = async (postulacionId: number) => {
+    try {
+      setStartingInterview(postulacionId);
+
+      console.log('🎯 [UserDashboard] Step 4: Continuing interview and generating questions for postulation:', postulacionId);
+      console.log('🔍 [UserDashboard] DEBUG: preguntaAPI object:', preguntaAPI);
+      console.log('🔍 [UserDashboard] DEBUG: preguntaAPI.generar function:', preguntaAPI.generar);
+      
+      message.loading("Generating your interview questions...", 0);
+      
+      // Generate questions for the existing postulation using the API
+      console.log('🔍 [UserDashboard] DEBUG: About to call preguntaAPI.generar with:', { idPostulacion: postulacionId });
+      const questionsResponse = await preguntaAPI.generar({ idPostulacion: postulacionId });
+      console.log('✅ [UserDashboard] Questions generated for continue interview:', questionsResponse.data);
+      
+      message.destroy();
+      message.success("Questions ready! Redirecting to interview...");
+      
+      // Reload data to update the state
+      await loadDashboardData();
+      
+      // Navigate to the interview - now with questions pre-generated
+      navigate(`/usuario/interview/${postulacionId}`);
+      
+    } catch (error: any) {
+      console.error("❌ [UserDashboard] Error continuing interview:", error);
+      console.error("❌ [UserDashboard] Error details:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        stack: error.stack
+      });
+      message.destroy();
+      message.error("Failed to generate interview questions. Please try again.");
     } finally {
       setStartingInterview(null);
     }
@@ -425,9 +605,19 @@ const UserDashboard: React.FC = () => {
             <Button
               type="primary"
               size="small"
-              icon={<PlayCircleOutlined />}
+              icon={
+                startingInterview === record.id ? (
+                  <LoadingOutlined />
+                ) : (
+                  <PlayCircleOutlined />
+                )
+              }
               className="btn-gradient"
-              onClick={() => navigate(`/usuario/interview/${record.id}`)}
+              loading={startingInterview === record.id}
+              onClick={() => {
+                console.log('🖱️ [UserDashboard] Continue button clicked for record:', record.id);
+                handleContinueInterview(record.id!);
+              }}
             >
               Continue
             </Button>
@@ -502,55 +692,57 @@ const UserDashboard: React.FC = () => {
     },
   ];
 
-  // Apply to Job function - creates application using backend API
+  // Apply to Job function - creates postulation first, then starts interview
   const handleApplyToJob = async () => {
     if (!selectedJob || !user?.id) return;
 
     setApplying(true);
     try {
-      // Check if user already applied to prevent duplicates
-      const existingApplication = myApplications.find(
-        (app) => app.convocatoria?.id === selectedJob.id,
-      );
-      if (existingApplication) {
-        message.warning("You have already applied to this position.");
-        setApplyModalVisible(false);
-        setSelectedJob(null);
-        setApplying(false);
-        return;
-      }
-
       message.loading("Creating your application...", 0);
 
-      console.log('📊 [UserDashboard] Creating application via backend API');
+      console.log('📊 [UserDashboard] Step 1: Creating postulation for job:', selectedJob.id);
       
-      // Create application using backend API
-      const applicationData = {
-        usuarioId: user.id,
-        convocatoriaId: selectedJob.id,
-        fechaPostulacion: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
-        estado: "PENDIENTE"
+      if (!selectedJob.id) {
+        throw new Error("Job ID is missing");
+      }
+
+      // Step 1: Create postulation first
+      const postulacionData = {
+        usuario: {
+          id: user.id
+        },
+        convocatoria: {
+          id: selectedJob.id
+        }
       };
 
-      const response = await postulacionAPI.create(applicationData);
-      const newApplication = response.data;
+      const postulacionResponse = await postulacionAPI.create(postulacionData);
+      const postulacion = postulacionResponse.data;
+      const postulacionId = postulacion.data.id; // Extract ID from nested data object
+
+      console.log('✅ [UserDashboard] Step 1: Postulation created:', postulacionId);
+      
+      message.destroy();
+      message.loading("Starting your interview...", 0);
+
+      // Step 2: Start interview with the postulation ID
+      console.log('📊 [UserDashboard] Step 2: Starting interview with postulation:', postulacionId);
+      const interviewResponse = await postulacionAPI.iniciarEntrevista(postulacionId);
+      const { sessionId } = interviewResponse.data;
 
       message.destroy();
-      message.success("Application submitted successfully!");
+      message.success("Application submitted and interview started!");
 
-      // Close modal and refresh data
+      // Close modal and navigate to interview
       setApplyModalVisible(false);
       setSelectedJob(null);
+
+      // Reload dashboard data to show the new application
       await loadDashboardData();
 
-      // Ask if user wants to start interview immediately
-      Modal.confirm({
-        title: "Start Interview Now?",
-        content: "Would you like to start your interview immediately?",
-        okText: "Start Interview",
-        cancelText: "Later",
-        onOk: () => handleStartInterview(newApplication.id),
-      });
+      // Navigate to interview with postulation ID and session ID
+      navigate(`/usuario/interview/${postulacionId}?session=${sessionId}`);
+      
     } catch (error: any) {
       console.error("Error in application process:", error);
       message.destroy();
@@ -562,7 +754,7 @@ const UserDashboard: React.FC = () => {
       } else {
         message.error(
           error.response?.data?.message ||
-            "Error processing your application. Please try again.",
+            "Error submitting application. Please try again.",
         );
       }
     } finally {
@@ -835,11 +1027,15 @@ const UserDashboard: React.FC = () => {
                         ).length === 0
                       }
                       onClick={() => {
+                        console.log('🖱️ [UserDashboard] Main Continue Interview button clicked');
                         const inProgressApp = myApplications.find(
                           (a) => a.estado === EstadoPostulacion.EN_EVALUACION,
                         );
-                        if (inProgressApp) {
-                          navigate(`/usuario/interview/${inProgressApp.id}`);
+                        console.log('🔍 [UserDashboard] Found in progress app:', inProgressApp);
+                        if (inProgressApp && inProgressApp.id) {
+                          handleContinueInterview(inProgressApp.id);
+                        } else {
+                          console.warn('⚠️ [UserDashboard] No in progress app found or missing ID');
                         }
                       }}
                     >
@@ -956,7 +1152,7 @@ const UserDashboard: React.FC = () => {
             >
               {availableJobs.length > 0 ? (
                 <Row gutter={[24, 24]}>
-                  {availableJobs.slice(0, 4).map((job) => {
+                  {availableJobs.slice(0, 4).map((job: any) => {
                     const alreadyApplied = myApplications.some(
                       (app) => app.convocatoria?.id === job.id,
                     );
@@ -979,11 +1175,39 @@ const UserDashboard: React.FC = () => {
                                     <Text className="job-company">
                                       {job.empresa?.nombre}
                                     </Text>
-                                    <Tag color="blue" className="job-position">
-                                      {job.puesto}
-                                    </Tag>
+                                    <div className="job-tags">
+                                      <Tag color="blue" className="job-position">
+                                        {job.puesto}
+                                      </Tag>
+                                      {job.experienceLevel && (
+                                        <Tag color="purple" className="experience-tag">
+                                          {job.experienceLevel}
+                                        </Tag>
+                                      )}
+                                      {job.workMode && (
+                                        <Tag color="cyan" className="workmode-tag">
+                                          {job.workMode}
+                                        </Tag>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
+                              </div>
+
+                              {/* Enhanced Information Display */}
+                              <div className="job-enhanced-info">
+                                {job.formattedSalaryRange && (
+                                  <div className="salary-info">
+                                    <Text className="salary-label">💰 Salary:</Text>
+                                    <Text className="salary-value">{job.formattedSalaryRange}</Text>
+                                  </div>
+                                )}
+                                {job.location && (
+                                  <div className="location-info">
+                                    <Text className="location-label">📍 Location:</Text>
+                                    <Text className="location-value">{job.location}</Text>
+                                  </div>
+                                )}
                               </div>
 
                               <div className="job-description-container">
@@ -997,14 +1221,44 @@ const UserDashboard: React.FC = () => {
                                 </Text>
                               </div>
 
-                              <div className="job-footer">
-                                <Space>
-                                  <ClockCircleOutlined className="job-icon" />
-                                  <Text className="job-date">
-                                    Ends{" "}
-                                    {dayjs(job.fechaCierre).format("MMM DD")}
+                              {/* Technical Requirements Preview */}
+                              {job.technicalRequirements && (
+                                <div className="tech-requirements-preview">
+                                  <Text strong className="tech-label">🔧 Requirements:</Text>
+                                  <Text className="tech-text">
+                                    {job.technicalRequirements.length > 80
+                                      ? `${job.technicalRequirements.substring(0, 80)}...`
+                                      : job.technicalRequirements}
                                   </Text>
-                                </Space>
+                                </div>
+                              )}
+
+                              {/* Benefits Preview */}
+                              {job.benefitsPerks && (
+                                <div className="benefits-preview">
+                                  <Text strong className="benefits-label">✨ Benefits:</Text>
+                                  <Text className="benefits-text">
+                                    {job.benefitsPerks.length > 80
+                                      ? `${job.benefitsPerks.substring(0, 80)}...`
+                                      : job.benefitsPerks}
+                                  </Text>
+                                </div>
+                              )}
+
+                              <div className="job-footer">
+                                <div className="job-footer-info">
+                                  <Space>
+                                    <ClockCircleOutlined className="job-icon" />
+                                    <Text className="job-date">
+                                      Closes {dayjs(job.fechaCierre).format("MMM DD")}
+                                    </Text>
+                                  </Space>
+                                  {job.daysUntilClosing !== undefined && job.daysUntilClosing <= 7 && (
+                                    <Text className="urgency-indicator">
+                                      ⚡ {job.daysUntilClosing} days left!
+                                    </Text>
+                                  )}
+                                </div>
                                 <Button
                                   type="primary"
                                   size="small"
@@ -1135,10 +1389,10 @@ const UserDashboard: React.FC = () => {
                 </div>
                 <div className="header-text">
                   <Title level={3} className="header-title">
-                    Apply for Position
+                    Start Interview
                   </Title>
                   <Text className="header-subtitle">
-                    Complete your application in just a few clicks
+                    Begin your AI-powered interview process
                   </Text>
                 </div>
               </div>
@@ -1189,15 +1443,15 @@ const UserDashboard: React.FC = () => {
             {/* Process Timeline */}
             <div className="application-process">
               <Title level={5} className="process-title">
-                Application Process
+                Interview Process
               </Title>
               <div className="process-steps">
                 <div className="step">
                   <div className="step-number active">1</div>
                   <div className="step-content">
-                    <Text className="step-title">Submit Application</Text>
+                    <Text className="step-title">Start Interview</Text>
                     <Text className="step-description">
-                      Review and confirm your application
+                      Begin your AI-powered assessment
                     </Text>
                   </div>
                 </div>
@@ -1205,7 +1459,7 @@ const UserDashboard: React.FC = () => {
                 <div className="step">
                   <div className="step-number">2</div>
                   <div className="step-content">
-                    <Text className="step-title">AI Interview</Text>
+                    <Text className="step-title">Answer Questions</Text>
                     <Text className="step-description">
                       Complete personalized interview questions
                     </Text>
@@ -1274,16 +1528,16 @@ const UserDashboard: React.FC = () => {
                   className="apply-button"
                   loading={applying}
                   onClick={handleApplyToJob}
-                  icon={applying ? <LoadingOutlined /> : <SendOutlined />}
+                  icon={applying ? <LoadingOutlined /> : <RobotOutlined />}
                   disabled={applying}
                 >
                   {applying
-                    ? "Submitting Application..."
-                    : "Submit Application"}
+                    ? "Starting Interview..."
+                    : "Start Interview"}
                 </Button>
               </div>
               <Text className="footer-note">
-                By applying, you agree to our terms and conditions
+                By starting the interview, you agree to our terms and conditions
               </Text>
             </div>
           </div>
@@ -1594,10 +1848,15 @@ const UserDashboard: React.FC = () => {
                         <Button
                           type="primary"
                           className="action-button primary"
-                          icon={<PlayCircleOutlined />}
-                          onClick={() =>
-                            navigate(`/usuario/interview/${application.id}`)
+                          icon={
+                            startingInterview === application.id ? (
+                              <LoadingOutlined />
+                            ) : (
+                              <PlayCircleOutlined />
+                            )
                           }
+                          loading={startingInterview === application.id}
+                          onClick={() => handleContinueInterview(application.id!)}
                           block
                         >
                           Continue Interview
@@ -1714,8 +1973,9 @@ const UserDashboard: React.FC = () => {
               <div className="stat-item">
                 <div className="stat-number">
                   {
-                    new Set(availableJobs.map((job) => job.empresa?.nombre))
-                      .size
+                    Array.isArray(availableJobs) ? 
+                    new Set(availableJobs.map((job) => job.empresa?.nombre)).size :
+                    0
                   }
                 </div>
                 <div className="stat-label">Companies</div>
@@ -1755,7 +2015,7 @@ const UserDashboard: React.FC = () => {
                 allowClear
               >
                 {Array.from(
-                  new Set(availableJobs.map((job) => job.empresa?.nombre)),
+                  new Set(Array.isArray(availableJobs) ? availableJobs.map((job) => job.empresa?.nombre) : []),
                 ).map((company) => (
                   <Option key={company} value={company}>
                     {company}
@@ -1769,7 +2029,7 @@ const UserDashboard: React.FC = () => {
                 allowClear
               >
                 {Array.from(
-                  new Set(availableJobs.map((job) => job.puesto)),
+                  new Set(Array.isArray(availableJobs) ? availableJobs.map((job) => job.puesto) : []),
                 ).map((position) => (
                   <Option key={position} value={position}>
                     {position}
@@ -1781,12 +2041,12 @@ const UserDashboard: React.FC = () => {
 
           {/* Jobs Content */}
           <div className="jobs-body">
-            {availableJobs.length > 0 ? (
+            {Array.isArray(availableJobs) && availableJobs.length > 0 ? (
               <div className="jobs-grid">
                 {availableJobs.map((job) => {
-                  const alreadyApplied = myApplications.some(
+                  const alreadyApplied = Array.isArray(myApplications) ? myApplications.some(
                     (app) => app.convocatoria?.id === job.id,
-                  );
+                  ) : false;
                   const daysLeft = dayjs(job.fechaCierre).diff(dayjs(), "day");
                   const urgency =
                     daysLeft <= 3
@@ -1902,11 +2162,11 @@ const UserDashboard: React.FC = () => {
                             <Button
                               type="primary"
                               className="apply-job-button"
-                              icon={<SendOutlined />}
-                              onClick={() => openApplyModal(job)}
+                              icon={<RobotOutlined />}
+                              onClick={() => handleApplyAndStartInterview(job)}
                               block
                             >
-                              Apply Now
+                              Start Interview
                             </Button>
                           )}
                         </div>
