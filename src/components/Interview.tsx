@@ -164,33 +164,51 @@ const Interview: React.FC = () => {
       console.log('📝 [Interview] Job data from postulation:', jobData);
       setJob(jobData);
 
-      // Always check if we have questions already generated (regardless of sessionId)
+      // Always try to get the latest question state using preguntaAPI.generar() 
+      // which includes estadoRespuestas data
+      console.log('📝 [Interview] Attempting to get latest question state with estadoRespuestas');
       try {
-        const questionsResponse = await preguntaAPI.getByPostulacion(postulacionId);
+        const questionsResponse = await preguntaAPI.generar({ idPostulacion: postulacionId });
         const questionsData = questionsResponse.data;
-        console.log('📝 [Interview] Questions loaded for postulation:', postulacionId, questionsData);
+        console.log('📝 [Interview] Latest question state loaded:', questionsData);
         
-        if (questionsData && questionsData.length > 0) {
-          // Map the API response to match our Pregunta interface
-          const mappedQuestions: Pregunta[] = questionsData.map((q: any) => ({
-            id: q.id,
-            pregunta: q.textoPregunta, // Map textoPregunta to pregunta
-            tipo: q.tipoLegible || q.tipo, // Use readable type first, then fallback
-            dificultad: q.dificultad || "5",
-            categoria: q.tipoLegible || q.tipo,
-            postulacion: { id: postulacionId },
-            // Keep original fields for reference
-            numero: q.numero,
-            typeKey: q.tipo,
-            // Progress tracking fields from the API
-            respondida: q.respondida || false,
-            evaluada: q.evaluada || false,
-            respuesta: q.respuesta || null,
-            fechaRespuesta: q.fechaRespuesta || null,
-          }));
+        if (questionsData && questionsData.success && Array.isArray(questionsData.questions) && questionsData.questions.length > 0) {
+          // Sort questions by ID to maintain correct order  
+          const sortedQuestions = questionsData.questions.sort((a, b) => a.id - b.id);
           
-          // Pre-fill answers array with existing responses
-          const answersArray = mappedQuestions.map(q => q.respuesta || "");
+          // Map the API response using estadoRespuestas as source of truth
+          const mappedQuestions: Pregunta[] = sortedQuestions.map((q: any) => {
+            const questionId = q.id;
+            const isAnswered = questionsData.estadoRespuestas ? questionsData.estadoRespuestas[questionId.toString()] === true : false;
+            
+            console.log(`🔍 [Interview] Question ${questionId} answered status from estadoRespuestas:`, isAnswered);
+            
+            return {
+              id: questionId,
+              pregunta: q.question || q.textoPregunta, // Support both formats
+              tipo: q.typeReadable || q.tipoLegible || q.type || q.tipo || "Technical",
+              dificultad: q.score ? Math.ceil(q.score / 2).toString() : (q.dificultad || "5"),
+              categoria: q.typeReadable || q.tipoLegible || q.type || q.tipo || "Technical",
+              postulacion: { id: postulacionId },
+              // Keep original fields for reference
+              numero: q.numero,
+              typeKey: q.type || q.tipo,
+              score: q.score,
+              // Progress tracking fields - ONLY use estadoRespuestas as source of truth
+              respondida: isAnswered,
+              evaluada: q.evaluada || false,
+              respuesta: isAnswered ? (q.respuesta || "Respondida anteriormente") : null,
+              fechaRespuesta: q.fechaRespuesta || null,
+            };
+          });
+          
+          // Pre-fill answers array with existing responses or placeholder for answered questions
+          const answersArray = mappedQuestions.map(q => {
+            if (q.respondida) {
+              return q.respuesta || "Respondida anteriormente";
+            }
+            return "";
+          });
           
           // Find the first unanswered question to continue from
           const firstUnansweredIndex = mappedQuestions.findIndex(q => !q.respondida);
@@ -200,22 +218,30 @@ const Interview: React.FC = () => {
           setAnswers(answersArray);
           setCurrentQuestion(startingQuestion);
           setCurrentStep(6); // Ready to answer questions
-          setLoading(false); // Questions already exist, stop loading
-          console.log('✅ [Interview] Ready to start answering questions with mapped questions:', mappedQuestions.length);
+          setLoading(false); // Questions ready, stop loading
+          
+          console.log('✅ [Interview] Ready to start answering questions with estadoRespuestas data:', mappedQuestions.length);
           console.log('📝 [Interview] Continuing from question:', startingQuestion + 1, 'of', mappedQuestions.length);
-          console.log('📝 [Interview] Sample mapped question:', {
-            question: mappedQuestions[0]?.pregunta,
-            type: mappedQuestions[0]?.tipo,
-            originalText: questionsData[0]?.textoPregunta,
-            answered: mappedQuestions[0]?.respondida,
-            response: mappedQuestions[0]?.respuesta ? 'Has response' : 'No response'
+          console.log('� [Interview] estadoRespuestas from API:', questionsData.estadoRespuestas);
+          console.log('📊 [Interview] Progress summary:', {
+            totalQuestions: questionsData.totalPreguntas || mappedQuestions.length,
+            preguntasRespondidas: questionsData.preguntasRespondidas || mappedQuestions.filter(q => q.respondida).length,
+            preguntasPendientes: questionsData.preguntasPendientes || mappedQuestions.filter(q => !q.respondida).length,
+            progresoRespuestas: questionsData.progresoRespuestas || 0,
+            startingFrom: startingQuestion + 1,
+            allQuestionStates: mappedQuestions.map(q => ({
+              id: q.id,
+              respondida: q.respondida,
+              hasResponse: !!q.respuesta
+            }))
           });
-          return; // Exit early since we have questions
+          
+          return; // Exit early since we have questions with proper estadoRespuestas data
         } else {
-          console.log('📝 [Interview] No questions found, will generate new ones');
+          console.log('📝 [Interview] No questions found in generar response, will generate new ones');
         }
       } catch (error) {
-        console.log('📝 [Interview] Error loading questions, will generate new ones:', error);
+        console.log('📝 [Interview] Error loading questions via generar API, will generate new ones:', error);
       }
 
       // If sessionId is available, check other interview progress
@@ -270,27 +296,42 @@ const Interview: React.FC = () => {
       const questionsData = response.data;
       
       if (questionsData && questionsData.success && Array.isArray(questionsData.questions)) {
-        const generatedQuestions: Pregunta[] = questionsData.questions.map((q: any, index: number) => ({
-          id: q.id || index + 1,
-          pregunta: q.question, // Map "question" field to "pregunta"
-          tipo: q.typeReadable || q.type || "Technical", // Use readable type first, then fallback
-          dificultad: q.score ? Math.ceil(q.score / 2).toString() : "5", // Convert score to difficulty (1-10 scale)
-          categoria: q.typeReadable || q.type || "Technical", // Use readable category
-          postulacion: { id: targetPostulacionId }, // Set the postulation reference
-          // Additional fields from new API format
-          score: q.score,
-          typeKey: q.type, // Keep original type key for reference
-          // New progress tracking fields
-          respondida: q.respondida || false,
-          evaluada: q.evaluada || false,
-          respuesta: q.respuesta || null,
-          fechaRespuesta: q.fechaRespuesta || null,
-        }));
-
-        // Pre-fill answers array with existing responses
-        const answersArray = generatedQuestions.map(q => q.respuesta || "");
+        // Sort questions by ID to maintain correct order
+        const sortedQuestions = questionsData.questions.sort((a, b) => a.id - b.id);
         
-        // Find the first unanswered question to continue from
+        const generatedQuestions: Pregunta[] = sortedQuestions.map((q: any, index: number) => {
+          const questionId = q.id || index + 1;
+          const isAnswered = questionsData.estadoRespuestas ? questionsData.estadoRespuestas[questionId.toString()] === true : false;
+          
+          console.log(`🔍 [Interview] Question ${questionId} answered status from estadoRespuestas:`, isAnswered);
+          
+          return {
+            id: questionId,
+            pregunta: q.question, // Map "question" field to "pregunta"
+            tipo: q.typeReadable || q.type || "Technical", // Use readable type first, then fallback
+            dificultad: q.score ? Math.ceil(q.score / 2).toString() : "5", // Convert score to difficulty (1-10 scale)
+            categoria: q.typeReadable || q.type || "Technical", // Use readable category
+            postulacion: { id: targetPostulacionId }, // Set the postulation reference
+            // Additional fields from new API format
+            score: q.score,
+            typeKey: q.type, // Keep original type key for reference
+            // New progress tracking fields - ONLY use estadoRespuestas as source of truth
+            respondida: isAnswered,
+            evaluada: q.evaluada || false,
+            respuesta: isAnswered ? (q.respuesta || "Respondida anteriormente") : null,
+            fechaRespuesta: q.fechaRespuesta || null,
+          };
+        });
+
+        // Pre-fill answers array with existing responses or placeholder for answered questions
+        const answersArray = generatedQuestions.map(q => {
+          if (q.respondida) {
+            return q.respuesta || "Respondida anteriormente";
+          }
+          return "";
+        });
+        
+        // Find the first unanswered question to continue from (based on estadoRespuestas)
         const firstUnansweredIndex = generatedQuestions.findIndex(q => !q.respondida);
         const startingQuestion = firstUnansweredIndex >= 0 ? firstUnansweredIndex : 0;
 
@@ -301,18 +342,26 @@ const Interview: React.FC = () => {
         
         console.log('✅ [Interview] Questions generated successfully:', generatedQuestions.length);
         console.log('📝 [Interview] Continuing from question:', startingQuestion + 1, 'of', generatedQuestions.length);
-        console.log('📝 [Interview] Sample question:', {
+        console.log('� [Interview] estadoRespuestas from API:', questionsData.estadoRespuestas);
+        console.log('�📝 [Interview] Sample question mapping:', {
           question: generatedQuestions[0]?.pregunta,
           type: generatedQuestions[0]?.tipo,
           score: generatedQuestions[0]?.score,
           answered: generatedQuestions[0]?.respondida,
-          response: generatedQuestions[0]?.respuesta ? 'Has response' : 'No response'
+          response: generatedQuestions[0]?.respuesta ? 'Has response' : 'No response',
+          questionId: generatedQuestions[0]?.id,
+          estadoRespuesta: questionsData.estadoRespuestas && generatedQuestions[0]?.id ? questionsData.estadoRespuestas[generatedQuestions[0].id.toString()] : 'N/A'
         });
         console.log('📊 [Interview] Progress summary:', {
           totalQuestions: generatedQuestions.length,
           answeredQuestions: generatedQuestions.filter(q => q.respondida).length,
           startingFrom: startingQuestion + 1,
-          progressPercentage: questionsData.progresoRespuestas || 0
+          progressPercentage: questionsData.progresoRespuestas || 0,
+          allQuestionStates: generatedQuestions.map(q => ({
+            id: q.id,
+            respondida: q.respondida,
+            hasResponse: !!q.respuesta
+          }))
         });
         
         // Questions are ready, stop loading
@@ -438,31 +487,6 @@ const Interview: React.FC = () => {
       setCurrentStep(12);
     }
   }
-
-  // Navigation functions for moving between questions without submitting
-  const handlePreviousQuestion = () => {
-    if (currentQuestion > 0) {
-      // Save current answer before moving
-      const newAnswers = [...answers];
-      newAnswers[currentQuestion] = currentAnswer;
-      setAnswers(newAnswers);
-      
-      setCurrentQuestion(currentQuestion - 1);
-      console.log('📝 [Interview] Moved to previous question:', currentQuestion);
-    }
-  };
-
-  const handleGoToQuestion = (questionIndex: number) => {
-    if (questionIndex >= 0 && questionIndex < questions.length) {
-      // Save current answer before moving
-      const newAnswers = [...answers];
-      newAnswers[currentQuestion] = currentAnswer;
-      setAnswers(newAnswers);
-      
-      setCurrentQuestion(questionIndex);
-      console.log('📝 [Interview] Moved to question:', questionIndex + 1);
-    }
-  };
 
   if (loading) {
     return (
@@ -882,20 +906,12 @@ const Interview: React.FC = () => {
   }
 
   const currentQ = questions[currentQuestion]
-  
-  // Calculate progress based on actually answered questions
-  const answeredCount = questions.filter((q, index) => 
-    q.respondida || (answers[index] && answers[index].trim().length > 0)
-  ).length;
-  const progress = questions.length > 0 ? (answeredCount / questions.length) * 100 : 0;
 
   // Debug: Log current question state
   console.log('🔍 [Interview Debug] Current state:', {
     questionsLength: questions.length,
     currentQuestion: currentQuestion + 1,
     totalQuestions: questions.length,
-    answeredCount: answeredCount,
-    progressPercentage: Math.round(progress),
     currentQ: currentQ ? { 
       id: currentQ.id,
       pregunta: currentQ.pregunta?.substring(0, 50) + '...', 
@@ -1035,17 +1051,28 @@ const Interview: React.FC = () => {
       {/* Main Content */}
       <Content className="content-layout">
         <div className="interview-container">
-          {/* Progress Section */}
+          {/* Question Info Section */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <Card className="progress-container">
-              <Row justify="space-between" align="middle" className="mb-6">
+              <Row justify="space-between" align="middle" className="mb-0">
                 <Col>
                   <Title level={4} className="mb-0">
                     Question {questions.length > 0 ? currentQuestion + 1 : 0} of {questions.length}
+                    {currentQ?.respondida && (
+                      <Tag color="green" className="ml-2">
+                        <CheckCircleOutlined className="mr-1" />
+                        Answered
+                      </Tag>
+                    )}
                   </Title>
                   <Paragraph className="text-gray-600 dark:text-gray-400 mb-0">
                     {postulacion?.convocatoria?.titulo} - {postulacion?.convocatoria?.empresa?.nombre}
                   </Paragraph>
+                  <div className="mt-1">
+                    <Text className="text-sm text-gray-500 dark:text-gray-400">
+                      Progress: {questions.filter(q => q.respondida).length} answered, {questions.filter(q => !q.respondida).length} remaining
+                    </Text>
+                  </div>
                 </Col>
                 <Col>
                   <Space size="middle">
@@ -1063,60 +1090,6 @@ const Interview: React.FC = () => {
                   </Space>
                 </Col>
               </Row>
-              <Progress
-                percent={progress}
-                strokeColor={{
-                  "0%": "#6366f1",
-                  "100%": "#8b5cf6",
-                }}
-                strokeWidth={8}
-                className="mb-4"
-              />
-              
-              {/* Question Status Indicators */}
-              <div className="question-indicators">
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {questions.map((question, index) => {
-                    const isAnswered = question.respondida || (answers[index] && answers[index].trim().length > 0);
-                    const isCurrent = index === currentQuestion;
-                    
-                    return (
-                      <button
-                        key={question.id || index}
-                        onClick={() => handleGoToQuestion(index)}
-                        className={`
-                          w-8 h-8 rounded-full text-xs font-medium border-2 transition-all duration-200
-                          ${isCurrent 
-                            ? 'bg-blue-500 text-white border-blue-500 scale-110' 
-                            : isAnswered 
-                              ? 'bg-green-500 text-white border-green-500 hover:scale-105' 
-                              : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:border-blue-300 hover:scale-105'
-                          }
-                        `}
-                        title={`Question ${index + 1} - ${isAnswered ? 'Answered' : 'Not answered'} ${isCurrent ? '(Current)' : ''}`}
-                      >
-                        {index + 1}
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="flex justify-center mt-2 text-xs text-gray-500 dark:text-gray-400">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span>Answered</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                      <span>Current</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600"></div>
-                      <span>Pending</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </Card>
           </motion.div>
 
@@ -1128,6 +1101,21 @@ const Interview: React.FC = () => {
             transition={{ duration: 0.6 }}
           >
             <Card className="question-card">
+              {/* Show answered status if question is already answered */}
+              {currentQ?.respondida && (
+                <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircleOutlined className="text-green-600" />
+                    <span className="font-medium text-green-800 dark:text-green-300">
+                      Question Already Answered
+                    </span>
+                  </div>
+                  <Paragraph className="text-green-700 dark:text-green-400 mb-0 mt-2">
+                    You have already answered this question. You can review or modify your answer below.
+                  </Paragraph>
+                </div>
+              )}
+              
               {/* AI Assistant Header */}
               <div className="flex items-start space-x-4 mb-8">
                 <div className="mirabot-avatar flex-shrink-0">
@@ -1183,63 +1171,34 @@ const Interview: React.FC = () => {
 
                 {/* Action Buttons */}
                 <div className="flex justify-between items-center pt-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      Question {currentQuestion + 1} of {questions.length}
-                    </div>
-                    {currentQuestion > 0 && (
-                      <Button
-                        type="default"
-                        size="large"
-                        icon={<ArrowLeftOutlined />}
-                        onClick={handlePreviousQuestion}
-                        className="px-6 h-12"
-                      >
-                        Previous
-                      </Button>
-                    )}
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Question {currentQuestion + 1} of {questions.length}
                   </div>
-                  <div className="flex items-center space-x-3">
-                    {currentQuestion < questions.length - 1 && (
-                      <Button
-                        type="default"
-                        size="large"
-                        onClick={() => {
-                          // Save current answer and move to next question without submitting
-                          const newAnswers = [...answers];
-                          newAnswers[currentQuestion] = currentAnswer;
-                          setAnswers(newAnswers);
-                          setCurrentQuestion(currentQuestion + 1);
-                        }}
-                        className="px-6 h-12"
-                      >
-                        Skip & Continue
-                      </Button>
-                    )}
-                    <Button
-                      type="primary"
-                      size="large"
-                      icon={
-                        isSubmitting ? (
-                          <LoadingOutlined />
-                        ) : currentQuestion === questions.length - 1 ? (
-                          <CheckCircleOutlined />
-                        ) : (
-                          <SendOutlined />
-                        )
-                      }
-                      onClick={handleNextQuestion}
-                      loading={isSubmitting}
-                      className="btn-gradient px-8 h-12 text-lg font-medium"
-                      disabled={!currentAnswer.trim()}
-                    >
-                      {isSubmitting
-                        ? "Analyzing Answer..."
-                        : currentQuestion === questions.length - 1
-                          ? "Complete Interview"
+                  <Button
+                    type="primary"
+                    size="large"
+                    icon={
+                      isSubmitting ? (
+                        <LoadingOutlined />
+                      ) : currentQuestion === questions.length - 1 ? (
+                        <CheckCircleOutlined />
+                      ) : (
+                        <SendOutlined />
+                      )
+                    }
+                    onClick={handleNextQuestion}
+                    loading={isSubmitting}
+                    className="btn-gradient px-8 h-12 text-lg font-medium"
+                    disabled={!currentAnswer.trim()}
+                  >
+                    {isSubmitting
+                      ? "Analyzing Answer..."
+                      : currentQuestion === questions.length - 1
+                        ? "Complete Interview"
+                        : currentQ?.respondida 
+                          ? "Update Answer & Next"
                           : "Submit & Next"}
-                    </Button>
-                  </div>
+                  </Button>
                 </div>
               </div>
             </Card>
