@@ -64,7 +64,6 @@ const { Title, Paragraph, Text } = Typography
 const { TextArea } = Input
 
 const Interview: React.FC = () => {
-  // Core interview state
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [questions, setQuestions] = useState<Pregunta[]>([])
   const [answers, setAnswers] = useState<string[]>([])
@@ -78,6 +77,7 @@ const Interview: React.FC = () => {
   const [interviewCompleted, setInterviewCompleted] = useState(false)
   const [consolidatedResults, setConsolidatedResults] = useState<any>(null)
   const [sessionId, setSessionId] = useState<string | null>(null)
+  const [entrevistaSessionId, setEntrevistaSessionId] = useState<string | null>(null) // Session ID from API responses
   
   // V2 Flow state - Pasos 1-12
   const [currentStep, setCurrentStep] = useState(3) // Start directly at preparation phase
@@ -104,7 +104,7 @@ const Interview: React.FC = () => {
     }
     
     loadInterviewData();
-  }, [id, location.search])
+  }, [id, location.search, location.pathname])
 
   useEffect(() => {
     if (!showResults && questions.length > 0 && !interviewCompleted) {
@@ -149,6 +149,9 @@ const Interview: React.FC = () => {
       
       console.log('📝 [Interview] Loading interview data, ID:', id, 'Session ID:', sessionId);
       
+      // Check if this is a results page
+      const isResultsPage = location.pathname.includes('/results');
+      
       // The ID now refers to postulacion ID, not convocatoria ID
       const postulacionId = Number(id);
       
@@ -164,6 +167,22 @@ const Interview: React.FC = () => {
       console.log('📝 [Interview] Job data from postulation:', jobData);
       setJob(jobData);
 
+      if (isResultsPage) {
+        // For results page, go directly to complete history endpoint using postulation ID
+        console.log('📝 [Interview] Results page detected - loading complete history directly for postulation:', postulacionId);
+        
+        try {
+          await loadResults(postulacionId);
+          setLoading(false); // Stop loading after results are loaded
+          return;
+        } catch (error) {
+          console.error('📝 [Interview] Error loading results via complete history:', error);
+          message.error("No se pudieron cargar los resultados de la entrevista");
+          setLoading(false);
+          return;
+        }
+      }
+
       // Always try to get the latest question state using preguntaAPI.generar() 
       // which includes estadoRespuestas data
       console.log('📝 [Interview] Attempting to get latest question state with estadoRespuestas');
@@ -172,9 +191,15 @@ const Interview: React.FC = () => {
         const questionsData = questionsResponse.data;
         console.log('📝 [Interview] Latest question state loaded:', questionsData);
         
+        // Extract sessionId from response
+        if (questionsData && questionsData.entrevistaSessionId) {
+          console.log('🔍 [Interview] Session ID from loadInterviewData:', questionsData.entrevistaSessionId);
+          setEntrevistaSessionId(questionsData.entrevistaSessionId.toString());
+        }
+        
         if (questionsData && questionsData.success && Array.isArray(questionsData.questions) && questionsData.questions.length > 0) {
           // Sort questions by ID to maintain correct order  
-          const sortedQuestions = questionsData.questions.sort((a, b) => a.id - b.id);
+          const sortedQuestions = questionsData.questions.sort((a: any, b: any) => a.id - b.id);
           
           // Map the API response using estadoRespuestas as source of truth
           const mappedQuestions: Pregunta[] = sortedQuestions.map((q: any) => {
@@ -222,7 +247,8 @@ const Interview: React.FC = () => {
           
           console.log('✅ [Interview] Ready to start answering questions with estadoRespuestas data:', mappedQuestions.length);
           console.log('📝 [Interview] Continuing from question:', startingQuestion + 1, 'of', mappedQuestions.length);
-          console.log('� [Interview] estadoRespuestas from API:', questionsData.estadoRespuestas);
+          console.log('📊 [Interview] Session ID captured:', questionsData.entrevistaSessionId);
+          console.log('📊 [Interview] estadoRespuestas from API:', questionsData.estadoRespuestas);
           console.log('📊 [Interview] Progress summary:', {
             totalQuestions: questionsData.totalPreguntas || mappedQuestions.length,
             preguntasRespondidas: questionsData.preguntasRespondidas || mappedQuestions.filter(q => q.respondida).length,
@@ -244,27 +270,41 @@ const Interview: React.FC = () => {
         console.log('📝 [Interview] Error loading questions via generar API, will generate new ones:', error);
       }
 
-      // If sessionId is available, check other interview progress
+      // If sessionId is available, check if interview is already completed using complete history
       if (sessionId) {
-        // Check if interview is already completed
+        console.log('📝 [Interview] SessionId available, checking for completed interview via complete history');
         try {
-          const resultsResponse = await entrevistaAPI.getResultados(sessionId);
-          const results = resultsResponse.data;
-          if (results) {
-            console.log('📝 [Interview] Interview already completed, showing results');
-            setConsolidatedResults(results);
-            setShowResults(true);
-            setInterviewCompleted(true);
-            setCurrentStep(12);
-            setLoading(false); // Results ready, stop loading
-            return;
+          const historialResponse = await evaluacionAPI.getHistorialCompleto(postulacionId);
+          const historialData = historialResponse.data;
+          
+          if (historialData && historialData.success && historialData.postulacion?.estado === 'COMPLETADA') {
+            console.log('📝 [Interview] Interview completed, loading complete history:', historialData);
+            
+            // Use the loadResults function to properly transform the data
+            await loadResults(postulacionId);
+            return; // loadResults now handles setLoading(false)
           }
         } catch (error) {
-          console.log('📝 [Interview] No results found, interview not completed yet');
+          console.log('📝 [Interview] No complete history found, interview not completed yet');
         }
       }
       
-      // If we reach here, we need to generate questions
+      // Also check if current URL indicates this is a results page (for direct navigation)
+      const urlIndicatesResults = location.pathname.includes('/results');
+      if (urlIndicatesResults) {
+        console.log('📝 [Interview] URL indicates results page, loading complete history directly');
+        await loadResults(postulacionId);
+        return; // loadResults now handles setLoading(false)
+      }
+      
+      // If we reach here, we need to check if this is a results page or generate questions
+      const currentPageIsResults = location.pathname.includes('/results');
+      if (currentPageIsResults) {
+        console.log('📝 [Interview] Results page detected, loading complete history directly');
+        await loadResults(postulacionId);
+        return; // loadResults now handles setLoading(false)
+      }
+      
       console.log('📝 [Interview] Setting step to 4 for automatic question generation');
       setCurrentStep(4);
       setLoading(false); // Let the useEffect handle loading during question generation
@@ -295,9 +335,15 @@ const Interview: React.FC = () => {
       const response = await preguntaAPI.generar({ idPostulacion: targetPostulacionId });
       const questionsData = response.data;
       
+      // Extract sessionId from response
+      if (questionsData && questionsData.entrevistaSessionId) {
+        console.log('🔍 [Interview] Session ID from preguntaAPI.generar:', questionsData.entrevistaSessionId);
+        setEntrevistaSessionId(questionsData.entrevistaSessionId.toString());
+      }
+      
       if (questionsData && questionsData.success && Array.isArray(questionsData.questions)) {
         // Sort questions by ID to maintain correct order
-        const sortedQuestions = questionsData.questions.sort((a, b) => a.id - b.id);
+        const sortedQuestions = questionsData.questions.sort((a: any, b: any) => a.id - b.id);
         
         const generatedQuestions: Pregunta[] = sortedQuestions.map((q: any, index: number) => {
           const questionId = q.id || index + 1;
@@ -342,8 +388,9 @@ const Interview: React.FC = () => {
         
         console.log('✅ [Interview] Questions generated successfully:', generatedQuestions.length);
         console.log('📝 [Interview] Continuing from question:', startingQuestion + 1, 'of', generatedQuestions.length);
-        console.log('� [Interview] estadoRespuestas from API:', questionsData.estadoRespuestas);
-        console.log('�📝 [Interview] Sample question mapping:', {
+        console.log('📊 [Interview] Session ID captured:', questionsData.entrevistaSessionId);
+        console.log('📊 [Interview] estadoRespuestas from API:', questionsData.estadoRespuestas);
+        console.log('📝 [Interview] Sample question mapping:', {
           question: generatedQuestions[0]?.pregunta,
           type: generatedQuestions[0]?.tipo,
           score: generatedQuestions[0]?.score,
@@ -380,14 +427,155 @@ const Interview: React.FC = () => {
     }
   }
 
-  // Cargar resultados con postulacion ID
+  // Cargar resultados completos usando el nuevo endpoint
   const loadResults = async (postulacionId: number) => {
     try {
-      const evaluationResponse = await evaluacionAPI.getResultados(postulacionId)
-      setConsolidatedResults(evaluationResponse.data)
+      console.log('📝 [Interview] Loading complete interview history for results:', postulacionId);
+      
+      const historialResponse = await evaluacionAPI.getHistorialCompleto(postulacionId);
+      const historialData = historialResponse.data;
+      
+      if (historialData && historialData.success) {
+        console.log('📝 [Interview] Complete history loaded:', historialData);
+        console.log('📝 [Interview] API Response structure:', {
+          postulacionId: historialData.postulacionId,
+          estadisticas: historialData.estadisticas,
+          preguntasCount: historialData.preguntas?.length,
+          sampleQuestion: historialData.preguntas?.[0]
+        });
+        
+        // Use the correct API response structure
+        const questions = historialData.preguntas || [];
+        
+        // Calculate final score from estadisticas (already provided by API)
+        const finalScore = historialData.estadisticas?.puntajeTotalObtenido || 0;
+        const maxScore = historialData.estadisticas?.puntajeMaximoPosible || 100;
+        const finalScorePercentage = maxScore > 0 ? (finalScore / maxScore) * 100 : 0;
+        
+        // Calculate criteria averages from individual question evaluations
+        const criteriaAverages = {
+          claridad_estructura: 0,
+          dominio_tecnico: 0,
+          pertinencia: 0,
+          comunicacion_seguridad: 0
+        };
+        
+        if (questions.length > 0) {
+          questions.forEach((q: any) => {
+            if (q.evaluacion) {
+              criteriaAverages.claridad_estructura += q.evaluacion.claridadEstructura || 0;
+              criteriaAverages.dominio_tecnico += q.evaluacion.dominioTecnico || 0;
+              criteriaAverages.pertinencia += q.evaluacion.pertinencia || 0;
+              criteriaAverages.comunicacion_seguridad += q.evaluacion.comunicacionSeguridad || 0;
+            }
+          });
+          
+          const keys: (keyof typeof criteriaAverages)[] = ['claridad_estructura', 'dominio_tecnico', 'pertinencia', 'comunicacion_seguridad'];
+          keys.forEach(key => {
+            criteriaAverages[key] = criteriaAverages[key] / questions.length;
+          });
+        }
+        
+        // Collect all strengths and improvements from individual questions
+        const allFortalezas: string[] = [];
+        const allOportunidadesMejora: string[] = [];
+        
+        questions.forEach((q: any) => {
+          if (q.evaluacion?.fortalezas && Array.isArray(q.evaluacion.fortalezas)) {
+            allFortalezas.push(...q.evaluacion.fortalezas);
+          }
+          if (q.evaluacion?.oportunidadesMejora && Array.isArray(q.evaluacion.oportunidadesMejora)) {
+            allOportunidadesMejora.push(...q.evaluacion.oportunidadesMejora);
+          }
+        });
+        
+        // Remove duplicates and limit to most relevant
+        const uniqueFortalezas = [...new Set(allFortalezas)].slice(0, 5);
+        const uniqueOportunidadesMejora = [...new Set(allOportunidadesMejora)].slice(0, 5);
+        
+        // Transform the complete history data for results display according to UI expectations
+        const transformedResults = {
+          // Main score (use actual API data)
+          puntajeFinal: finalScorePercentage,
+          
+          // Criteria summary expected by the UI
+          resumenPorCriterio: criteriaAverages,
+          
+          // Question evaluations expected by the UI (map correctly from API response)
+          evaluacionesPorPregunta: questions.map((q: any) => ({
+            pregunta: {
+              texto: q.textoPregunta,
+              tipo: q.tipoLegible || q.tipo
+            },
+            evaluacion: {
+              // Map the actual API fields correctly
+              puntuacionFinal: q.evaluacion?.puntajeTotal || 0, // Use puntajeTotal, not puntuacionFinal
+              claridadEstructura: q.evaluacion?.claridadEstructura || 0,
+              dominioTecnico: q.evaluacion?.dominioTecnico || 0,
+              pertinencia: q.evaluacion?.pertinencia || 0,
+              comunicacionSeguridad: q.evaluacion?.comunicacionSeguridad || 0,
+              feedback: q.evaluacion?.feedback || 'No feedback available'
+            },
+            respuesta: q.respuestaUsuario || 'No response recorded'
+          })),
+          
+          // Use collected strengths and improvements
+          fortalezas: uniqueFortalezas.length > 0 ? uniqueFortalezas : [
+            'Completed all interview questions',
+            'Demonstrated understanding of the requirements',
+            'Provided structured responses'
+          ],
+          oportunidadesMejora: uniqueOportunidadesMejora.length > 0 ? uniqueOportunidadesMejora : [
+            'Consider providing more specific examples',
+            'Include more technical details where applicable',
+            'Expand on practical experience'
+          ],
+          
+          // Raw data for reference (keep original API structure)
+          statistics: historialData.estadisticas,
+          postulacion: historialData.postulacion,
+          questions: historialData.preguntas,
+          entrevistaSessionId: historialData.entrevistaSessionId
+        };
+        
+        console.log('📝 [Interview] Transformed results for display:', {
+          finalScore: transformedResults.puntajeFinal,
+          criteriaCount: Object.keys(transformedResults.resumenPorCriterio).length,
+          questionsCount: transformedResults.evaluacionesPorPregunta.length,
+          strengthsCount: transformedResults.fortalezas.length,
+          improvementsCount: transformedResults.oportunidadesMejora.length
+        });
+        setConsolidatedResults(transformedResults);
+        
+        setShowResults(true);
+        setInterviewCompleted(true);
+        setCurrentStep(12);
+        
+        // Also set questions if available for context
+        if (historialData.preguntas && Array.isArray(historialData.preguntas)) {
+          const mappedQuestions = historialData.preguntas.map((q: any) => ({
+            id: q.preguntaId,
+            pregunta: q.textoPregunta,
+            tipo: q.tipoLegible || q.tipo,
+            score: q.score,
+            respondida: q.respondida,
+            evaluada: q.evaluada,
+            respuesta: q.respuestaUsuario,
+            fechaRespuesta: q.fechaRespuesta,
+            evaluacion: q.evaluacion
+          }));
+          setQuestions(mappedQuestions);
+        }
+        
+        console.log('✅ [Interview] Results loaded successfully from complete history');
+        setLoading(false); // Stop loading when results are ready
+      } else {
+        throw new Error("No history data available");
+      }
     } catch (error: any) {
-      console.error("Error loading results:", error)
-      message.error("Error loading interview results")
+      console.error("❌ [Interview] Error loading complete history:", error);
+      message.error("Error loading interview results");
+      setLoading(false); // Stop loading on error too
     }
   }
 
@@ -428,21 +616,43 @@ const Interview: React.FC = () => {
       const response = await evaluacionAPI.evaluar(evaluationRequest)
 
       if (response.data) {
-        setEvaluations((prev) => [...prev, response.data])
-
-        // Paso 9: Actualizar progreso (opcional)
-        if (sessionId) {
-          const progressStep = 7 + ((currentQuestion + 1) / questions.length) * 2; // Steps 7-9
-          await entrevistaAPI.actualizarProgreso(sessionId, { step: Math.floor(progressStep) });
+        // Extract sessionId from evaluation response
+        if (response.data.entrevistaSessionId) {
+          console.log('🔍 [Interview] Session ID from evaluacionAPI.evaluar:', response.data.entrevistaSessionId);
+          setEntrevistaSessionId(response.data.entrevistaSessionId.toString());
         }
 
-        if (currentQuestion < questions.length - 1) {
+        setEvaluations((prev) => [...prev, response.data])
+
+        // Update question as answered and reload progress
+        const updatedQuestions = [...questions];
+        updatedQuestions[currentQuestion] = {
+          ...updatedQuestions[currentQuestion],
+          respondida: true,
+          respuesta: currentAnswer.trim(),
+          fechaRespuesta: new Date().toISOString()
+        };
+        setQuestions(updatedQuestions);
+
+        // Check if all questions are now answered
+        const allQuestionsAnswered = updatedQuestions.every(q => q.respondida);
+        console.log('🔍 [Interview] After updating question:', {
+          currentQuestion: currentQuestion + 1,
+          totalQuestions: updatedQuestions.length,
+          answeredQuestions: updatedQuestions.filter(q => q.respondida).length,
+          allQuestionsAnswered,
+          isLastQuestion: currentQuestion === questions.length - 1
+        });
+
+        if (allQuestionsAnswered || currentQuestion === questions.length - 1) {
+          // All questions answered, proceed to complete interview
+          console.log('✅ [Interview] All questions completed, calling handleSubmitInterview');
+          await handleSubmitInterview()
+        } else {
+          // Move to next unanswered question
           setCurrentQuestion((prev) => prev + 1)
           setCurrentAnswer("")
           message.success("¡Respuesta enviada exitosamente! Pasando a la siguiente pregunta...")
-        } else {
-          // All questions answered, proceed to step 10-12
-          await handleSubmitInterview()
         }
       } else {
         throw new Error("Invalid evaluation response")
@@ -461,30 +671,33 @@ const Interview: React.FC = () => {
       console.log('📝 [Interview] Steps 10-12: Finalizing interview');
       setInterviewCompleted(true)
 
-      // Paso 10: Finalizar entrevista v2
-      if (sessionId) {
-        await entrevistaAPI.finalizarV2(sessionId);
-        console.log('✅ [Interview] Interview finalized via v2 API');
+      // Use sessionId from API responses (entrevistaSessionId)
+      const activeSessionId = entrevistaSessionId || sessionId;
+      
+      if (!activeSessionId) {
+        console.error('❌ [Interview] No session ID available for completion');
+        message.error("No se pudo completar la entrevista: ID de sesión no disponible");
+        return;
       }
 
-      // Paso 12: Obtener resultados
-      if (sessionId) {
-        const resultsResponse = await entrevistaAPI.getResultados(sessionId);
-        setConsolidatedResults(resultsResponse.data);
-        setShowResults(true);
-        setCurrentStep(12);
-        console.log('✅ [Interview] Results loaded successfully');
-      }
+      // Paso 10: Completar entrevista usando el nuevo endpoint v2 con sessionId
+      console.log('📝 [Interview] Step 10: Calling /api/v2/entrevistas/finalizar/{sessionId} endpoint:', activeSessionId);
+      const completarResponse = await entrevistaAPI.finalizarV2(activeSessionId);
+      console.log('✅ [Interview] Interview completed via v2 API:', completarResponse.data);
 
       message.success("¡Entrevista completada exitosamente!", 2)
+      
+      // Redirect to results after completing interview
+      console.log('📝 [Interview] Redirecting to results page');
+      navigate(`/usuario/interview/${id}/results`);
       
     } catch (error) {
       console.error("❌ [Interview] Error completing interview:", error)
       message.error("Error al completar la entrevista. Tus respuestas fueron guardadas.", 2)
       
-      // Still show results even if there's an error
-      setShowResults(true);
-      setCurrentStep(12);
+      // Still redirect to results even if there's an error
+      console.log('📝 [Interview] Redirecting to results page despite error');
+      navigate(`/usuario/interview/${id}/results`);
     }
   }
 
@@ -686,47 +899,69 @@ const Interview: React.FC = () => {
                   <>
                     {/* Performance Charts */}
                     <Row gutter={[24, 24]} className="mb-8">
-                      <Col xs={24} lg={8}>
-                        <Card title="Overall Performance" className="h-full">
-                          <ResponsiveContainer width="100%" height={250}>
-                            <RadarChart data={radarData}>
-                              <PolarGrid />
-                              <PolarAngleAxis dataKey="subject" />
-                              <PolarRadiusAxis domain={[0, 10]} />
-                              <Radar name="Score" dataKey="A" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
-                              <Tooltip />
-                            </RadarChart>
-                          </ResponsiveContainer>
-                        </Card>
+                      <Col xs={24}>
+                        <motion.div
+                          initial={{ opacity: 0, x: -50 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6, delay: 0.1 }}
+                        >
+                          <Card title="Overall Performance" className="h-full">
+                            <ResponsiveContainer width="100%" height={400}>
+                              <RadarChart data={radarData}>
+                                <PolarGrid />
+                                <PolarAngleAxis dataKey="subject" />
+                                <PolarRadiusAxis domain={[0, 10]} />
+                                <Radar name="Score" dataKey="A" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
+                                <Tooltip />
+                              </RadarChart>
+                            </ResponsiveContainer>
+                          </Card>
+                        </motion.div>
                       </Col>
-                      <Col xs={24} lg={8}>
-                        <Card title="Question Scores" className="h-full">
-                          <ResponsiveContainer width="100%" height={250}>
-                            <LineChart data={lineData}>
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis dataKey="question" />
-                              <YAxis domain={[0, 10]} />
-                              <Tooltip />
-                              <Line type="monotone" dataKey="score" stroke="#6366f1" strokeWidth={2} />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        </Card>
+                    </Row>
+                    <Row gutter={[24, 24]} className="mb-8">
+                      <Col xs={24}>
+                        <motion.div
+                          initial={{ opacity: 0, x: 50 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6, delay: 0.2 }}
+                        >
+                          <Card title="Question Scores" className="h-full">
+                            <ResponsiveContainer width="100%" height={400}>
+                              <LineChart data={lineData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="question" />
+                                <YAxis domain={[0, 10]} />
+                                <Tooltip />
+                                <Line type="monotone" dataKey="score" stroke="#6366f1" strokeWidth={3} />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          </Card>
+                        </motion.div>
                       </Col>
-                      <Col xs={24} lg={8}>
-                        <Card title="Skills Breakdown" className="h-full">
-                          <ResponsiveContainer width="100%" height={250}>
-                            <BarChart data={barData}>
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis dataKey="question" />
-                              <YAxis domain={[0, 10]} />
-                              <Tooltip />
-                              <Bar dataKey="clarity" fill="#8884d8" />
-                              <Bar dataKey="technical" fill="#82ca9d" />
-                              <Bar dataKey="relevance" fill="#ffc658" />
-                              <Bar dataKey="communication" fill="#ff7300" />
-                            </BarChart>
-                          </ResponsiveContainer>
-                        </Card>
+                    </Row>
+                    <Row gutter={[24, 24]} className="mb-8">
+                      <Col xs={24}>
+                        <motion.div
+                          initial={{ opacity: 0, x: -50 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6, delay: 0.3 }}
+                        >
+                          <Card title="Skills Breakdown" className="h-full">
+                            <ResponsiveContainer width="100%" height={400}>
+                              <BarChart data={barData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="question" />
+                                <YAxis domain={[0, 10]} />
+                                <Tooltip />
+                                <Bar dataKey="clarity" fill="#8884d8" />
+                                <Bar dataKey="technical" fill="#82ca9d" />
+                                <Bar dataKey="relevance" fill="#ffc658" />
+                                <Bar dataKey="communication" fill="#ff7300" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </Card>
+                        </motion.div>
                       </Col>
                     </Row>
 
@@ -1071,6 +1306,11 @@ const Interview: React.FC = () => {
                   <div className="mt-1">
                     <Text className="text-sm text-gray-500 dark:text-gray-400">
                       Progress: {questions.filter(q => q.respondida).length} answered, {questions.filter(q => !q.respondida).length} remaining
+                      {questions.length > 0 && (
+                        <span className="ml-2">
+                          ({Math.round((questions.filter(q => q.respondida).length / questions.length) * 100)}% complete)
+                        </span>
+                      )}
                     </Text>
                   </div>
                 </Col>
@@ -1180,7 +1420,7 @@ const Interview: React.FC = () => {
                     icon={
                       isSubmitting ? (
                         <LoadingOutlined />
-                      ) : currentQuestion === questions.length - 1 ? (
+                      ) : (currentQuestion === questions.length - 1 || questions.filter(q => !q.respondida).length <= 1) ? (
                         <CheckCircleOutlined />
                       ) : (
                         <SendOutlined />
@@ -1193,8 +1433,8 @@ const Interview: React.FC = () => {
                   >
                     {isSubmitting
                       ? "Analyzing Answer..."
-                      : currentQuestion === questions.length - 1
-                        ? "Complete Interview"
+                      : (currentQuestion === questions.length - 1 || questions.filter(q => !q.respondida).length <= 1)
+                        ? "Complete & View Results"
                         : currentQ?.respondida 
                           ? "Update Answer & Next"
                           : "Submit & Next"}

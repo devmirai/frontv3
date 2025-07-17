@@ -132,10 +132,11 @@ export const entrevistaAPI = {
   delete: (id: number) => api.delete(`/entrevistas/${id}`),
   enviarRespuesta: (entrevistaId: number, data: any) => api.post(`/entrevistas/${entrevistaId}/respuesta`, data),
   finalizarEntrevista: (entrevistaId: number) => api.post(`/entrevistas/${entrevistaId}/finalizar`),
-  // v2 endpoints
+  // v2 endpoints with sessionId
   actualizarProgreso: (sessionId: string, data: any) => api.patch(`/v2/entrevistas/progreso/${sessionId}`, data),
   finalizarV2: (sessionId: string) => api.patch(`/v2/entrevistas/finalizar/${sessionId}`),
   getResultados: (sessionId: string) => api.get(`/v2/entrevistas/resultados/${sessionId}`),
+  getResumen: (sessionId: string) => api.get(`/v2/entrevistas/resumen/${sessionId}`),
 };
 
 // Preguntas API
@@ -167,6 +168,7 @@ export const evaluacionAPI = {
   getById: (id: number) => api.get(`/evaluaciones/${id}`),
   getByPostulacion: (postulacionId: number) => api.get(`/evaluaciones/postulacion/${postulacionId}`),
   getResultados: (postulacionId: number) => api.get(`/evaluaciones/resultados/${postulacionId}`),
+  getHistorialCompleto: (postulacionId: number) => api.get(`/evaluaciones/historial-completo/${postulacionId}`),
   evaluar: (data: any) => api.post('/evaluaciones/evaluar', data),
   create: (data: any) => api.post('/evaluaciones', data),
   update: (id: number, data: any) => api.put(`/evaluaciones/${id}`, data),
