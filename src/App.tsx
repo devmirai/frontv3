@@ -78,6 +78,9 @@ const ThemedApp: React.FC = () => {
                 {/* Demo Route - Solo para desarrollo */}
                 <Route path="/demo-data" element={<DemoDataViewer />} />
 
+                {/* 🥧 Modo Diseño Público - No requiere login */}
+                <Route path="/design/interview/314159" element={<Interview />} />
+
                 {/* Dashboard Redirect */}
                 <Route
                   path="/dashboard"

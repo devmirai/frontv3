@@ -91,6 +91,93 @@ const Interview: React.FC = () => {
   const { user } = useAuth()
   const location = useLocation()
 
+  // Detectar modo diseño cuando el ID es "314159" (chiste con π) O la ruta es pública
+  const isDesignMode = id === "314159" || location.pathname.includes('/design/interview/314159')
+
+  // Preguntas mock para modo diseño
+  const mockQuestions: Pregunta[] = [
+    {
+      id: 1,
+      pregunta: "¿Cuál es la diferencia entre useState y useReducer en React? ¿Cuándo usarías cada uno?",
+      tipo: "Técnica",
+      dificultad: "7",
+      categoria: "React",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 2,
+      pregunta: "Explica cómo implementarías testing unitario para un componente React usando Jest y React Testing Library.",
+      tipo: "Técnica",
+      dificultad: "8",
+      categoria: "Testing",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 3,
+      pregunta: "¿Qué estrategias usarías para optimizar el rendimiento de una aplicación React con muchos componentes?",
+      tipo: "Técnica",
+      dificultad: "9",
+      categoria: "Performance",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 4,
+      pregunta: "Describe tu experiencia con metodologías ágiles. ¿Cómo manejas los sprints y la comunicación en equipo?",
+      tipo: "Soft Skills",
+      dificultad: "6",
+      categoria: "Metodologías",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 5,
+      pregunta: "¿Cuál es la diferencia entre trabajar con arrays y objetos en JavaScript? Proporciona ejemplos de cuándo usar cada uno.",
+      tipo: "Técnica",
+      dificultad: "5",
+      categoria: "JavaScript",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 6,
+      pregunta: "Describe un problema técnico complejo que hayas resuelto recientemente. ¿Cuál fue tu proceso de debugging?",
+      tipo: "Experiencia",
+      dificultad: "7",
+      categoria: "Problem Solving",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 7,
+      pregunta: "¿Cuáles son las ventajas y desventajas de TypeScript vs JavaScript? ¿Cuándo recomendarías usar TypeScript?",
+      tipo: "Técnica",
+      dificultad: "6",
+      categoria: "Languages",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 8,
+      pregunta: "Explica tu workflow de Git. ¿Cómo manejas branches, merges y conflicts en proyectos colaborativos?",
+      tipo: "Técnica",
+      dificultad: "5",
+      categoria: "Version Control",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 9,
+      pregunta: "¿Qué son los principios SOLID? Explica uno de ellos con un ejemplo práctico en código.",
+      tipo: "Técnica",
+      dificultad: "8",
+      categoria: "Arquitectura",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 10,
+      pregunta: "Describe diferentes algoritmos de ordenamiento. ¿Cuál elegirías para ordenar un array de 1 millón de elementos y por qué?",
+      tipo: "Técnica",
+      dificultad: "9",
+      categoria: "Algorithms",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    }
+  ]
+
   // Add a ref to track if we've initiated question generation
   const questionGenerationInitiated = useRef(false);
 
@@ -143,6 +230,22 @@ const Interview: React.FC = () => {
 
   const loadInterviewData = async () => {
     if (!id) return
+
+    // 🥧 Modo diseño activado con ID especial de pi (314159)
+    if (isDesignMode) {
+      console.log('🥧 [Interview] Modo diseño activado con ID π (314159)');
+      
+      // Simular loading breve
+      setTimeout(() => {
+        setQuestions(mockQuestions);
+        setAnswers(new Array(mockQuestions.length).fill(""));
+        setCurrentStep(6); // Ir directo a las preguntas
+        setLoading(false);
+        console.log('🥧 [Interview] Preguntas mock cargadas:', mockQuestions.length);
+      }, 1000);
+      
+      return;
+    }
 
     try {
       setLoading(true);
@@ -592,7 +695,7 @@ const Interview: React.FC = () => {
       return
     }
 
-    if (!questions[currentQuestion] || !id) {
+    if (!questions[currentQuestion] || (!id && !isDesignMode)) {
       message.error("Datos de la entrevista no disponibles")
       return
     }
@@ -606,6 +709,51 @@ const Interview: React.FC = () => {
       newAnswers[currentQuestion] = currentAnswer.trim()
       setAnswers(newAnswers)
 
+      // 🥧 Modo diseño - simulación simple
+      if (isDesignMode) {
+        console.log('🥧 [Interview] Modo diseño - simulando evaluación');
+        
+        // Simular delay de evaluación
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Simular evaluación simple
+        const mockEvaluation = {
+          id: questions[currentQuestion].id,
+          respuesta: currentAnswer.trim(),
+          puntaje: Math.floor(Math.random() * 3) + 8, // Puntaje entre 8-10
+          feedback: "Excelente respuesta en modo diseño",
+          claridad_estructura: 9,
+          dominio_tecnico: 8,
+          resolucion_problemas: 9,
+          comunicacion: 8
+        };
+        
+        setEvaluations((prev) => [...prev, mockEvaluation as any]);
+        
+        // Actualizar pregunta como respondida
+        const updatedQuestions = [...questions];
+        updatedQuestions[currentQuestion] = {
+          ...updatedQuestions[currentQuestion],
+          respondida: true,
+          respuesta: currentAnswer.trim(),
+          fechaRespuesta: new Date().toISOString()
+        };
+        setQuestions(updatedQuestions);
+        
+        if (currentQuestion === questions.length - 1) {
+          console.log('🥧 [Interview] Todas las preguntas completadas en modo diseño');
+          await handleSubmitInterview();
+        } else {
+          setCurrentQuestion((prev) => prev + 1);
+          setCurrentAnswer("");
+          message.success("¡Respuesta evaluada! Pasando a la siguiente pregunta...");
+        }
+        
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Lógica normal para modo producción
       // Paso 8: Evaluar respuesta - usar postulation ID  
       const evaluationRequest = {
         preguntaId: questions[currentQuestion].id!,
@@ -671,6 +819,43 @@ const Interview: React.FC = () => {
       console.log('📝 [Interview] Steps 10-12: Finalizing interview');
       setInterviewCompleted(true)
 
+      // 🥧 Modo diseño - finalización simulada
+      if (isDesignMode) {
+        console.log('🥧 [Interview] Modo diseño - generando resultados mock');
+        
+        // Simular delay de finalización
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Generar resultados mock básicos
+        const mockResults = {
+          puntajeFinal: Math.floor(Math.random() * 20) + 80, // 80-100%
+          resumenPorCriterio: {
+            claridad_estructura: 8.5,
+            dominio_tecnico: 8.8,
+            resolucion_problemas: 9.0,
+            comunicacion: 8.2
+          },
+          fortalezas: [
+            "Excelente conocimiento técnico",
+            "Respuestas bien estructuradas",
+            "Buen manejo de conceptos avanzados"
+          ],
+          oportunidadesMejora: [
+            "Incluir más ejemplos prácticos",
+            "Profundizar en casos de uso específicos"
+          ]
+        };
+        
+        setConsolidatedResults(mockResults);
+        setShowResults(true);
+        setCurrentStep(12);
+        
+        message.success("¡Entrevista de diseño completada exitosamente! 🥧", 2);
+        console.log('🥧 [Interview] Resultados mock generados');
+        return;
+      }
+
+      // Lógica normal para modo producción
       // Use sessionId from API responses (entrevistaSessionId)
       const activeSessionId = entrevistaSessionId || sessionId;
       
