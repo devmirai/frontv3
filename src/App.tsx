@@ -80,6 +80,14 @@ const ThemedApp: React.FC = () => {
 
                 {/* 🥧 Modo Diseño Público - No requiere login */}
                 <Route path="/design/interview/314159" element={<Interview />} />
+                
+                {/* 🥧 Rutas adicionales para modo diseño - acceso directo */}
+                <Route path="/interview/314159" element={<Interview />} />
+                <Route path="/interview/314159/start" element={<Interview />} />
+                <Route path="/interview/314159/results" element={<Interview />} />
+                <Route path="/usuario/interview/314159" element={<Interview />} />
+                <Route path="/usuario/interview/314159/start" element={<Interview />} />
+                <Route path="/usuario/interview/314159/results" element={<Interview />} />
 
                 {/* Dashboard Redirect */}
                 <Route

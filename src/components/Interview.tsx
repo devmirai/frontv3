@@ -39,6 +39,7 @@ import {
   type Postulacion,
   type Evaluacion,
   EstadoPostulacion,
+  Rol,
 } from "../types/api"
 import {
   LineChart,
@@ -58,12 +59,26 @@ import {
 } from "recharts"
 import ThemeToggle from "./ThemeToggle"
 import PrintReport from "./PrintReport"
+import DesignModeInterview from "./DesignModeInterview"
 
 const { Header, Content } = Layout
 const { Title, Paragraph, Text } = Typography
 const { TextArea } = Input
 
 const Interview: React.FC = () => {
+  const { id: paramId } = useParams()
+  const currentLocation = useLocation()
+  
+  // 🥧 VERIFICACIÓN TEMPRANA DE MODO DISEÑO
+  const earlyDesignModeCheck = paramId === "314159" || currentLocation.pathname.includes('/314159')
+  
+  console.log('🔍 [Interview] Early design mode check - ID:', paramId, 'Pathname:', currentLocation.pathname, 'IsDesignMode:', earlyDesignModeCheck);
+  
+  // Si es modo diseño, usar componente simplificado
+  if (earlyDesignModeCheck) {
+    return <DesignModeInterview />
+  }
+
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [questions, setQuestions] = useState<Pregunta[]>([])
   const [answers, setAnswers] = useState<string[]>([])
@@ -88,11 +103,31 @@ const Interview: React.FC = () => {
   
   const navigate = useNavigate()
   const { id } = useParams()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const location = useLocation()
 
-  // Detectar modo diseño cuando el ID es "314159" (chiste con π) O la ruta es pública
-  const isDesignMode = id === "314159" || location.pathname.includes('/design/interview/314159')
+  // Detectar modo diseño cuando el ID es "314159" (chiste con π) O la ruta contiene 314159
+  const isDesignMode = id === "314159" || location.pathname.includes('/314159')
+
+  // En modo diseño, ignorar el estado de autenticación
+  const effectiveAuthLoading = isDesignMode ? false : authLoading
+
+  // En modo diseño, inicializar inmediatamente sin loading
+  useEffect(() => {
+    console.log('🔍 [Interview] Debug - ID:', id, 'Pathname:', location.pathname, 'IsDesignMode:', isDesignMode);
+    if (isDesignMode) {
+      setLoading(false);
+      console.log('🥧 [Interview] Modo diseño detectado - desactivando loading inicial');
+    }
+  }, [isDesignMode]);
+
+  // Valores por defecto para modo diseño cuando no hay usuario autenticado
+  const designModeDefaults = {
+    name: "Design Mode User",
+    avatar: null,
+    jobTitle: "Frontend Developer Position",
+    companyName: "TechCorp Solutions"
+  }
 
   // Preguntas mock para modo diseño
   const mockQuestions: Pregunta[] = [
@@ -190,8 +225,20 @@ const Interview: React.FC = () => {
       console.log('📝 [Interview] Session ID extracted from URL:', sessionParam);
     }
     
-    loadInterviewData();
-  }, [id, location.search, location.pathname])
+    console.log('🔍 [Interview] useEffect loadInterviewData - isDesignMode:', isDesignMode, 'effectiveAuthLoading:', effectiveAuthLoading);
+    
+    // En modo diseño, cargar datos inmediatamente sin esperar autenticación
+    if (isDesignMode) {
+      console.log('🥧 [Interview] Ejecutando loadInterviewData en modo diseño');
+      loadInterviewData();
+    } else if (!effectiveAuthLoading) {
+      // En modo normal, esperar a que termine la carga de autenticación
+      console.log('📝 [Interview] Ejecutando loadInterviewData en modo normal');
+      loadInterviewData();
+    } else {
+      console.log('⏳ [Interview] Esperando autenticación...');
+    }
+  }, [id, location.search, location.pathname, isDesignMode, effectiveAuthLoading])
 
   useEffect(() => {
     if (!showResults && questions.length > 0 && !interviewCompleted) {
@@ -229,23 +276,49 @@ const Interview: React.FC = () => {
   }, [currentQuestion, questions.length, answers]);
 
   const loadInterviewData = async () => {
+    console.log('🔍 [Interview] loadInterviewData called - ID:', id, 'IsDesignMode:', isDesignMode);
     if (!id) return
 
-    // 🥧 Modo diseño activado con ID especial de pi (314159)
-    if (isDesignMode) {
-      console.log('🥧 [Interview] Modo diseño activado con ID π (314159)');
-      
-      // Simular loading breve
-      setTimeout(() => {
+      // 🥧 Modo diseño activado con ID especial de pi (314159)
+      if (isDesignMode) {
+        console.log('🥧 [Interview] Modo diseño activado con ID π (314159)');
+        
+        // Crear datos mock completos para modo diseño
+        const mockPostulacion: Postulacion = {
+          id: 314159,
+          fechaPostulacion: "2025-07-18",
+          estado: "ENTREVISTA" as EstadoPostulacion,
+          convocatoria: {
+            id: 314159,
+            titulo: designModeDefaults.jobTitle,
+            descripcion: "Desarrollo de aplicaciones web modernas con React, TypeScript y Node.js",
+            puesto: "Frontend Developer",
+            fechaPublicacion: "2025-07-01",
+            fechaCierre: "2025-07-31",
+            activo: true,
+            empresa: {
+              id: 314159,
+              nombre: designModeDefaults.companyName,
+              email: "contact@techcorp.com",
+              telefono: "+1-555-0123",
+              direccion: "123 Tech Street, Silicon Valley",
+              descripcion: "Leading technology company focused on innovative web solutions",
+              rol: Rol.EMPRESA
+            }
+          }
+        };
+        
+        // Cargar datos inmediatamente en modo diseño
         setQuestions(mockQuestions);
         setAnswers(new Array(mockQuestions.length).fill(""));
+        setPostulacion(mockPostulacion);
+        setJob(mockPostulacion.convocatoria);
         setCurrentStep(6); // Ir directo a las preguntas
         setLoading(false);
-        console.log('🥧 [Interview] Preguntas mock cargadas:', mockQuestions.length);
-      }, 1000);
-      
-      return;
-    }
+        console.log('🥧 [Interview] Preguntas mock cargadas inmediatamente:', mockQuestions.length);
+        
+        return;
+      }
 
     try {
       setLoading(true);
@@ -1023,12 +1096,18 @@ const Interview: React.FC = () => {
             <div className="flex items-center space-x-4">
               <PrintReport
                 data={consolidatedResults}
-                candidateName={`${user?.name}`}
-                jobTitle={postulacion?.convocatoria?.titulo}
-                companyName={postulacion?.convocatoria?.empresa?.nombre}
+                candidateName={isDesignMode ? designModeDefaults.name : `${user?.name}`}
+                jobTitle={postulacion?.convocatoria?.titulo || (isDesignMode ? designModeDefaults.jobTitle : undefined)}
+                companyName={postulacion?.convocatoria?.empresa?.nombre || (isDesignMode ? designModeDefaults.companyName : undefined)}
               />
               <ThemeToggle />
-              <Avatar src={user?.avatar} size="large" className="border-2 border-indigo-200" />
+              <Avatar 
+                src={isDesignMode ? designModeDefaults.avatar : user?.avatar} 
+                size="large" 
+                className="border-2 border-indigo-200"
+              >
+                {isDesignMode ? "DM" : (user?.name?.[0] || "U")}
+              </Avatar>
             </div>
           </div>
         </Header>
@@ -1302,9 +1381,9 @@ const Interview: React.FC = () => {
                     </Button>
                     <PrintReport
                       data={consolidatedResults}
-                      candidateName={`${user?.name}`}
-                      jobTitle={postulacion?.convocatoria?.titulo}
-                      companyName={postulacion?.convocatoria?.empresa?.nombre}
+                      candidateName={isDesignMode ? designModeDefaults.name : `${user?.name}`}
+                      jobTitle={postulacion?.convocatoria?.titulo || (isDesignMode ? designModeDefaults.jobTitle : undefined)}
+                      companyName={postulacion?.convocatoria?.empresa?.nombre || (isDesignMode ? designModeDefaults.companyName : undefined)}
                     />
                   </Space>
                 </div>
@@ -1463,7 +1542,13 @@ const Interview: React.FC = () => {
               </span>
             </div>
             <ThemeToggle />
-            <Avatar src={user?.avatar} size="large" className="border-2 border-indigo-200" />
+            <Avatar 
+              src={isDesignMode ? designModeDefaults.avatar : user?.avatar} 
+              size="large" 
+              className="border-2 border-indigo-200"
+            >
+              {isDesignMode ? "DM" : (user?.name?.[0] || "U")}
+            </Avatar>
           </div>
         </div>
       </Header>

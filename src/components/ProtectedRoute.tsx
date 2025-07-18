@@ -13,7 +13,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
   const { isAuthenticated, user, loading } = useAuth();
   const location = useLocation();
 
-  if (loading) {
+  // 🥧 Permitir acceso al modo diseño sin autenticación
+  const isDesignMode = location.pathname.includes('/314159');
+  
+  console.log('🔍 [ProtectedRoute] Debug - Pathname:', location.pathname, 'IsDesignMode:', isDesignMode, 'IsAuthenticated:', isAuthenticated, 'Loading:', loading);
+
+  if (loading && !isDesignMode) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Spin size="large" />
@@ -21,8 +26,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
     );
   }
 
-  if (!isAuthenticated) {
+  // Permitir acceso sin autenticación solo para modo diseño
+  if (!isAuthenticated && !isDesignMode) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // En modo diseño, no validar roles
+  if (isDesignMode) {
+    return <>{children}</>;
   }
 
   if (requiredRole && user?.role !== requiredRole) {
