@@ -1,7 +1,7 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 
-const API_BASE_URL = 'http://localhost:8081/api';
-const AUTH_BASE_URL = 'http://localhost:8081';
+const API_BASE_URL = 'https://devmirai.duckdns.org/api';
+const AUTH_BASE_URL = 'https://devmirai.duckdns.org/';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
