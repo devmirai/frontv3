@@ -3,7 +3,6 @@ import {
   mockCompanies,
   mockJobs,
   mockApplications,
-  testCredentials,
 } from "./mockData";
 import { Rol, EstadoPostulacion } from "../types/api";
 
@@ -546,9 +545,9 @@ export const generateMockQuestions = (
 // Simular evaluación de entrevista
 export const simulateInterviewEvaluation = (
   answers: string[],
-  questions: any[],
+  _questions: any[],
 ) => {
-  const scores = answers.map((answer, index) => {
+  const scores = answers.map((answer, _index) => {
     // Simular puntaje basado en longitud y palabras clave
     const wordCount = answer.split(" ").length;
     const hasKeywords =

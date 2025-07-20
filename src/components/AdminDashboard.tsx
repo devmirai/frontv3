@@ -66,7 +66,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import {
   usuarioAPI,
@@ -80,7 +79,7 @@ import PrintReport from "./PrintReport";
 import dayjs from "dayjs";
 
 const { Header, Sider, Content } = Layout;
-const { Title, Paragraph, Text } = Typography;
+const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 const { TabPane } = Tabs;
 
@@ -127,7 +126,6 @@ const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [systemForm] = Form.useForm();
   const [emailForm] = Form.useForm();
-  const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   const menuItems = [
@@ -138,7 +136,6 @@ const AdminDashboard: React.FC = () => {
       className: "sidebar-menu-item",
     },
     {
-      key: "divider-1",
       type: "divider",
     },
     {
@@ -161,7 +158,6 @@ const AdminDashboard: React.FC = () => {
       ],
     },
     {
-      key: "divider-2",
       type: "divider",
     },
     {
@@ -184,7 +180,6 @@ const AdminDashboard: React.FC = () => {
       ],
     },
     {
-      key: "divider-3",
       type: "divider",
     },
     {
@@ -356,7 +351,7 @@ const AdminDashboard: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
-      render: (record: any) => (
+      render: (_record: any) => (
         <Dropdown
           menu={{
             items: [
@@ -412,7 +407,7 @@ const AdminDashboard: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
-      render: (record: any) => (
+      render: (_record: any) => (
         <Dropdown
           menu={{
             items: [
@@ -481,7 +476,7 @@ const AdminDashboard: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
-      render: (record: any) => (
+      render: (_record: any) => (
         <Dropdown
           menu={{
             items: [
@@ -958,7 +953,7 @@ const AdminDashboard: React.FC = () => {
           <Menu
             mode="inline"
             selectedKeys={[activeTab]}
-            items={menuItems}
+            items={menuItems as any}
             className="enhanced-menu admin-menu"
             onClick={({ key }) => setActiveTab(key)}
             style={{
@@ -1041,7 +1036,7 @@ const AdminDashboard: React.FC = () => {
                 />
                 <NotificationDropdown />
                 <ThemeToggle />
-                <Dropdown menu={userMenu} trigger={["click"]}>
+                <Dropdown menu={userMenu as any} trigger={["click"]}>
                   <Avatar
                     src={user?.avatar}
                     size="large"

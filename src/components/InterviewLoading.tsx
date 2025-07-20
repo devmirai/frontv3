@@ -1,6 +1,6 @@
 import type React from "react"
 import { useState, useEffect } from "react"
-import { Layout, Card, Typography, Button, Progress, message, Spin } from "antd"
+import { Layout, Typography, Button, Progress, message } from "antd"
 import {
   RobotOutlined,
   LoadingOutlined,

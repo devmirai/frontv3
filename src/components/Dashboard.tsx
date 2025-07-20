@@ -18,7 +18,6 @@ import {
 } from 'antd';
 import {
   DashboardOutlined,
-  UserOutlined,
   FileTextOutlined,
   SettingOutlined,
   PlusOutlined,
@@ -26,7 +25,6 @@ import {
   TeamOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
-  ExclamationCircleOutlined,
   MoreOutlined,
   EyeOutlined,
   EditOutlined,
@@ -248,7 +246,7 @@ const Dashboard: React.FC = () => {
     {
       title: 'Actions',
       key: 'actions',
-      render: (_, record: any) => (
+      render: (_: any, record: any) => (
         <Dropdown menu={actionMenu(record)} trigger={['click']}>
           <Button type="text" icon={<MoreOutlined />} />
         </Dropdown>

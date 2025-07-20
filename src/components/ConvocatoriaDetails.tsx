@@ -13,7 +13,8 @@ import {
   Col,
   Spin,
   Descriptions,
-  Alert
+  Alert,
+  Statistic
 } from 'antd';
 import {
   ArrowLeftOutlined,

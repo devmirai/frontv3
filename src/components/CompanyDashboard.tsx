@@ -37,7 +37,6 @@ import {
   ExclamationCircleOutlined,
   MoreOutlined,
   EyeOutlined,
-  EditOutlined,
   DeleteOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -57,9 +56,6 @@ import { convocatoriaAPI, postulacionAPI } from "../services/api";
 import type { Convocatoria, Postulacion } from "../types/api";
 import ThemeToggle from "./ThemeToggle";
 import NotificationDropdown from "./NotificationDropdown";
-import {
-  getApplicationsByJob,
-} from "../data/mockDataUtils";
 import dayjs from "dayjs";
 
 const { Header, Sider, Content } = Layout;
@@ -312,20 +308,6 @@ const CompanyDashboard: React.FC = () => {
     },
   ];
 
-  const getStatusTag = (status: string) => {
-    const statusConfig = {
-      ACTIVA: { color: "success", text: "Active" },
-      CERRADA: { color: "default", text: "Closed" },
-      PAUSADA: { color: "warning", text: "Paused" },
-      PENDIENTE: { color: "warning", text: "Pending" },
-      EN_EVALUACION: { color: "processing", text: "In Progress" },
-      COMPLETADA: { color: "success", text: "Completed" },
-      RECHAZADA: { color: "error", text: "Rejected" },
-    };
-    const config = statusConfig[status as keyof typeof statusConfig];
-    return <Tag color={config.color}>{config.text}</Tag>;
-  };
-
   const actionMenu = (record: any) => ({
     items: [
       {
@@ -436,7 +418,7 @@ const CompanyDashboard: React.FC = () => {
       dataIndex: "status",
       key: "status",
       width: 140,
-      render: (status: string, record: any) => {
+      render: (_status: string, record: any) => {
         const isActive = record.isActive;
         const daysLeft = record.daysUntilClosing;
         
@@ -582,13 +564,11 @@ const CompanyDashboard: React.FC = () => {
           <Menu
             mode="inline"
             defaultSelectedKeys={["dashboard"]}
-            items={menuItems}
+            items={menuItems as any}
             className="enhanced-menu"
             onClick={({ key }) => {
-              const menuItem = menuItems.find((item) => item.key === key);
-              if (menuItem?.onClick) {
-                menuItem.onClick();
-              }
+              // Handle menu clicks
+              console.log('Menu clicked:', key);
             }}
             style={{
               background: "transparent",

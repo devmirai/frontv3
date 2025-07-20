@@ -33,7 +33,7 @@ import { motion } from "framer-motion"
 import { useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { convocatoriaAPI, postulacionAPI, evaluacionAPI } from "../services/api"
-import { type Convocatoria, type Postulacion, type Evaluacion, EstadoPostulacion } from "../types/api"
+import { type Convocatoria, type Postulacion, EstadoPostulacion } from "../types/api"
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from "recharts"
 import ThemeToggle from "./ThemeToggle"
 import PrintReport from "./PrintReport"
@@ -47,7 +47,6 @@ const CandidatesList: React.FC = () => {
   const [postulaciones, setPostulaciones] = useState<Postulacion[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCandidate, setSelectedCandidate] = useState<Postulacion | null>(null)
-  const [candidateEvaluations, setCandidateEvaluations] = useState<Evaluacion[]>([])
   const [evaluationModalVisible, setEvaluationModalVisible] = useState(false)
   const [evaluationLoading, setEvaluationLoading] = useState(false)
   const [consolidatedResults, setConsolidatedResults] = useState<any>(null)
@@ -142,7 +141,7 @@ const CandidatesList: React.FC = () => {
     {
       title: "Candidate",
       key: "candidate",
-      render: (_, record: Postulacion) => (
+      render: (_: any, record: Postulacion) => (
         <div className="flex items-center space-x-3">
           <Avatar size="large" className="bg-indigo-600">
             {record.usuario?.nombre?.charAt(0)}
@@ -176,7 +175,7 @@ const CandidatesList: React.FC = () => {
     {
       title: "Contact",
       key: "contact",
-      render: (_, record: Postulacion) => (
+      render: (_: any, record: Postulacion) => (
         <div className="text-sm text-gray-600 dark:text-gray-400">
           <div>📞 {record.usuario?.telefono}</div>
           <div>🎂 {dayjs(record.usuario?.nacimiento).format("MMM DD, YYYY")}</div>
@@ -186,7 +185,7 @@ const CandidatesList: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
-      render: (_, record: Postulacion) => (
+      render: (_: any, record: Postulacion) => (
         <Space>
           <Button
             type="primary"

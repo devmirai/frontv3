@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, Button, Typography, Row, Col, Space, Tag, Avatar, Divider, message } from 'antd';
 import { UserOutlined, LoginOutlined, EyeOutlined } from '@ant-design/icons';
 import { 
@@ -11,10 +11,9 @@ import {
 import { 
   simulateLogin, 
   getApplicationsByUser, 
-  getJobsByCompany, 
-  getInitialDashboardData 
+  getJobsByCompany 
 } from '../data/mockDataUtils';
-import { Rol, EstadoPostulacion } from '../types/api';
+import { EstadoPostulacion } from '../types/api';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -155,7 +154,7 @@ const DemoDataViewer: React.FC = () => {
       {/* Trabajos Disponibles */}
       <Card title="💼 Trabajos de Prueba" style={{ marginBottom: '24px' }}>
         <Row gutter={[16, 16]}>
-          {mockJobs.map((job, index) => (
+          {mockJobs.map((job, _index) => (
             <Col span={8} key={job.id}>
               <Card 
                 type="inner" 

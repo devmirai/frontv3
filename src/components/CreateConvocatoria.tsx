@@ -20,14 +20,12 @@ import {
   Steps,
   Select,
   Switch,
-  Space,
   Progress,
   Tooltip,
   Badge,
 } from "antd";
 import {
   ArrowLeftOutlined,
-  SaveOutlined,
   EyeOutlined,
   RobotOutlined,
   CalendarOutlined,
@@ -53,10 +51,9 @@ import { convocatoriaAPI } from "../services/api";
 import ThemeToggle from "./ThemeToggle";
 import dayjs from "dayjs";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Header, Content } = Layout;
-const { Step } = Steps;
 const { Option } = Select;
 
 interface ConvocatoriaFormData {

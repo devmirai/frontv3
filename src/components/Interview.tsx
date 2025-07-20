@@ -33,12 +33,11 @@ import {
 import { motion } from "framer-motion"
 import { useNavigate, useParams, useLocation } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
-import { preguntaAPI, evaluacionAPI, postulacionAPI, convocatoriaAPI, entrevistaAPI } from "../services/api"
+import { preguntaAPI, evaluacionAPI, postulacionAPI, entrevistaAPI } from "../services/api"
 import {
   type Pregunta,
   type Postulacion,
   type Evaluacion,
-  EstadoPostulacion,
 } from "../types/api"
 import {
   LineChart,

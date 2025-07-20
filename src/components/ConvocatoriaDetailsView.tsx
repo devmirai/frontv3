@@ -11,11 +11,8 @@ import {
   Tag,
   Table,
   Avatar,
-  Statistic,
-  Divider,
   message,
   Spin,
-  Badge,
   Tooltip,
   Empty,
   Modal,
@@ -29,34 +26,19 @@ import {
   ArrowLeftOutlined,
   CalendarOutlined,
   TeamOutlined,
-  TrophyOutlined,
   EyeOutlined,
   MailOutlined,
   PhoneOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
-  ExclamationCircleOutlined,
-  EditOutlined,
   DownloadOutlined,
-  FilterOutlined,
-  SearchOutlined,
   StarOutlined,
   UserOutlined,
   RobotOutlined,
   PlayCircleOutlined,
   MessageOutlined,
   MoreOutlined,
-  FileTextOutlined,
   BankOutlined,
-  EnvironmentOutlined,
-  DollarOutlined,
-  GlobalOutlined,
-  SafetyOutlined,
-  ThunderboltOutlined,
-  BulbOutlined,
-  HeartOutlined,
-  SendOutlined,
-  PlusOutlined,
 } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
@@ -75,7 +57,7 @@ const CandidateDetailView: React.FC<{
   candidate: Postulacion | null;
   convocatoriaTitle: string;
   companyName?: string;
-}> = ({ visible, onClose, candidate, convocatoriaTitle, companyName }) => {
+}> = ({ visible, onClose, candidate, convocatoriaTitle, companyName: _companyName }) => {
   if (!candidate) return null;
 
   return (
