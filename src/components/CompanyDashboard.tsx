@@ -242,7 +242,7 @@ const CompanyDashboard: React.FC = () => {
 
   const stats = [
     {
-      title: "Active Job Postings",
+      title: "Convocatorias Activas",
       value: convocatorias.filter((c) => c.activo).length,
       icon: <FileTextOutlined className="text-blue-600" />,
       color: "blue",
@@ -308,6 +308,75 @@ const CompanyDashboard: React.FC = () => {
     },
   ];
 
+  const handleDeleteConvocatoria = async (convocatoriaId: number, titulo: string) => {
+    try {
+      console.log(`🗑️ [CompanyDashboard] Attempting to delete convocatoria ${convocatoriaId}: "${titulo}"`);
+      
+      // Verify we have authentication token
+      const token = localStorage.getItem('mirai_token');
+      if (!token) {
+        console.error(`❌ [CompanyDashboard] No authentication token found`);
+        message.error("No tienes autorización. Por favor inicia sesión nuevamente.");
+        return;
+      }
+      
+      console.log(`🔑 [CompanyDashboard] Authentication token found, proceeding with deletion`);
+      
+      const response = await convocatoriaAPI.delete(convocatoriaId);
+      console.log(`✅ [CompanyDashboard] Successfully deleted convocatoria ${convocatoriaId}:`, response);
+      
+      message.success(`Convocatoria "${titulo}" eliminada exitosamente`);
+      
+      // Reload dashboard data to reflect changes
+      await loadDashboardData();
+      
+      console.log(`🔄 [CompanyDashboard] Dashboard data reloaded after deletion`);
+    } catch (error: any) {
+      console.error(`❌ [CompanyDashboard] Error deleting convocatoria ${convocatoriaId}:`, error);
+      
+      // Provide more detailed error information
+      let errorMessage = "Error al eliminar la convocatoria.";
+      
+      if (error.response) {
+        // Server responded with error status
+        const status = error.response.status;
+        const data = error.response.data;
+        
+        console.error(`HTTP ${status} Error:`, data);
+        
+        switch (status) {
+          case 401:
+            errorMessage = "No tienes autorización para eliminar esta convocatoria. Por favor inicia sesión nuevamente.";
+            break;
+          case 403:
+            errorMessage = "No tienes permisos para eliminar esta convocatoria.";
+            break;
+          case 404:
+            errorMessage = "La convocatoria no fue encontrada. Puede que ya haya sido eliminada.";
+            break;
+          case 409:
+            errorMessage = "No se puede eliminar la convocatoria porque tiene postulaciones asociadas.";
+            break;
+          case 500:
+            errorMessage = "Error interno del servidor. Por favor contacta al administrador.";
+            break;
+          default:
+            errorMessage = `Error del servidor (${status}): ${data?.message || 'Error desconocido'}`;
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        console.error("No response received:", error.request);
+        errorMessage = "No se pudo conectar con el servidor. Verifica tu conexión a internet.";
+      } else {
+        // Something else happened
+        console.error("Request setup error:", error.message);
+        errorMessage = `Error inesperado: ${error.message}`;
+      }
+      
+      message.error(errorMessage);
+    }
+  };
+
   const actionMenu = (record: any) => ({
     items: [
       {
@@ -318,16 +387,26 @@ const CompanyDashboard: React.FC = () => {
       },
       {
         key: "candidates",
-        label: "View Candidates",
+        label: "Ver Candidatos",
         icon: <TeamOutlined />,
         onClick: () =>
           navigate(`/empresa/convocatoria/${record.id}/candidates`),
       },
       {
         key: "delete",
-        label: "Delete",
+        label: "Eliminar",
         icon: <DeleteOutlined />,
         danger: true,
+        onClick: () => {
+          Modal.confirm({
+            title: "Confirmar Eliminación",
+            content: `¿Estás seguro de que quieres eliminar la convocatoria "${record.titulo}"? Esta acción no se puede deshacer.`,
+            okText: "Sí, Eliminar",
+            cancelText: "Cancelar",
+            okType: "danger",
+            onOk: () => handleDeleteConvocatoria(record.id, record.titulo),
+          });
+        },
       },
     ],
   });
@@ -336,13 +415,13 @@ const CompanyDashboard: React.FC = () => {
     items: [
       {
         key: "profile",
-        label: "Profile",
+        label: "Perfil",
         icon: <UserOutlined />,
         onClick: () => setProfileModalVisible(true),
       },
       {
         key: "settings",
-        label: "Settings",
+        label: "Configuración",
         icon: <SettingOutlined />,
         onClick: () => setSettingsDrawerVisible(true),
       },
@@ -352,7 +431,7 @@ const CompanyDashboard: React.FC = () => {
       },
       {
         key: "logout",
-        label: "Logout",
+        label: "Cerrar Sesión",
         icon: <LogoutOutlined />,
         onClick: logout,
       },
@@ -361,7 +440,7 @@ const CompanyDashboard: React.FC = () => {
 
   const convocatoriaColumns = [
     {
-      title: "Job Posting",
+      title: "Convocatoria",
       dataIndex: "titulo",
       key: "titulo",
       width: 280,
@@ -382,7 +461,7 @@ const CompanyDashboard: React.FC = () => {
       ),
     },
     {
-      title: "Category & Experience",
+      title: "Categoría y Experiencia",
       key: "categoryInfo",
       width: 180,
       render: (_: any, record: any) => (
@@ -404,17 +483,17 @@ const CompanyDashboard: React.FC = () => {
       ),
     },
     {
-      title: "Location",
+      title: "Ubicación",
       key: "location",
       width: 150,
       render: (_: any, record: any) => (
         <div className="text-sm text-gray-600 dark:text-gray-400">
-          {record.location || "Not specified"}
+          {record.location || "No especificada"}
         </div>
       ),
     },
     {
-      title: "Status",
+      title: "Estado",
       dataIndex: "status",
       key: "status",
       width: 140,
@@ -423,22 +502,22 @@ const CompanyDashboard: React.FC = () => {
         const daysLeft = record.daysUntilClosing;
         
         if (!isActive) {
-          return <Tag color="red">CLOSED</Tag>;
+          return <Tag color="red">CERRADA</Tag>;
         }
         
         if (daysLeft <= 3 && daysLeft > 0) {
-          return <Tag color="orange">CLOSING SOON ({daysLeft}d)</Tag>;
+          return <Tag color="orange">CIERRA PRONTO ({daysLeft}d)</Tag>;
         }
         
         if (daysLeft <= 0) {
-          return <Tag color="red">EXPIRED</Tag>;
+          return <Tag color="red">EXPIRADA</Tag>;
         }
         
-        return <Tag color="green">ACTIVE ({daysLeft}d left)</Tag>;
+        return <Tag color="green">ACTIVA ({daysLeft}d restantes)</Tag>;
       },
     },
     {
-      title: "Applications",
+      title: "Aplicaciones",
       key: "applications",
       width: 120,
       render: (_: any, record: Convocatoria) => {
@@ -455,17 +534,17 @@ const CompanyDashboard: React.FC = () => {
           <div>
             <div className="font-medium text-lg">{count}</div>
             <div className="text-xs text-green-600 dark:text-green-400">
-              {completed} completed
+              {completed} completadas
             </div>
             <div className="text-xs text-orange-600 dark:text-orange-400">
-              {pending} pending
+              {pending} pendientes
             </div>
           </div>
         );
       },
     },
     {
-      title: "Publication Date",
+      title: "Fecha de Publicación",
       dataIndex: "publicationDate",
       key: "publicationDate",
       width: 130,
@@ -476,25 +555,25 @@ const CompanyDashboard: React.FC = () => {
       ),
     },
     {
-      title: "End Date",
+      title: "Fecha de Cierre",
       dataIndex: "closingDate",
       key: "closingDate",
       width: 130,
       render: (date: string, record: any) => (
         <div>
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            {dayjs(date).format("MMM DD, YYYY")}
+            {dayjs(date).format("DD [de] MMM [de] YYYY")}
           </div>
           {record.daysUntilClosing <= 7 && record.daysUntilClosing > 0 && (
             <div className="text-xs text-orange-500 font-medium">
-              {record.daysUntilClosing} days left
+              {record.daysUntilClosing} días restantes
             </div>
           )}
         </div>
       ),
     },
     {
-      title: "Actions",
+      title: "Acciones",
       key: "actions",
       width: 100,
       fixed: 'right' as const,
@@ -1283,9 +1362,19 @@ const CompanyDashboard: React.FC = () => {
                             },
                             {
                               key: "delete",
-                              label: "Delete Job",
+                              label: "Eliminar Trabajo",
                               icon: <DeleteOutlined />,
                               danger: true,
+                              onClick: () => {
+                                Modal.confirm({
+                                  title: "Confirmar Eliminación",
+                                  content: `¿Estás seguro de que quieres eliminar la convocatoria "${job.titulo}"? Esta acción no se puede deshacer y eliminará todas las aplicaciones asociadas.`,
+                                  okText: "Sí, Eliminar",
+                                  cancelText: "Cancelar",
+                                  okType: "danger",
+                                  onOk: () => handleDeleteConvocatoria(job.id, job.titulo),
+                                });
+                              },
                             },
                           ],
                         }}

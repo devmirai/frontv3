@@ -425,22 +425,22 @@ const CandidatesList: React.FC = () => {
                             data={[
                               {
                                 subject: "Claridad",
-                                A: consolidatedResults?.resumenPorCriterio?.claridad_estructura / 10 || 0,
+                                A: (consolidatedResults?.resumenPorCriterio?.claridad_estructura || 0) / 10,
                                 fullMark: 10,
                               },
                               {
                                 subject: "Técnico",
-                                A: consolidatedResults?.resumenPorCriterio?.dominio_tecnico / 10 || 0,
+                                A: (consolidatedResults?.resumenPorCriterio?.dominio_tecnico || 0) / 10,
                                 fullMark: 10,
                               },
                               {
                                 subject: "Relevancia",
-                                A: consolidatedResults?.resumenPorCriterio?.pertinencia / 10 || 0,
+                                A: (consolidatedResults?.resumenPorCriterio?.pertinencia || 0) / 10,
                                 fullMark: 10,
                               },
                               {
                                 subject: "Comunicación",
-                                A: consolidatedResults?.resumenPorCriterio?.comunicacion_seguridad / 10 || 0,
+                                A: (consolidatedResults?.resumenPorCriterio?.comunicacion_seguridad || 0) / 10,
                                 fullMark: 10,
                               },
                             ]}
@@ -461,11 +461,11 @@ const CandidatesList: React.FC = () => {
                             <div className="flex justify-between mb-1">
                               <span>Claridad y Estructura</span>
                               <span>
-                                {(consolidatedResults?.resumenPorCriterio?.claridad_estructura || 0).toFixed(1)}/10
+                                {((consolidatedResults?.resumenPorCriterio?.claridad_estructura || 0) / 10).toFixed(1)}/10
                               </span>
                             </div>
                             <Progress
-                              percent={(consolidatedResults?.resumenPorCriterio?.claridad_estructura || 0) * 10}
+                              percent={(consolidatedResults?.resumenPorCriterio?.claridad_estructura || 0)}
                               strokeColor="#52c41a"
                             />
                           </div>
@@ -473,21 +473,21 @@ const CandidatesList: React.FC = () => {
                             <div className="flex justify-between mb-1">
                               <span>Conocimiento Técnico</span>
                               <span>
-                                {(consolidatedResults?.resumenPorCriterio?.dominio_tecnico || 0).toFixed(1)}/10
+                                {((consolidatedResults?.resumenPorCriterio?.dominio_tecnico || 0) / 10).toFixed(1)}/10
                               </span>
                             </div>
                             <Progress
-                              percent={(consolidatedResults?.resumenPorCriterio?.dominio_tecnico || 0) * 10}
+                              percent={(consolidatedResults?.resumenPorCriterio?.dominio_tecnico || 0)}
                               strokeColor="#1890ff"
                             />
                           </div>
                           <div>
                             <div className="flex justify-between mb-1">
                               <span>Relevancia</span>
-                              <span>{(consolidatedResults?.resumenPorCriterio?.pertinencia || 0).toFixed(1)}/10</span>
+                              <span>{((consolidatedResults?.resumenPorCriterio?.pertinencia || 0) / 10).toFixed(1)}/10</span>
                             </div>
                             <Progress
-                              percent={(consolidatedResults?.resumenPorCriterio?.pertinencia || 0) * 10}
+                              percent={(consolidatedResults?.resumenPorCriterio?.pertinencia || 0)}
                               strokeColor="#722ed1"
                             />
                           </div>
@@ -495,11 +495,11 @@ const CandidatesList: React.FC = () => {
                             <div className="flex justify-between mb-1">
                               <span>Comunicación</span>
                               <span>
-                                {(consolidatedResults?.resumenPorCriterio?.comunicacion_seguridad || 0).toFixed(1)}/10
+                                {((consolidatedResults?.resumenPorCriterio?.comunicacion_seguridad || 0) / 10).toFixed(1)}/10
                               </span>
                             </div>
                             <Progress
-                              percent={(consolidatedResults?.resumenPorCriterio?.comunicacion_seguridad || 0) * 10}
+                              percent={(consolidatedResults?.resumenPorCriterio?.comunicacion_seguridad || 0)}
                               strokeColor="#fa8c16"
                             />
                           </div>
@@ -523,38 +523,38 @@ const CandidatesList: React.FC = () => {
                             <div className="grid grid-cols-2 gap-4 mb-3">
                               <div>
                                 <span className="text-sm text-gray-600 dark:text-gray-400">Claridad:</span>
-                                <Progress percent={(item.evaluacion?.claridadEstructura || 0) * 10} size="small" />
+                                <Progress percent={(item.evaluacion?.claridadEstructura || 0)} size="small" />
                               </div>
                               <div>
                                 <span className="text-sm text-gray-600 dark:text-gray-400">Técnico:</span>
-                                <Progress percent={(item.evaluacion?.dominioTecnico || 0) * 10} size="small" />
+                                <Progress percent={(item.evaluacion?.dominioTecnico || 0)} size="small" />
                               </div>
                               <div>
                                 <span className="text-sm text-gray-600 dark:text-gray-400">Relevancia:</span>
-                                <Progress percent={(item.evaluacion?.pertinencia || 0) * 10} size="small" />
+                                <Progress percent={(item.evaluacion?.pertinencia || 0)} size="small" />
                               </div>
                               <div>
                                 <span className="text-sm text-gray-600 dark:text-gray-400">Comunicación:</span>
-                                <Progress percent={(item.evaluacion?.comunicacionSeguridad || 0) * 10} size="small" />
+                                <Progress percent={(item.evaluacion?.comunicacionSeguridad || 0)} size="small" />
                               </div>
                             </div>
                           </Col>
                           <Col xs={24} lg={8} className="text-center">
                             <Title level={4} className="mb-0">
-                              {item.evaluacion?.puntuacionFinal?.toFixed(1) || "N/A"}/10
+                              {((item.evaluacion?.puntuacionFinal || 0) / 10).toFixed(1)}/10
                             </Title>
                             <Tag
                               color={
-                                item.evaluacion?.puntuacionFinal >= 8
+                                (item.evaluacion?.puntuacionFinal || 0) / 10 >= 8
                                   ? "success"
-                                  : item.evaluacion?.puntuacionFinal >= 6
+                                  : (item.evaluacion?.puntuacionFinal || 0) / 10 >= 6
                                     ? "warning"
                                     : "error"
                               }
                             >
-                              {item.evaluacion?.puntuacionFinal >= 8
+                              {(item.evaluacion?.puntuacionFinal || 0) / 10 >= 8
                                 ? "Excelente"
-                                : item.evaluacion?.puntuacionFinal >= 6
+                                : (item.evaluacion?.puntuacionFinal || 0) / 10 >= 6
                                   ? "Bueno"
                                   : "Deficiente"}
                             </Tag>

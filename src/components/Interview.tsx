@@ -462,10 +462,11 @@ const Interview: React.FC = () => {
         if (questions.length > 0) {
           questions.forEach((q: any) => {
             if (q.evaluacion) {
-              criteriaAverages.claridad_estructura += q.evaluacion.claridadEstructura || 0;
-              criteriaAverages.dominio_tecnico += q.evaluacion.dominioTecnico || 0;
-              criteriaAverages.pertinencia += q.evaluacion.pertinencia || 0;
-              criteriaAverages.comunicacion_seguridad += q.evaluacion.comunicacionSeguridad || 0;
+              // Convert 100-point scale scores to 10-point scale by dividing by 10
+              criteriaAverages.claridad_estructura += (q.evaluacion.claridadEstructura || 0) / 10;
+              criteriaAverages.dominio_tecnico += (q.evaluacion.dominioTecnico || 0) / 10;
+              criteriaAverages.pertinencia += (q.evaluacion.pertinencia || 0) / 10;
+              criteriaAverages.comunicacion_seguridad += (q.evaluacion.comunicacionSeguridad || 0) / 10;
             }
           });
           
@@ -507,12 +508,12 @@ const Interview: React.FC = () => {
               tipo: q.tipoLegible || q.tipo
             },
             evaluacion: {
-              // Map the actual API fields correctly
-              puntuacionFinal: q.evaluacion?.puntajeTotal || 0, // Use puntajeTotal, not puntuacionFinal
-              claridadEstructura: q.evaluacion?.claridadEstructura || 0,
-              dominioTecnico: q.evaluacion?.dominioTecnico || 0,
-              pertinencia: q.evaluacion?.pertinencia || 0,
-              comunicacionSeguridad: q.evaluacion?.comunicacionSeguridad || 0,
+              // Convert 100-point scale scores to 10-point scale by dividing by 10
+              puntuacionFinal: (q.evaluacion?.puntajeTotal || 0) / 10, // Use puntajeTotal, convert to 10-point scale
+              claridadEstructura: (q.evaluacion?.claridadEstructura || 0) / 10,
+              dominioTecnico: (q.evaluacion?.dominioTecnico || 0) / 10,
+              pertinencia: (q.evaluacion?.pertinencia || 0) / 10,
+              comunicacionSeguridad: (q.evaluacion?.comunicacionSeguridad || 0) / 10,
               feedback: q.evaluacion?.feedback || 'No feedback available'
             },
             respuesta: q.respuestaUsuario || 'No response recorded'
@@ -724,11 +725,11 @@ const Interview: React.FC = () => {
             <div className="loading-details">
               <div className="detail-item">
                 <Text strong>Posición:</Text>
-                <Text>{postulacion?.convocatoria?.titulo || 'Cargando...'}</Text>
+                <Text>{job?.titulo || postulacion?.convocatoria?.titulo || 'Cargando...'}</Text>
               </div>
               <div className="detail-item">
                 <Text strong>Empresa:</Text>
-                <Text>{postulacion?.convocatoria?.empresa?.nombre || 'Cargando...'}</Text>
+                <Text>{job?.empresa?.nombre || postulacion?.convocatoria?.empresa?.nombre || 'Cargando...'}</Text>
               </div>
             </div>
             <div className="loading-tips">
@@ -782,18 +783,18 @@ const Interview: React.FC = () => {
     const radarData = [
       {
         subject: "Clarity & Structure",
-        A: consolidatedResults?.resumenPorCriterio?.claridad_estructura / 10 || 0,
+        A: consolidatedResults?.resumenPorCriterio?.claridad_estructura || 0,
         fullMark: 10,
       },
       {
         subject: "Technical Knowledge",
-        A: consolidatedResults?.resumenPorCriterio?.dominio_tecnico / 10 || 0,
+        A: consolidatedResults?.resumenPorCriterio?.dominio_tecnico || 0,
         fullMark: 10,
       },
-      { subject: "Relevance", A: consolidatedResults?.resumenPorCriterio?.pertinencia / 10 || 0, fullMark: 10 },
+      { subject: "Relevance", A: consolidatedResults?.resumenPorCriterio?.pertinencia || 0, fullMark: 10 },
       {
         subject: "Communication",
-        A: consolidatedResults?.resumenPorCriterio?.comunicacion_seguridad / 10 || 0,
+        A: consolidatedResults?.resumenPorCriterio?.comunicacion_seguridad || 0,
         fullMark: 10,
       },
     ]
@@ -996,7 +997,7 @@ const Interview: React.FC = () => {
                                       Claridad y Estructura
                                     </Paragraph>
                                     <Progress
-                                      percent={(item.evaluacion?.claridadEstructura || 0) * 10}
+                                      percent={item.evaluacion?.claridadEstructura || 0}
                                       strokeColor="#52c41a"
                                       size="small"
                                     />
@@ -1007,7 +1008,7 @@ const Interview: React.FC = () => {
                                       Conocimiento Técnico
                                     </Paragraph>
                                     <Progress
-                                      percent={(item.evaluacion?.dominioTecnico || 0) * 10}
+                                      percent={item.evaluacion?.dominioTecnico || 0}
                                       strokeColor="#1890ff"
                                       size="small"
                                     />
@@ -1018,7 +1019,7 @@ const Interview: React.FC = () => {
                                       Pertinencia
                                     </Paragraph>
                                     <Progress
-                                      percent={(item.evaluacion?.pertinencia || 0) * 10}
+                                      percent={item.evaluacion?.pertinencia || 0}
                                       strokeColor="#722ed1"
                                       size="small"
                                     />
@@ -1029,7 +1030,7 @@ const Interview: React.FC = () => {
                                       Comunicación
                                     </Paragraph>
                                     <Progress
-                                      percent={(item.evaluacion?.comunicacionSeguridad || 0) * 10}
+                                      percent={item.evaluacion?.comunicacionSeguridad || 0}
                                       strokeColor="#fa8c16"
                                       size="small"
                                     />
