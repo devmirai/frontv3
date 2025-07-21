@@ -143,40 +143,40 @@ const CreateConvocatoria: React.FC = () => {
     const errors: string[] = [];
     
     if (!allValues.jobTitle || String(allValues.jobTitle).trim() === '') {
-      errors.push("Job Title is required");
+      errors.push("El título del trabajo es requerido");
     }
     
     if (!allValues.jobDescription || String(allValues.jobDescription).trim() === '') {
-      errors.push("Job Description is required");
+      errors.push("La descripción del trabajo es requerida");
     }
     
     if (!allValues.technicalRequirements || String(allValues.technicalRequirements).trim() === '') {
-      errors.push("Technical Requirements is required");
+      errors.push("Los requisitos técnicos son requeridos");
     }
     
     if (!allValues.category || Number(allValues.category) < 1) {
-      errors.push("Category is required");
+      errors.push("La categoría es requerida");
     }
     
     if (!allValues.experienceLevel || Number(allValues.experienceLevel) < 1) {
-      errors.push("Experience Level is required");
+      errors.push("El nivel de experiencia es requerido");
     }
     
     if (!allValues.workMode || Number(allValues.workMode) < 1) {
-      errors.push("Work Mode is required");
+      errors.push("El modo de trabajo es requerido");
     }
     
     if (!allValues.fechaPublicacion) {
-      errors.push("Publication Date is required");
+      errors.push("La fecha de publicación es requerida");
     }
     
     if (!allValues.fechaCierre) {
-      errors.push("Closing Date is required");
+      errors.push("La fecha de cierre es requerida");
     }
     
     if (errors.length > 0) {
       console.error("Validation errors:", errors);
-      message.error(`Missing required fields: ${errors.join(", ")}`);
+      message.error(`Campos requeridos faltantes: ${errors.join(", ")}`);
       return false;
     }
     
@@ -284,23 +284,23 @@ const CreateConvocatoria: React.FC = () => {
 
   const steps = [
     {
-      title: "Basic Info",
-      description: "Job title and description",
+      title: "Información Básica",
+      description: "Título y descripción del puesto",
       icon: <FormOutlined />,
     },
     {
-      title: "Requirements",
-      description: "Skills and experience",
+      title: "Requisitos",
+      description: "Habilidades y experiencia",
       icon: <FileTextOutlined />,
     },
     {
-      title: "Details",
-      description: "Location and benefits",
+      title: "Detalles",
+      description: "Ubicación y beneficios",
       icon: <SettingOutlined />,
     },
     {
-      title: "AI Configuration",
-      description: "Interview settings",
+      title: "Configuración IA",
+      description: "Configuraciones de entrevista",
       icon: <RobotOutlined />,
     },
   ];
@@ -319,7 +319,7 @@ const CreateConvocatoria: React.FC = () => {
           setCurrentStep(currentStep + 1);
         }).catch((errorInfo) => {
           console.log('Validation failed for step', currentStep, ':', errorInfo);
-          message.error('Please fill in all required fields before continuing');
+          message.error('Por favor complete todos los campos requeridos antes de continuar');
         });
       } else {
         setCurrentStep(currentStep + 1);
@@ -364,21 +364,21 @@ const CreateConvocatoria: React.FC = () => {
               onClick={() => navigate("/empresa/dashboard")}
               className="back-button"
             >
-              Back to Dashboard
+              Volver al Panel
             </Button>
             <div className="header-info">
               <Title level={3} className="header-title">
-                Create New Job Posting
+                Crear Nueva Oferta de Trabajo
               </Title>
               <Text className="header-subtitle">
-                Set up an AI-powered interview for your position
+                Configura una entrevista impulsada por IA para tu posición
               </Text>
             </div>
           </div>
 
           <div className="header-right">
             <div className="progress-indicator">
-              <Text className="progress-text">Form Progress</Text>
+              <Text className="progress-text">Progreso del Formulario</Text>
               <Progress
                 percent={getFormProgress()}
                 size="small"
@@ -386,14 +386,14 @@ const CreateConvocatoria: React.FC = () => {
                 className="progress-bar"
               />
             </div>
-            <Tooltip title="Toggle Preview">
+            <Tooltip title="Alternar Vista Previa">
               <Button
                 type={showPreview ? "primary" : "default"}
                 icon={<EyeOutlined />}
                 onClick={() => setShowPreview(!showPreview)}
                 className="preview-toggle"
               >
-                Preview
+                Vista Previa
               </Button>
             </Tooltip>
             <ThemeToggle />
@@ -450,63 +450,62 @@ const CreateConvocatoria: React.FC = () => {
                           </div>
                           <div className="step-info">
                             <Title level={4} className="step-title">
-                              Basic Information
+                              Información Básica
                             </Title>
                             <Text className="step-description">
-                              Start with the essential details about your job
-                              posting
+                              Comience con los detalles esenciales sobre su oferta de trabajo
                             </Text>
                           </div>
                         </div>
 
                         <div className="form-section">
-                          <Form.Item
+                            <Form.Item
                             name="jobTitle"
                             label={
                               <span className="form-label">
-                                <UserOutlined /> Job Title
+                                <UserOutlined /> Título del Trabajo
                               </span>
                             }
                             rules={[
                               {
                                 required: true,
-                                message: "Please enter the job title",
+                                message: "Por favor ingrese el título del trabajo",
                               },
                               {
                                 min: 5,
-                                message: "Title must be at least 5 characters",
+                                message: "El título debe tener al menos 5 caracteres",
                               },
                               {
                                 max: 100,
-                                message: "Title cannot exceed 100 characters",
+                                message: "El título no puede exceder los 100 caracteres",
                               },
                             ]}
                           >
                             <Input
-                              placeholder="e.g., Senior Full Stack Developer"
+                              placeholder="ej., Desarrollador Full Stack Senior"
                               size="large"
                               className="modern-input"
                             />
                           </Form.Item>
 
-                          <Form.Item
+                            <Form.Item
                             name="category"
                             label={
                               <span className="form-label">
-                                <BulbOutlined /> Category
+                                <BulbOutlined /> Categoría
                               </span>
                             }
                             rules={[
                               {
                                 required: true,
-                                message: "Please select a category",
+                                message: "Por favor seleccione una categoría",
                               },
                             ]}
                           >
                             <Select
                               size="large"
                               className="modern-select"
-                              placeholder="Select job category"
+                              placeholder="Seleccione la categoría del trabajo"
                             >
                               {CATEGORIES.map((cat) => (
                                 <Option key={cat.value} value={cat.value}>
@@ -520,29 +519,29 @@ const CreateConvocatoria: React.FC = () => {
                             name="jobDescription"
                             label={
                               <span className="form-label">
-                                <FileTextOutlined /> Job Description
+                                <FileTextOutlined /> Descripción del Trabajo
                               </span>
                             }
                             rules={[
                               {
                                 required: true,
-                                message: "Please enter the job description",
+                                message: "Por favor ingrese la descripción del trabajo",
                               },
                               {
                                 min: 50,
                                 message:
-                                  "Description must be at least 50 characters",
+                                  "La descripción debe tener al menos 50 caracteres",
                               },
                               {
                                 max: 1000,
                                 message:
-                                  "Description cannot exceed 1000 characters",
+                                  "La descripción no puede exceder los 1000 caracteres",
                               },
                             ]}
                           >
                             <TextArea
                               rows={6}
-                              placeholder="Describe the main responsibilities, work environment, and what makes this position attractive..."
+                              placeholder="Describe las principales responsabilidades, ambiente de trabajo y qué hace atractiva esta posición..."
                               className="modern-textarea"
                               showCount
                               maxLength={1000}
@@ -561,10 +560,10 @@ const CreateConvocatoria: React.FC = () => {
                           </div>
                           <div className="step-info">
                             <Title level={4} className="step-title">
-                              Requirements & Skills
+                              Requisitos y Habilidades
                             </Title>
                             <Text className="step-description">
-                              Define the technical skills and experience needed
+                              Define las habilidades técnicas y experiencia necesarias
                             </Text>
                           </div>
                         </div>
@@ -574,29 +573,29 @@ const CreateConvocatoria: React.FC = () => {
                             name="technicalRequirements"
                             label={
                               <span className="form-label">
-                                <ThunderboltOutlined /> Technical Requirements
+                                <ThunderboltOutlined /> Requisitos Técnicos
                               </span>
                             }
                             rules={[
                               {
                                 required: true,
-                                message: "Please enter the requirements",
+                                message: "Por favor ingrese los requisitos",
                               },
                               {
                                 min: 100,
                                 message:
-                                  "Requirements must be at least 100 characters",
+                                  "Los requisitos deben tener al menos 100 caracteres",
                               },
                               {
                                 max: 2000,
                                 message:
-                                  "Requirements cannot exceed 2000 characters",
+                                  "Los requisitos no pueden exceder los 2000 caracteres",
                               },
                             ]}
                           >
                             <TextArea
                               rows={8}
-                              placeholder="Detail the technologies, required experience, technical skills, specific knowledge, years of experience, methodologies, tools, etc..."
+                              placeholder="Detalla las tecnologías, experiencia requerida, habilidades técnicas, conocimientos específicos, años de experiencia, metodologías, herramientas, etc..."
                               className="modern-textarea"
                               showCount
                               maxLength={2000}
@@ -607,20 +606,20 @@ const CreateConvocatoria: React.FC = () => {
                             name="experienceLevel"
                             label={
                               <span className="form-label">
-                                <StarOutlined /> Experience Level
+                                <StarOutlined /> Nivel de Experiencia
                               </span>
                             }
                             rules={[
                               {
                                 required: true,
-                                message: "Please select experience level",
+                                message: "Por favor seleccione el nivel de experiencia",
                               },
                             ]}
                           >
                             <Select
                               size="large"
                               className="modern-select"
-                              placeholder="Select required experience"
+                              placeholder="Seleccione la experiencia requerida"
                             >
                               {EXPERIENCE_LEVELS.map((exp) => (
                                 <Option key={exp.value} value={exp.value}>
@@ -642,10 +641,10 @@ const CreateConvocatoria: React.FC = () => {
                           </div>
                           <div className="step-info">
                             <Title level={4} className="step-title">
-                              Job Details
+                              Detalles del Trabajo
                             </Title>
                             <Text className="step-description">
-                              Configure work mode, location, and compensation
+                              Configure el modo de trabajo, ubicación y compensación
                             </Text>
                           </div>
                         </div>
@@ -657,20 +656,20 @@ const CreateConvocatoria: React.FC = () => {
                                 name="workMode"
                                 label={
                                   <span className="form-label">
-                                    <GlobalOutlined /> Work Mode
+                                    <GlobalOutlined /> Modo de Trabajo
                                   </span>
                                 }
                                 rules={[
                                   {
                                     required: true,
-                                    message: "Please select work mode",
+                                    message: "Por favor seleccione el modo de trabajo",
                                   },
                                 ]}
                               >
                                 <Select
                                   size="large"
                                   className="modern-select"
-                                  placeholder="Select work mode"
+                                  placeholder="Seleccione el modo de trabajo"
                                 >
                                   {WORK_MODES.map((mode) => (
                                     <Option key={mode.value} value={mode.value}>
@@ -685,12 +684,12 @@ const CreateConvocatoria: React.FC = () => {
                                 name="location"
                                 label={
                                   <span className="form-label">
-                                    <EnvironmentOutlined /> Location
+                                    <EnvironmentOutlined /> Ubicación
                                   </span>
                                 }
                               >
                                 <Input
-                                  placeholder="e.g., San Francisco, CA or Remote"
+                                  placeholder="ej., San Francisco, CA o Remoto"
                                   size="large"
                                   className="modern-input"
                                 />
@@ -704,13 +703,13 @@ const CreateConvocatoria: React.FC = () => {
                                 name="salaryMin"
                                 label={
                                   <span className="form-label">
-                                    <DollarOutlined /> Salary Min
+                                    <DollarOutlined /> Salario Mínimo
                                   </span>
                                 }
                               >
                                 <Input
                                   type="number"
-                                  placeholder="e.g., 80000"
+                                  placeholder="ej., 80000"
                                   size="large"
                                   className="modern-input"
                                 />
@@ -721,13 +720,13 @@ const CreateConvocatoria: React.FC = () => {
                                 name="salaryMax"
                                 label={
                                   <span className="form-label">
-                                    <DollarOutlined /> Salary Max
+                                    <DollarOutlined /> Salario Máximo
                                   </span>
                                 }
                               >
                                 <Input
                                   type="number"
-                                  placeholder="e.g., 120000"
+                                  placeholder="ej., 120000"
                                   size="large"
                                   className="modern-input"
                                 />
@@ -739,14 +738,14 @@ const CreateConvocatoria: React.FC = () => {
                             name="salaryCurrency"
                             label={
                               <span className="form-label">
-                                <DollarOutlined /> Currency
+                                <DollarOutlined /> Moneda
                               </span>
                             }
                           >
                             <Select
                               size="large"
                               className="modern-select"
-                              placeholder="Select currency"
+                              placeholder="Seleccione la moneda"
                             >
                               <Option value="USD">USD - US Dollar</Option>
                               <Option value="MXN">MXN - Mexican Peso</Option>
@@ -759,13 +758,13 @@ const CreateConvocatoria: React.FC = () => {
                             name="benefitsPerks"
                             label={
                               <span className="form-label">
-                                <SafetyOutlined /> Benefits & Perks
+                                <SafetyOutlined /> Beneficios y Ventajas
                               </span>
                             }
                           >
                             <TextArea
                               rows={4}
-                              placeholder="Describe benefits like health insurance, PTO, 401k, flexible hours, etc."
+                              placeholder="Describe beneficios como seguro médico, vacaciones, 401k, horarios flexibles, etc."
                               className="modern-textarea"
                               showCount
                               maxLength={500}
@@ -778,13 +777,13 @@ const CreateConvocatoria: React.FC = () => {
                                 name="fechaPublicacion"
                                 label={
                                   <span className="form-label">
-                                    <CalendarOutlined /> Publication Date
+                                    <CalendarOutlined /> Fecha de Publicación
                                   </span>
                                 }
                                 rules={[
                                   {
                                     required: true,
-                                    message: "Select publication date",
+                                    message: "Seleccione la fecha de publicación",
                                   },
                                 ]}
                               >
@@ -804,13 +803,13 @@ const CreateConvocatoria: React.FC = () => {
                                 name="fechaCierre"
                                 label={
                                   <span className="form-label">
-                                    <ClockCircleOutlined /> Closing Date
+                                    <ClockCircleOutlined /> Fecha de Cierre
                                   </span>
                                 }
                                 rules={[
                                   {
                                     required: true,
-                                    message: "Select closing date",
+                                    message: "Seleccione la fecha de cierre",
                                   },
                                   { validator: validateDates },
                                 ]}
@@ -840,10 +839,10 @@ const CreateConvocatoria: React.FC = () => {
                           </div>
                           <div className="step-info">
                             <Title level={4} className="step-title">
-                              AI Interview Configuration
+                              Configuración de Entrevista IA
                             </Title>
                             <Text className="step-description">
-                              Configure the AI-powered interview settings
+                              Configure los ajustes de la entrevista impulsada por IA
                             </Text>
                           </div>
                         </div>
@@ -854,11 +853,11 @@ const CreateConvocatoria: React.FC = () => {
                               <RobotOutlined className="ai-info-icon" />
                               <div>
                                 <Title level={5} className="ai-info-title">
-                                  AI-Powered Interview
+                                  Entrevista Impulsada por IA
                                 </Title>
                                 <Text className="ai-info-description">
-                                  Candidates will participate in an intelligent
-                                  interview powered by mirAI
+                                  Los candidatos participarán en una entrevista inteligente
+                                  impulsada por mirAI
                                 </Text>
                               </div>
                             </div>
@@ -868,7 +867,7 @@ const CreateConvocatoria: React.FC = () => {
                             name="dificultad"
                             label={
                               <span className="form-label">
-                                <StarOutlined /> Interview Difficulty Level
+                                <StarOutlined /> Nivel de Dificultad de la Entrevista
                               </span>
                             }
                           >
@@ -878,15 +877,15 @@ const CreateConvocatoria: React.FC = () => {
                                   min={1}
                                   max={10}
                                   marks={{
-                                    1: "Beginner",
+                                    1: "Principiante",
                                     3: "Junior",
-                                    5: "Mid",
+                                    5: "Intermedio",
                                     7: "Senior",
-                                    10: "Expert",
+                                    10: "Experto",
                                   }}
                                   tooltip={{
                                     formatter: (value) =>
-                                      `Level ${value}/10 - ${getDifficultyLabel(value || 5)}`,
+                                      `Nivel ${value}/10 - ${getDifficultyLabel(value || 5)}`,
                                   }}
                                   className="modern-slider"
                                 />
@@ -918,19 +917,19 @@ const CreateConvocatoria: React.FC = () => {
                                     {getDifficultyLabel(
                                       previewData?.dificultad || 5,
                                     )}{" "}
-                                    Level
+                                    Nivel
                                   </Text>
                                   <Text
                                     className="difficulty-desc"
                                     type="secondary"
                                   >
                                     {previewData?.dificultad <= 3
-                                      ? "Basic concepts and fundamentals"
+                                      ? "Conceptos básicos y fundamentos"
                                       : previewData?.dificultad <= 6
-                                        ? "Intermediate questions with practical cases"
+                                        ? "Preguntas intermedias con casos prácticos"
                                         : previewData?.dificultad <= 8
-                                          ? "Advanced questions and architecture"
-                                          : "Expert-level optimization and complex scenarios"}
+                                          ? "Preguntas avanzadas y arquitectura"
+                                          : "Optimización de nivel experto y escenarios complejos"}
                                   </Text>
                                 </div>
                               </div>
@@ -942,13 +941,13 @@ const CreateConvocatoria: React.FC = () => {
                             valuePropName="checked"
                             label={
                               <span className="form-label">
-                                <CheckCircleOutlined /> Publish Immediately
+                                <CheckCircleOutlined /> Publicar Inmediatamente
                               </span>
                             }
                           >
                             <Switch
-                              checkedChildren="Active"
-                              unCheckedChildren="Draft"
+                              checkedChildren="Activo"
+                              unCheckedChildren="Borrador"
                               className="modern-switch"
                             />
                           </Form.Item>
@@ -965,7 +964,7 @@ const CreateConvocatoria: React.FC = () => {
                             onClick={prevStep}
                             className="nav-button secondary"
                           >
-                            Previous
+                            Anterior
                           </Button>
                         )}
                       </div>
@@ -976,7 +975,7 @@ const CreateConvocatoria: React.FC = () => {
                           onClick={() => navigate("/empresa/dashboard")}
                           className="nav-button cancel"
                         >
-                          Cancel
+                          Cancelar
                         </Button>
 
                         {currentStep < steps.length - 1 ? (
@@ -986,7 +985,7 @@ const CreateConvocatoria: React.FC = () => {
                             onClick={nextStep}
                             className="nav-button primary"
                           >
-                            Next Step
+                            Siguiente Paso
                           </Button>
                         ) : (
                           <>
@@ -999,12 +998,12 @@ const CreateConvocatoria: React.FC = () => {
                                 console.log("DEBUG - Current form values:", currentValues);
                                 console.log("DEBUG - Saved form data:", formData);
                                 console.log("DEBUG - All combined data:", allData);
-                                message.info("Check console for current form values");
+                                message.info("Revise la consola para ver los valores actuales del formulario");
                               }}
                               className="nav-button debug"
                               style={{ marginRight: 8 }}
                             >
-                              Debug Values
+                              Depurar Valores
                             </Button>
                             <Button
                               type="primary"
@@ -1021,7 +1020,7 @@ const CreateConvocatoria: React.FC = () => {
                                 form.submit();
                               }}
                             >
-                              Create Job Posting
+                              Crear Oferta de Trabajo
                             </Button>
                           </>
                         )}
@@ -1041,10 +1040,10 @@ const CreateConvocatoria: React.FC = () => {
                       <EyeOutlined className="preview-icon" />
                       <div>
                         <Title level={4} className="preview-title">
-                          Live Preview
+                          Vista Previa en Vivo
                         </Title>
                         <Text className="preview-subtitle">
-                          See how candidates will view this job
+                          Vea cómo verán los candidatos este trabajo
                         </Text>
                       </div>
                     </div>
@@ -1060,37 +1059,37 @@ const CreateConvocatoria: React.FC = () => {
                           </Avatar>
                           <div className="company-info">
                             <Text className="company-name">
-                              {user?.name || "Your Company"}
+                              {user?.name || "Su Empresa"}
                             </Text>
                             <Text className="job-location">
-                              {previewData?.location || "Location TBD"}
+                              {previewData?.location || "Ubicación por definir"}
                             </Text>
                           </div>
                         </div>
 
                         <Tag color="green" className="job-status-tag">
-                          {previewData?.isActive ? "Active" : "Draft"}
+                          {previewData?.isActive ? "Activo" : "Borrador"}
                         </Tag>
                       </div>
 
                       <Title level={3} className="job-preview-title">
-                        {previewData?.jobTitle || "Job Title"}
+                        {previewData?.jobTitle || "Título del Trabajo"}
                       </Title>
 
                       <div className="job-meta">
                         <div className="meta-item">
                           <TeamOutlined className="meta-icon" />
                           <span>
-                            {EXPERIENCE_LEVELS.find(exp => exp.value === previewData?.experienceLevel)?.label || "Experience Level"}
+                            {EXPERIENCE_LEVELS.find(exp => exp.value === previewData?.experienceLevel)?.label || "Nivel de Experiencia"}
                           </span>
                         </div>
                         <div className="meta-item">
                           <GlobalOutlined className="meta-icon" />
-                          <span>{WORK_MODES.find(mode => mode.value === previewData?.workMode)?.label || "Work Mode"}</span>
+                          <span>{WORK_MODES.find(mode => mode.value === previewData?.workMode)?.label || "Modo de Trabajo"}</span>
                         </div>
                         <div className="meta-item">
                           <BulbOutlined className="meta-icon" />
-                          <span>{CATEGORIES.find(cat => cat.value === previewData?.category)?.label || "Category"}</span>
+                          <span>{CATEGORIES.find(cat => cat.value === previewData?.category)?.label || "Categoría"}</span>
                         </div>
                       </div>
 
@@ -1105,26 +1104,26 @@ const CreateConvocatoria: React.FC = () => {
 
                       {/* Description */}
                       <div className="preview-section">
-                        <Title level={5}>Job Description</Title>
+                        <Title level={5}>Descripción del Trabajo</Title>
                         <Text className="preview-text">
                           {previewData?.jobDescription ||
-                            "Job description will appear here..."}
+                            "La descripción del trabajo aparecerá aquí..."}
                         </Text>
                       </div>
 
                       {/* Requirements */}
                       <div className="preview-section">
-                        <Title level={5}>Requirements</Title>
+                        <Title level={5}>Requisitos</Title>
                         <Text className="preview-text">
                           {previewData?.technicalRequirements ||
-                            "Technical requirements will appear here..."}
+                            "Los requisitos técnicos aparecerán aquí..."}
                         </Text>
                       </div>
 
                       {/* Benefits */}
                       {previewData?.benefitsPerks && (
                           <div className="preview-section">
-                            <Title level={5}>Benefits & Perks</Title>
+                            <Title level={5}>Beneficios y Ventajas</Title>
                             <Text className="preview-text">
                               {previewData.benefitsPerks}
                             </Text>
@@ -1136,13 +1135,13 @@ const CreateConvocatoria: React.FC = () => {
                         <div className="ai-preview-header">
                           <RobotOutlined className="ai-preview-icon" />
                           <Title level={5} className="ai-preview-title">
-                            AI-Powered Interview
+                            Entrevista Impulsada por IA
                           </Title>
                         </div>
                         <Text className="ai-preview-description">
-                          Candidates will participate in an intelligent
-                          interview with personalized questions and real-time
-                          evaluation at difficulty level{" "}
+                          Los candidatos participarán en una entrevista inteligente
+                          con preguntas personalizadas y evaluación en tiempo real
+                          en el nivel de dificultad{" "}
                           {previewData?.dificultad || 5}/10.
                         </Text>
                         <div className="difficulty-preview">
@@ -1162,11 +1161,11 @@ const CreateConvocatoria: React.FC = () => {
                       {previewData?.fechaPublicacion &&
                         previewData?.fechaCierre && (
                           <div className="timeline-preview">
-                            <Title level={5}>Application Timeline</Title>
+                            <Title level={5}>Cronograma de Aplicación</Title>
                             <div className="timeline-item">
                               <CalendarOutlined className="timeline-icon" />
                               <span>
-                                Opens:{" "}
+                                Abre:{" "}
                                 {previewData.fechaPublicacion.format(
                                   "MMM DD, YYYY",
                                 )}
@@ -1175,7 +1174,7 @@ const CreateConvocatoria: React.FC = () => {
                             <div className="timeline-item">
                               <ClockCircleOutlined className="timeline-icon" />
                               <span>
-                                Closes:{" "}
+                                Cierra:{" "}
                                 {previewData.fechaCierre.format("MMM DD, YYYY")}
                               </span>
                             </div>

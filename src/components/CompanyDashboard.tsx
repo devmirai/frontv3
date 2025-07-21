@@ -80,7 +80,7 @@ const CompanyDashboard: React.FC = () => {
     {
       key: "dashboard",
       icon: <DashboardOutlined />,
-      label: "Dashboard",
+      label: "Panel",
       className: "sidebar-menu-item",
     },
     {
@@ -89,29 +89,29 @@ const CompanyDashboard: React.FC = () => {
     },
     {
       key: "job-management",
-      label: "Job Management",
+      label: "Gestión de Empleos",
       type: "group",
       children: [
         {
           key: "convocatorias",
           icon: <FileTextOutlined />,
-          label: "Job Postings",
+          label: "Ofertas de Trabajo",
           className: "sidebar-menu-item",
           onClick: () => setJobPostingsModalVisible(true),
         },
         {
           key: "candidates",
           icon: <TeamOutlined />,
-          label: "Candidates",
+          label: "Candidatos",
           className: "sidebar-menu-item",
           onClick: () => setCandidatesModalVisible(true),
         },
         {
           key: "analytics",
           icon: <BarChartOutlined />,
-          label: "Analytics",
+          label: "Analíticas",
           className: "sidebar-menu-item",
-          onClick: () => message.info("Analytics feature coming soon!"),
+          onClick: () => message.info("¡Función de analíticas próximamente!"),
         },
       ],
     },
@@ -121,20 +121,20 @@ const CompanyDashboard: React.FC = () => {
     },
     {
       key: "account",
-      label: "Account",
+      label: "Cuenta",
       type: "group",
       children: [
         {
           key: "profile",
           icon: <UserOutlined />,
-          label: "Profile",
+          label: "Perfil",
           className: "sidebar-menu-item",
           onClick: () => setProfileModalVisible(true),
         },
         {
           key: "settings",
           icon: <SettingOutlined />,
-          label: "Settings",
+          label: "Configuración",
           className: "sidebar-menu-item",
           onClick: () => setSettingsDrawerVisible(true),
         },
@@ -258,11 +258,11 @@ const CompanyDashboard: React.FC = () => {
           : 0,
     },
     {
-      title: "Total Applications",
+      title: "Postulaciones Totales",
       value: postulaciones.length,
       icon: <TeamOutlined className="text-green-600" />,
       color: "green",
-      change: `${postulaciones.filter((p) => p.estado === "COMPLETADA").length} completed`,
+      change: `${postulaciones.filter((p) => p.estado === "COMPLETADA").length} completadas`,
       trend: "up",
       percentage:
         postulaciones.length > 0
@@ -274,11 +274,11 @@ const CompanyDashboard: React.FC = () => {
           : 0,
     },
     {
-      title: "Pending Review",
+      title: "Pendiente de Revisión",
       value: postulaciones.filter((p) => p.estado === "PENDIENTE").length,
       icon: <ClockCircleOutlined className="text-orange-600" />,
       color: "orange",
-      change: "Need attention",
+      change: "Necesita atención",
       trend: "neutral",
       percentage:
         postulaciones.length > 0
@@ -290,11 +290,11 @@ const CompanyDashboard: React.FC = () => {
           : 0,
     },
     {
-      title: "In Progress",
+      title: "En Progreso",
       value: postulaciones.filter((p) => p.estado === "EN_EVALUACION").length,
       icon: <ExclamationCircleOutlined className="text-purple-600" />,
       color: "purple",
-      change: "Active interviews",
+      change: "Entrevistas activas",
       trend: "up",
       percentage:
         postulaciones.length > 0
@@ -312,7 +312,7 @@ const CompanyDashboard: React.FC = () => {
     items: [
       {
         key: "view",
-        label: "View Details",
+        label: "Ver Detalles",
         icon: <EyeOutlined />,
         onClick: () => navigate(`/empresa/convocatoria/${record.id}`),
       },
@@ -636,11 +636,11 @@ const CompanyDashboard: React.FC = () => {
             <div className="header-left">
               <div className="page-info">
                 <Title level={3} className="page-title">
-                  Company Dashboard
+                  Panel de Empresa
                 </Title>
                 <Text className="page-subtitle">
-                  Welcome back, {user?.name}! Manage your job postings and
-                  candidates.
+                  ¡Bienvenido de vuelta, {user?.name}! Administra tus
+                  publicaciones de trabajo y candidatos.
                 </Text>
               </div>
             </div>
@@ -694,27 +694,27 @@ const CompanyDashboard: React.FC = () => {
               <Row align="middle" gutter={[24, 24]}>
                 <Col xs={24} lg={16}>
                   <Title level={2} className="welcome-title">
-                    Welcome back, {user?.name}! 👋
+                    ¡Bienvenido de vuelta, {user?.name}! 👋
                   </Title>
                   <Paragraph className="welcome-description">
-                    You have{" "}
+                    Tienes{" "}
                     <strong>
                       {
                         postulaciones.filter((p) => p.estado === "PENDIENTE")
                           .length
                       }{" "}
-                      pending applications
+                      postulaciones pendientes
                     </strong>{" "}
-                    to review and{" "}
+                    para revisar y{" "}
                     <strong>
                       {
                         postulaciones.filter(
                           (p) => p.estado === "EN_EVALUACION",
                         ).length
                       }{" "}
-                      interviews
+                      entrevistas
                     </strong>{" "}
-                    in progress.
+                    en progreso.
                   </Paragraph>
                   <Space wrap>
                     <Button
@@ -726,9 +726,9 @@ const CompanyDashboard: React.FC = () => {
                           .length === 0
                       }
                     >
-                      Review Applications
+                      Revisar Postulaciones
                     </Button>
-                    <Button size="large">View Analytics</Button>
+                    <Button size="large">Ver Analíticas</Button>
                   </Space>
                 </Col>
                 <Col xs={24} lg={8}>
@@ -838,7 +838,7 @@ const CompanyDashboard: React.FC = () => {
             <Row gutter={[24, 24]} className="actions-section">
               <Col xs={24} lg={12}>
                 <Card
-                  title="Quick Actions"
+                  title="Acciones Rápidas"
                   className="actions-card"
                   extra={<RobotOutlined className="card-icon" />}
                 >
@@ -851,7 +851,7 @@ const CompanyDashboard: React.FC = () => {
                       className="btn-gradient action-button-large"
                       onClick={() => navigate("/empresa/convocatoria/create")}
                     >
-                      Create New Job Posting
+                      Crear Nueva Publicación de Trabajo
                     </Button>
                     <Button
                       block
@@ -859,7 +859,7 @@ const CompanyDashboard: React.FC = () => {
                       icon={<TeamOutlined />}
                       className="action-button-large"
                     >
-                      Manage Candidates
+                      Gestionar Candidatos
                     </Button>
                     <Button
                       block
@@ -867,14 +867,14 @@ const CompanyDashboard: React.FC = () => {
                       icon={<BarChartOutlined />}
                       className="action-button-large"
                     >
-                      View Reports
+                      Ver Reportes
                     </Button>
                   </Space>
                 </Card>
               </Col>
               <Col xs={24} lg={12}>
                 <Card
-                  title="AI Insights"
+                  title="Información de IA"
                   className="insights-card"
                   extra={<RobotOutlined className="card-icon" />}
                 >
@@ -883,11 +883,11 @@ const CompanyDashboard: React.FC = () => {
                       <div className="insight-header">
                         <span className="insight-emoji">💡</span>
                         <Text strong className="insight-title">
-                          Trending Skills
+                          Habilidades Tendencia
                         </Text>
                       </div>
                       <Text className="insight-description">
-                        React and TypeScript are the most requested skills this
+                        React y TypeScript son las habilidades más solicitadas este
                         month.
                       </Text>
                     </div>

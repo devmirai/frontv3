@@ -95,7 +95,7 @@ const UserDashboard: React.FC = () => {
     {
       key: "dashboard",
       icon: <DashboardOutlined />,
-      label: "Dashboard",
+      label: "Panel",
       className: "sidebar-menu-item",
     },
     {
@@ -104,27 +104,27 @@ const UserDashboard: React.FC = () => {
     },
     {
       key: "job-search",
-      label: "Job Search",
+      label: "Búsqueda de Empleo",
       type: "group" as const,
       children: [
         {
           key: "applications",
           icon: <FileTextOutlined />,
-          label: "My Applications",
+          label: "Mis Postulaciones",
           className: "sidebar-menu-item",
           onClick: () => setApplicationsModalVisible(true),
         },
         {
           key: "browse-jobs",
           icon: <SearchOutlined />,
-          label: "Browse Jobs",
+          label: "Explorar Trabajos",
           className: "sidebar-menu-item",
           onClick: () => setJobsModalVisible(true),
         },
         {
           key: "saved-jobs",
           icon: <HeartOutlined />,
-          label: "Saved Jobs",
+          label: "Trabajos Guardados",
           className: "sidebar-menu-item",
         },
       ],
@@ -135,19 +135,19 @@ const UserDashboard: React.FC = () => {
     },
     {
       key: "career",
-      label: "Career",
+      label: "Carrera",
       type: "group" as const,
       children: [
         {
           key: "interviews",
           icon: <TrophyOutlined />,
-          label: "Interview History",
+          label: "Historial de Entrevistas",
           className: "sidebar-menu-item",
         },
         {
           key: "skills",
           icon: <BookOutlined />,
-          label: "Skills Assessment",
+          label: "Evaluación de Habilidades",
           className: "sidebar-menu-item",
         },
       ],
@@ -158,20 +158,20 @@ const UserDashboard: React.FC = () => {
     },
     {
       key: "account",
-      label: "Account",
+      label: "Cuenta",
       type: "group" as const,
       children: [
         {
           key: "profile",
           icon: <UserOutlined />,
-          label: "Profile",
+          label: "Perfil",
           className: "sidebar-menu-item",
           onClick: () => setProfileModalVisible(true),
         },
         {
           key: "settings",
           icon: <SettingOutlined />,
-          label: "Settings",
+          label: "Configuración",
           className: "sidebar-menu-item",
           onClick: () => setSettingsDrawerVisible(true),
         },
@@ -306,52 +306,52 @@ const UserDashboard: React.FC = () => {
 
   const stats = [
     {
-      title: "Applications Sent",
+      title: "Postulaciones Enviadas",
       value: myApplications.length,
       icon: <FileTextOutlined className="text-blue-600" />,
       color: "blue",
-      change: "+3 this month",
+      change: "+3 este mes",
       trend: "up",
     },
     {
-      title: "Completed Interviews",
+      title: "Entrevistas Completadas",
       value: myApplications.filter(
         (a) => a.estado === EstadoPostulacion.COMPLETADA,
       ).length,
       icon: <CheckCircleOutlined className="text-green-600" />,
       color: "green",
-      change: `${Math.round((myApplications.filter((a) => a.estado === EstadoPostulacion.COMPLETADA).length / Math.max(myApplications.length, 1)) * 100)}% completion rate`,
+      change: `${Math.round((myApplications.filter((a) => a.estado === EstadoPostulacion.COMPLETADA).length / Math.max(myApplications.length, 1)) * 100)}% tasa de finalización`,
       trend: "up",
     },
     {
-      title: "In Progress",
+      title: "En Progreso",
       value: myApplications.filter(
         (a) => a.estado === EstadoPostulacion.EN_EVALUACION,
       ).length,
       icon: <ClockCircleOutlined className="text-orange-600" />,
       color: "orange",
-      change: "Active interviews",
+      change: "Entrevistas activas",
       trend: "up",
     },
     {
-      title: "Available Jobs",
+      title: "Trabajos Disponibles",
       value: availableJobs.length,
       icon: <StarOutlined className="text-purple-600" />,
       color: "purple",
-      change: "New opportunities",
+      change: "Nuevas oportunidades",
       trend: "up",
     },
   ];
 
   const getStatusTag = (status: EstadoPostulacion) => {
     const statusConfig = {
-      [EstadoPostulacion.PENDIENTE]: { color: "warning", text: "Pending" },
+      [EstadoPostulacion.PENDIENTE]: { color: "warning", text: "Pendiente" },
       [EstadoPostulacion.EN_EVALUACION]: {
         color: "processing",
-        text: "In Progress",
+        text: "En Progreso",
       },
-      [EstadoPostulacion.COMPLETADA]: { color: "success", text: "Completed" },
-      [EstadoPostulacion.RECHAZADA]: { color: "error", text: "Rejected" },
+      [EstadoPostulacion.COMPLETADA]: { color: "success", text: "Completada" },
+      [EstadoPostulacion.RECHAZADA]: { color: "error", text: "Rechazada" },
     };
     const config = statusConfig[status];
     return <Tag color={config.color}>{config.text}</Tag>;
@@ -361,13 +361,13 @@ const UserDashboard: React.FC = () => {
     items: [
       {
         key: "profile",
-        label: "Profile",
+        label: "Perfil",
         icon: <UserOutlined />,
         onClick: () => setProfileModalVisible(true),
       },
       {
         key: "settings",
-        label: "Settings",
+        label: "Configuración",
         icon: <SettingOutlined />,
         onClick: () => setSettingsDrawerVisible(true),
       },
@@ -377,7 +377,7 @@ const UserDashboard: React.FC = () => {
       },
       {
         key: "logout",
-        label: "Logout",
+        label: "Cerrar Sesión",
         icon: <LogoutOutlined />,
         onClick: logout,
       },
@@ -387,7 +387,7 @@ const UserDashboard: React.FC = () => {
   // Combined function for Steps 2-3: Create postulation and start interview immediately
   const handleApplyAndStartInterview = async (job: any) => {
     if (!user?.id) {
-      message.error('User information not available');
+      message.error('Información de usuario no disponible');
       return;
     }
 
@@ -395,7 +395,7 @@ const UserDashboard: React.FC = () => {
       console.log('🎯 [UserDashboard] Step 1: Creating postulation for job:', job.id);
       
       if (!job.id) {
-        throw new Error("Job ID is missing");
+        throw new Error("Falta el ID del trabajo");
       }
 
       // Step 1: Create postulation first
@@ -420,7 +420,7 @@ const UserDashboard: React.FC = () => {
       const { sessionId } = interviewResponse.data;
       
       console.log('✅ [UserDashboard] Step 2: Interview started:', sessionId);
-      message.success("Application submitted and interview started! Redirecting...");
+      message.success("¡Postulación enviada y entrevista iniciada! Redirigiendo...");
 
       // Reload dashboard data to show the new application
       await loadDashboardData();
@@ -432,11 +432,11 @@ const UserDashboard: React.FC = () => {
       console.error("❌ [UserDashboard] Error in application process:", error);
       
       if (error.response?.status === 409) {
-        message.error("You have already applied to this position.");
+        message.error("Ya has aplicado a esta posición.");
       } else if (error.response?.status === 400) {
-        message.error("Invalid application data. Please try again.");
+        message.error("Datos de postulación inválidos. Por favor intenta de nuevo.");
       } else {
-        message.error("Failed to submit application. Please try again.");
+        message.error("Error al enviar la postulación. Por favor intenta de nuevo.");
       }
     }
   }
@@ -453,7 +453,7 @@ const UserDashboard: React.FC = () => {
       const sessionId = response.data?.sessionId || response.data?.session_id;
       
       console.log(`✅ [UserDashboard] Interview started successfully: ${postulacionId}, Session: ${sessionId}`);
-      message.success("Interview started successfully!");
+      message.success("¡Entrevista iniciada exitosamente!");
       
       // Reload data to update the state
       await loadDashboardData();
@@ -466,7 +466,7 @@ const UserDashboard: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Error starting interview:", error);
-      message.error("Failed to start interview. Please try again.");
+      message.error("Error al iniciar la entrevista. Por favor intenta de nuevo.");
     } finally {
       setStartingInterview(null);
     }
@@ -481,7 +481,7 @@ const UserDashboard: React.FC = () => {
       console.log('🔍 [UserDashboard] DEBUG: preguntaAPI object:', preguntaAPI);
       console.log('🔍 [UserDashboard] DEBUG: preguntaAPI.generar function:', preguntaAPI.generar);
       
-      message.loading("Generating your interview questions...", 0);
+      message.loading("Generando las preguntas de tu entrevista...", 0);
       
       // Generate questions for the existing postulation using the API
       console.log('🔍 [UserDashboard] DEBUG: About to call preguntaAPI.generar with:', { idPostulacion: postulacionId });
@@ -489,7 +489,7 @@ const UserDashboard: React.FC = () => {
       console.log('✅ [UserDashboard] Questions generated for continue interview:', questionsResponse.data);
       
       message.destroy();
-      message.success("Questions ready! Redirecting to interview...");
+      message.success("¡Preguntas listas! Redirigiendo a la entrevista...");
       
       // Reload data to update the state
       await loadDashboardData();
@@ -506,7 +506,7 @@ const UserDashboard: React.FC = () => {
         stack: error.stack
       });
       message.destroy();
-      message.error("Failed to generate interview questions. Please try again.");
+      message.error("Error al generar las preguntas de la entrevista. Por favor intenta de nuevo.");
     } finally {
       setStartingInterview(null);
     }
@@ -514,7 +514,7 @@ const UserDashboard: React.FC = () => {
 
   const applicationColumns = [
     {
-      title: "Job",
+      title: "Trabajo",
       key: "job",
       render: (_: any, record: Postulacion) => (
         <div>
@@ -531,13 +531,13 @@ const UserDashboard: React.FC = () => {
       ),
     },
     {
-      title: "Status",
+      title: "Estado",
       dataIndex: "estado",
       key: "estado",
       render: (status: EstadoPostulacion) => getStatusTag(status),
     },
     {
-      title: "Applied Date",
+      title: "Fecha de Postulación",
       dataIndex: "fechaPostulacion",
       key: "fechaPostulacion",
       render: (date: string) => (
@@ -547,7 +547,7 @@ const UserDashboard: React.FC = () => {
       ),
     },
     {
-      title: "Progress",
+      title: "Progreso",
       key: "progress",
       render: (_: any, record: Postulacion) => {
         const getProgress = () => {
@@ -598,7 +598,7 @@ const UserDashboard: React.FC = () => {
               loading={startingInterview === record.id}
               onClick={() => handleStartInterview(record.id!)}
             >
-              Start Interview
+              Iniciar Entrevista
             </Button>
           )}
           {record.estado === EstadoPostulacion.EN_EVALUACION && (
@@ -619,7 +619,7 @@ const UserDashboard: React.FC = () => {
                 handleContinueInterview(record.id!);
               }}
             >
-              Continue
+              Continuar
             </Button>
           )}
           {record.estado === EstadoPostulacion.COMPLETADA && (
@@ -630,7 +630,7 @@ const UserDashboard: React.FC = () => {
                 navigate(`/usuario/interview/${record.id}/results`)
               }
             >
-              View Results
+              Ver Resultados
             </Button>
           )}
         </Space>
@@ -640,7 +640,7 @@ const UserDashboard: React.FC = () => {
 
   const jobsColumns = [
     {
-      title: "Job Title",
+      title: "Título del Trabajo",
       key: "title",
       render: (_: any, record: Convocatoria) => (
         <div>
@@ -654,13 +654,13 @@ const UserDashboard: React.FC = () => {
       ),
     },
     {
-      title: "Position",
+      title: "Posición",
       dataIndex: "puesto",
       key: "puesto",
       render: (puesto: string) => <Tag color="blue">{puesto}</Tag>,
     },
     {
-      title: "Closing Date",
+      title: "Fecha de Cierre",
       dataIndex: "fechaCierre",
       key: "fechaCierre",
       render: (date: string) => (
@@ -685,7 +685,7 @@ const UserDashboard: React.FC = () => {
             disabled={alreadyApplied}
             onClick={() => openApplyModal(record)}
           >
-            {alreadyApplied ? "Applied" : "Apply Now"}
+            {alreadyApplied ? "Aplicado" : "Aplicar Ahora"}
           </Button>
         );
       },
@@ -698,12 +698,12 @@ const UserDashboard: React.FC = () => {
 
     setApplying(true);
     try {
-      message.loading("Creating your application...", 0);
+      message.loading("Creando tu postulación...", 0);
 
       console.log('📊 [UserDashboard] Step 1: Creating postulation for job:', selectedJob.id);
       
       if (!selectedJob.id) {
-        throw new Error("Job ID is missing");
+        throw new Error("Falta el ID del trabajo");
       }
 
       // Step 1: Create postulation first
@@ -723,7 +723,7 @@ const UserDashboard: React.FC = () => {
       console.log('✅ [UserDashboard] Step 1: Postulation created:', postulacionId);
       
       message.destroy();
-      message.loading("Starting your interview...", 0);
+      message.loading("Iniciando tu entrevista...", 0);
 
       // Step 2: Start interview with the postulation ID
       console.log('📊 [UserDashboard] Step 2: Starting interview with postulation:', postulacionId);
@@ -731,7 +731,7 @@ const UserDashboard: React.FC = () => {
       const { sessionId } = interviewResponse.data;
 
       message.destroy();
-      message.success("Application submitted and interview started!");
+      message.success("¡Postulación enviada y entrevista iniciada!");
 
       // Close modal and navigate to interview
       setApplyModalVisible(false);
@@ -748,13 +748,13 @@ const UserDashboard: React.FC = () => {
       message.destroy();
 
       if (error.response?.status === 409) {
-        message.error("You have already applied to this position.");
+        message.error("Ya has aplicado a esta posición.");
       } else if (error.response?.status === 400) {
-        message.error("Invalid application data. Please try again.");
+        message.error("Datos de postulación inválidos. Por favor intenta de nuevo.");
       } else {
         message.error(
           error.response?.data?.message ||
-            "Error submitting application. Please try again.",
+            "Error al enviar la postulación. Por favor intenta de nuevo.",
         );
       }
     } finally {
@@ -768,7 +768,7 @@ const UserDashboard: React.FC = () => {
       (app) => app.convocatoria?.id === job.id,
     );
     if (alreadyApplied) {
-      message.warning("You have already applied to this position.");
+      message.warning("Ya has aplicado a esta posición.");
       return;
     }
 
@@ -778,13 +778,13 @@ const UserDashboard: React.FC = () => {
 
   const handleProfileSave = (values: any) => {
     console.log("Profile values:", values);
-    message.success("Profile updated successfully!");
+    message.success("¡Perfil actualizado exitosamente!");
     setProfileModalVisible(false);
   };
 
   const handleSettingsSave = (values: any) => {
     console.log("Settings values:", values);
-    message.success("Settings saved successfully!");
+    message.success("¡Configuración guardada exitosamente!");
     setSettingsDrawerVisible(false);
   };
 
@@ -823,7 +823,7 @@ const UserDashboard: React.FC = () => {
                 className="logo-content"
               >
                 <span className="logo-text">mirAI</span>
-                <span className="logo-subtitle">Career Portal</span>
+                <span className="logo-subtitle">Portal de Carrera</span>
               </motion.div>
             )}
           </motion.div>
@@ -880,23 +880,23 @@ const UserDashboard: React.FC = () => {
                 </div>
                 <div className="status-info">
                   <Title level={5} className="status-title">
-                    AI Assistant
+                    Asistente IA
                   </Title>
                   <Text className="status-description">
-                    Ready to help you succeed!
+                    ¡Listo para ayudarte a tener éxito!
                   </Text>
                   <div className="status-stats">
                     <div className="stat-item">
                       <span className="stat-number">
                         {myApplications.length}
                       </span>
-                      <span className="stat-label">Applications</span>
+                      <span className="stat-label">Postulaciones</span>
                     </div>
                     <div className="stat-item">
                       <span className="stat-number">
                         {availableJobs.length}
                       </span>
-                      <span className="stat-label">Jobs</span>
+                      <span className="stat-label">Trabajos</span>
                     </div>
                   </div>
                 </div>
@@ -923,11 +923,11 @@ const UserDashboard: React.FC = () => {
             <div className="header-left">
               <div className="page-info">
                 <Title level={3} className="page-title">
-                  My Dashboard
+                  Mi Panel
                 </Title>
                 <Text className="page-subtitle">
-                  Welcome back, {user?.name}! Track your applications and
-                  interviews.
+                  ¡Bienvenido de vuelta, {user?.name}! Rastrea tus postulaciones y
+                  entrevistas.
                 </Text>
               </div>
             </div>
@@ -940,7 +940,7 @@ const UserDashboard: React.FC = () => {
                   size="large"
                   onClick={() => setJobsModalVisible(true)}
                 >
-                  Search Jobs
+                  Buscar Trabajos
                 </Button>
                 <NotificationDropdown />
                 <ThemeToggle />
@@ -949,13 +949,13 @@ const UserDashboard: React.FC = () => {
                     items: [
                       {
                         key: "profile",
-                        label: "Profile",
+                        label: "Perfil",
                         icon: <UserOutlined />,
                         onClick: () => setProfileModalVisible(true),
                       },
                       {
                         key: "settings",
-                        label: "Settings",
+                        label: "Configuración",
                         icon: <SettingOutlined />,
                         onClick: () => setSettingsDrawerVisible(true),
                       },
@@ -965,7 +965,7 @@ const UserDashboard: React.FC = () => {
                       },
                       {
                         key: "logout",
-                        label: "Logout",
+                        label: "Cerrar Sesión",
                         icon: <LogoutOutlined />,
                         onClick: logout,
                       },
@@ -998,23 +998,23 @@ const UserDashboard: React.FC = () => {
               <Row align="middle" gutter={[24, 24]}>
                 <Col xs={24} lg={16}>
                   <Title level={2} className="welcome-title">
-                    Hello, {user?.name}! 👋
+                    ¡Hola, {user?.name}! 👋
                   </Title>
                   <Paragraph className="welcome-description">
-                    You have{" "}
+                    Tienes{" "}
                     <strong>
                       {
                         myApplications.filter(
                           (a) => a.estado === EstadoPostulacion.EN_EVALUACION,
                         ).length
                       }{" "}
-                      interviews
+                      entrevistas
                     </strong>{" "}
-                    in progress and{" "}
+                    en progreso y{" "}
                     <strong>
-                      {availableJobs.length} new job opportunities
+                      {availableJobs.length} nuevas oportunidades de trabajo
                     </strong>{" "}
-                    available.
+                    disponibles.
                   </Paragraph>
                   <Space wrap>
                     <Button
@@ -1039,13 +1039,13 @@ const UserDashboard: React.FC = () => {
                         }
                       }}
                     >
-                      Continue Interview
+                      Continuar Entrevista
                     </Button>
                     <Button
                       size="large"
                       onClick={() => setJobsModalVisible(true)}
                     >
-                      Browse Jobs
+                      Explorar Trabajos
                     </Button>
                   </Space>
                 </Col>
@@ -1105,14 +1105,14 @@ const UserDashboard: React.FC = () => {
               title={
                 <div className="table-header">
                   <Title level={4} className="table-title">
-                    My Applications
+                    Mis Postulaciones
                   </Title>
                   <Button
                     type="link"
                     className="view-all-button"
                     onClick={() => setApplicationsModalVisible(true)}
                   >
-                    View All
+                    Ver Todas
                   </Button>
                 </div>
               }
@@ -1137,14 +1137,14 @@ const UserDashboard: React.FC = () => {
               title={
                 <div className="table-header">
                   <Title level={4} className="table-title">
-                    Available Job Opportunities
+                    Oportunidades de Trabajo Disponibles
                   </Title>
                   <Button
                     type="link"
                     className="view-all-button"
                     onClick={() => setJobsModalVisible(true)}
                   >
-                    Browse All
+                    Explorar Todas
                   </Button>
                 </div>
               }
@@ -1279,7 +1279,7 @@ const UserDashboard: React.FC = () => {
                 </Row>
               ) : (
                 <Empty
-                  description="No job opportunities available at the moment"
+                  description="No hay oportunidades de trabajo disponibles en este momento"
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />
               )}
@@ -1289,7 +1289,7 @@ const UserDashboard: React.FC = () => {
             <Row gutter={[24, 24]} className="insights-section">
               <Col xs={24} lg={12}>
                 <Card
-                  title="Performance Insights"
+                  title="Información de Rendimiento"
                   className="insights-card"
                   extra={<TrophyOutlined className="card-icon" />}
                 >
@@ -1298,24 +1298,24 @@ const UserDashboard: React.FC = () => {
                       <div className="insight-header">
                         <span className="insight-emoji">🎯</span>
                         <Text strong className="insight-title">
-                          Strong Areas
+                          Áreas Fuertes
                         </Text>
                       </div>
                       <Text className="insight-description">
-                        Technical skills and problem-solving approach show
-                        consistent improvement.
+                        Las habilidades técnicas y el enfoque de resolución de
+                        problemas muestran una mejora constante.
                       </Text>
                     </div>
                     <div className="insight-item insight-improvement">
                       <div className="insight-header">
                         <span className="insight-emoji">📈</span>
                         <Text strong className="insight-title">
-                          Improvement Areas
+                          Áreas de Mejora
                         </Text>
                       </div>
                       <Text className="insight-description">
-                        Focus on communication clarity and providing more
-                        detailed examples.
+                        Enfócate en la claridad de comunicación y proporcionar
+                        ejemplos más detallados.
                       </Text>
                     </div>
                   </div>
@@ -1323,7 +1323,7 @@ const UserDashboard: React.FC = () => {
               </Col>
               <Col xs={24} lg={12}>
                 <Card
-                  title="AI Recommendations"
+                  title="Recomendaciones de IA"
                   className="insights-card"
                   extra={<RobotOutlined className="card-icon" />}
                 >
@@ -1332,24 +1332,24 @@ const UserDashboard: React.FC = () => {
                       <div className="insight-header">
                         <span className="insight-emoji">💡</span>
                         <Text strong className="insight-title">
-                          Skill Focus
+                          Enfoque de Habilidades
                         </Text>
                       </div>
                       <Text className="insight-description">
-                        Based on your applications, consider strengthening your
-                        React and Node.js skills.
+                        Basado en tus postulaciones, considera fortalecer tus
+                        habilidades en React y Node.js.
                       </Text>
                     </div>
                     <div className="insight-item insight-next">
                       <div className="insight-header">
                         <span className="insight-emoji">🚀</span>
                         <Text strong className="insight-title">
-                          Next Steps
+                          Próximos Pasos
                         </Text>
                       </div>
                       <Text className="insight-description">
-                        Apply to more senior positions to challenge yourself and
-                        grow your career.
+                        Postula a posiciones más senior para desafiarte y hacer
+                        crecer tu carrera.
                       </Text>
                     </div>
                   </div>
@@ -1389,10 +1389,10 @@ const UserDashboard: React.FC = () => {
                 </div>
                 <div className="header-text">
                   <Title level={3} className="header-title">
-                    Start Interview
+                    Iniciar Entrevista
                   </Title>
                   <Text className="header-subtitle">
-                    Begin your AI-powered interview process
+                    Comienza tu proceso de entrevista impulsado por IA
                   </Text>
                 </div>
               </div>
@@ -1443,15 +1443,15 @@ const UserDashboard: React.FC = () => {
             {/* Process Timeline */}
             <div className="application-process">
               <Title level={5} className="process-title">
-                Interview Process
+                Proceso de Entrevista
               </Title>
               <div className="process-steps">
                 <div className="step">
                   <div className="step-number active">1</div>
                   <div className="step-content">
-                    <Text className="step-title">Start Interview</Text>
+                    <Text className="step-title">Iniciar Entrevista</Text>
                     <Text className="step-description">
-                      Begin your AI-powered assessment
+                      Comienza tu evaluación impulsada por IA
                     </Text>
                   </div>
                 </div>
@@ -1459,9 +1459,9 @@ const UserDashboard: React.FC = () => {
                 <div className="step">
                   <div className="step-number">2</div>
                   <div className="step-content">
-                    <Text className="step-title">Answer Questions</Text>
+                    <Text className="step-title">Responder Preguntas</Text>
                     <Text className="step-description">
-                      Complete personalized interview questions
+                      Completa preguntas de entrevista personalizadas
                     </Text>
                   </div>
                 </div>
@@ -1469,9 +1469,9 @@ const UserDashboard: React.FC = () => {
                 <div className="step">
                   <div className="step-number">3</div>
                   <div className="step-content">
-                    <Text className="step-title">Review Results</Text>
+                    <Text className="step-title">Revisar Resultados</Text>
                     <Text className="step-description">
-                      Receive feedback and next steps
+                      Recibe retroalimentación y próximos pasos
                     </Text>
                   </div>
                 </div>
@@ -1484,18 +1484,18 @@ const UserDashboard: React.FC = () => {
                 <div className="info-card">
                   <RobotOutlined className="info-icon ai-icon" />
                   <div className="info-content">
-                    <Text className="info-title">AI-Powered Assessment</Text>
+                    <Text className="info-title">Evaluación Impulsada por IA</Text>
                     <Text className="info-description">
-                      Personalized questions based on job requirements
+                      Preguntas personalizadas basadas en los requisitos del trabajo
                     </Text>
                   </div>
                 </div>
                 <div className="info-card">
                   <ClockCircleOutlined className="info-icon time-icon" />
                   <div className="info-content">
-                    <Text className="info-title">30-60 Minutes</Text>
+                    <Text className="info-title">30-60 Minutos</Text>
                     <Text className="info-description">
-                      Complete at your own pace
+                      Completa a tu propio ritmo
                     </Text>
                   </div>
                 </div>
@@ -1520,7 +1520,7 @@ const UserDashboard: React.FC = () => {
                   disabled={applying}
                   className="cancel-button"
                 >
-                  Cancel
+                  Cancelar
                 </Button>
                 <Button
                   type="primary"
@@ -1532,12 +1532,12 @@ const UserDashboard: React.FC = () => {
                   disabled={applying}
                 >
                   {applying
-                    ? "Starting Interview..."
-                    : "Start Interview"}
+                    ? "Iniciando Entrevista..."
+                    : "Iniciar Entrevista"}
                 </Button>
               </div>
               <Text className="footer-note">
-                By starting the interview, you agree to our terms and conditions
+                Al iniciar la entrevista, aceptas nuestros términos y condiciones
               </Text>
             </div>
           </div>
@@ -1549,7 +1549,7 @@ const UserDashboard: React.FC = () => {
         title={
           <div className="modal-header">
             <UserOutlined className="modal-icon" />
-            <span>My Profile</span>
+            <span>Mi Perfil</span>
           </div>
         }
         open={profileModalVisible}
@@ -1560,7 +1560,7 @@ const UserDashboard: React.FC = () => {
             onClick={() => setProfileModalVisible(false)}
             className="modal-button"
           >
-            Cancel
+            Cancelar
           </Button>,
           <Button
             key="save"
@@ -1569,7 +1569,7 @@ const UserDashboard: React.FC = () => {
             icon={<SaveOutlined />}
             onClick={() => profileForm.submit()}
           >
-            Save Changes
+            Guardar Cambios
           </Button>,
         ]}
         width={600}
@@ -1586,13 +1586,13 @@ const UserDashboard: React.FC = () => {
               <Col span={12}>
                 <Form.Item
                   name="name"
-                  label="Full Name"
+                  label="Nombre Completo"
                   rules={[
-                    { required: true, message: "Please enter your name" },
+                    { required: true, message: "Por favor ingresa tu nombre" },
                   ]}
                 >
                   <Input
-                    placeholder="Enter your full name"
+                    placeholder="Ingresa tu nombre completo"
                     className="enhanced-input"
                   />
                 </Form.Item>
@@ -1602,12 +1602,12 @@ const UserDashboard: React.FC = () => {
                   name="email"
                   label="Email"
                   rules={[
-                    { required: true, message: "Please enter your email" },
-                    { type: "email", message: "Please enter a valid email" },
+                    { required: true, message: "Por favor ingresa tu email" },
+                    { type: "email", message: "Por favor ingresa un email válido" },
                   ]}
                 >
                   <Input
-                    placeholder="Enter your email"
+                    placeholder="Ingresa tu email"
                     disabled
                     className="enhanced-input"
                   />
@@ -1616,26 +1616,26 @@ const UserDashboard: React.FC = () => {
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item name="phone" label="Phone Number">
+                <Form.Item name="phone" label="Número de Teléfono">
                   <Input
-                    placeholder="Enter your phone number"
+                    placeholder="Ingresa tu número de teléfono"
                     className="enhanced-input"
                   />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item name="birthDate" label="Birth Date">
+                <Form.Item name="birthDate" label="Fecha de Nacimiento">
                   <DatePicker
                     className="enhanced-input w-full"
-                    placeholder="Select birth date"
+                    placeholder="Selecciona fecha de nacimiento"
                   />
                 </Form.Item>
               </Col>
             </Row>
-            <Form.Item name="bio" label="Bio">
+            <Form.Item name="bio" label="Biografía">
               <Input.TextArea
                 rows={4}
-                placeholder="Tell us about yourself..."
+                placeholder="Cuéntanos sobre ti..."
                 maxLength={500}
                 showCount
                 className="enhanced-textarea"
@@ -1664,7 +1664,7 @@ const UserDashboard: React.FC = () => {
               </div>
               <div className="header-text">
                 <Title level={3} className="applications-title">
-                  My Applications
+                  Mis Postulaciones
                 </Title>
                 <Text className="applications-subtitle">
                   Track your job applications and interview progress
@@ -1705,7 +1705,7 @@ const UserDashboard: React.FC = () => {
           <div className="applications-controls">
             <div className="controls-left">
               <Input
-                placeholder="Search applications..."
+                placeholder="Buscar postulaciones..."
                 prefix={<SearchOutlined />}
                 style={{ width: 280 }}
                 className="search-input"
@@ -1713,7 +1713,7 @@ const UserDashboard: React.FC = () => {
             </div>
             <div className="controls-right">
               <Select
-                placeholder="Filter by status"
+                placeholder="Filtrar por estado"
                 style={{ width: 180 }}
                 className="status-filter"
                 allowClear

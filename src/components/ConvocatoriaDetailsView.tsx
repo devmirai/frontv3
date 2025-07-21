@@ -79,10 +79,10 @@ const CandidateDetailView: React.FC<{
             </div>
             <div className="header-text">
               <Title level={3} className="candidate-modal-title">
-                Candidate Profile
+                Perfil del Candidato
               </Title>
               <Text className="candidate-modal-subtitle">
-                Detailed information and application progress
+                Información detallada y progreso de la aplicación
               </Text>
             </div>
           </div>
@@ -117,15 +117,15 @@ const CandidateDetailView: React.FC<{
                         className="status-tag"
                       >
                         {candidate.estado === "PENDIENTE"
-                          ? "Pending Review"
+                          ? "Revisión Pendiente"
                           : candidate.estado === "EN_EVALUACION"
-                            ? "In Progress"
+                            ? "En Progreso"
                             : candidate.estado === "COMPLETADA"
-                              ? "Completed"
-                              : "Rejected"}
+                              ? "Completada"
+                              : "Rechazada"}
                       </Tag>
                       <Text type="secondary">
-                        Applied {dayjs(candidate.fechaPostulacion).fromNow()}
+                        Aplicó {dayjs(candidate.fechaPostulacion).fromNow()}
                       </Text>
                     </div>
                   </div>
@@ -134,7 +134,7 @@ const CandidateDetailView: React.FC<{
 
               {/* Score Card */}
               {candidate.puntuacion && (
-                <Card className="score-info-card" title="Interview Performance">
+                <Card className="score-info-card" title="Rendimiento en la Entrevista">
                   <div className="score-section">
                     <div className="score-main">
                       <div className="score-circle">
@@ -148,7 +148,7 @@ const CandidateDetailView: React.FC<{
                       <div className="score-breakdown">
                         <div className="breakdown-item">
                           <Text className="breakdown-label">
-                            Technical Skills
+                            Habilidades Técnicas
                           </Text>
                           <Progress
                             percent={candidate.puntuacion * 0.9}
@@ -158,7 +158,7 @@ const CandidateDetailView: React.FC<{
                           />
                         </div>
                         <div className="breakdown-item">
-                          <Text className="breakdown-label">Communication</Text>
+                          <Text className="breakdown-label">Comunicación</Text>
                           <Progress
                             percent={candidate.puntuacion * 1.1}
                             strokeColor="#3b82f6"
@@ -173,18 +173,18 @@ const CandidateDetailView: React.FC<{
               )}
 
               {/* Timeline Card */}
-              <Card className="timeline-info-card" title="Application Timeline">
+              <Card className="timeline-info-card" title="Cronología de la Aplicación">
                 <Timeline
                   items={[
                     {
                       color: "blue",
                       children: (
                         <div>
-                          <Text strong>Application submitted</Text>
+                          <Text strong>Aplicación enviada</Text>
                           <br />
                           <Text type="secondary">
                             {dayjs(candidate.fechaPostulacion).format(
-                              "MMM DD, YYYY HH:mm",
+                              "DD [de] MMM [de] YYYY HH:mm",
                             )}
                           </Text>
                         </div>
@@ -196,10 +196,10 @@ const CandidateDetailView: React.FC<{
                             color: "orange",
                             children: (
                               <div>
-                                <Text strong>Interview started</Text>
+                                <Text strong>Entrevista iniciada</Text>
                                 <br />
                                 <Text type="secondary">
-                                  AI interview session initiated
+                                  Sesión de entrevista IA iniciada
                                 </Text>
                               </div>
                             ),
@@ -212,10 +212,10 @@ const CandidateDetailView: React.FC<{
                             color: "green",
                             children: (
                               <div>
-                                <Text strong>Interview completed</Text>
+                                <Text strong>Entrevista completada</Text>
                                 <br />
                                 <Text type="secondary">
-                                  Final score: {candidate.puntuacion}/100
+                                  Puntuación final: {candidate.puntuacion}/100
                                 </Text>
                               </div>
                             ),
@@ -229,7 +229,7 @@ const CandidateDetailView: React.FC<{
 
             <Col xs={24} lg={8}>
               {/* Contact Info */}
-              <Card className="contact-info-card" title="Contact Information">
+              <Card className="contact-info-card" title="Información de Contacto">
                 <div className="contact-info-grid">
                   <div className="contact-item">
                     <MailOutlined className="contact-icon" />
@@ -244,7 +244,7 @@ const CandidateDetailView: React.FC<{
                     <div className="contact-item">
                       <PhoneOutlined className="contact-icon" />
                       <div className="contact-details">
-                        <Text className="contact-label">Phone</Text>
+                        <Text className="contact-label">Teléfono</Text>
                         <Text className="contact-value">
                           {candidate.usuario.telefono}
                         </Text>
@@ -254,7 +254,7 @@ const CandidateDetailView: React.FC<{
                   <div className="contact-item">
                     <BankOutlined className="contact-icon" />
                     <div className="contact-details">
-                      <Text className="contact-label">Position</Text>
+                      <Text className="contact-label">Puesto</Text>
                       <Text className="contact-value">{convocatoriaTitle}</Text>
                     </div>
                   </div>
@@ -262,7 +262,7 @@ const CandidateDetailView: React.FC<{
               </Card>
 
               {/* Actions Card */}
-              <Card className="actions-info-card" title="Quick Actions">
+              <Card className="actions-info-card" title="Acciones Rápidas">
                 <Space
                   direction="vertical"
                   size="middle"
@@ -275,7 +275,7 @@ const CandidateDetailView: React.FC<{
                     size="large"
                     className="action-btn primary"
                   >
-                    Send Message
+                    Enviar Mensaje
                   </Button>
                   <Button
                     block
@@ -284,7 +284,7 @@ const CandidateDetailView: React.FC<{
                     className="action-btn secondary"
                     disabled={candidate.estado !== "PENDIENTE"}
                   >
-                    Start Interview
+                    Iniciar Entrevista
                   </Button>
                   <Button
                     block
@@ -292,7 +292,7 @@ const CandidateDetailView: React.FC<{
                     size="large"
                     className="action-btn secondary"
                   >
-                    Download CV
+                    Descargar CV
                   </Button>
                 </Space>
               </Card>
@@ -303,7 +303,7 @@ const CandidateDetailView: React.FC<{
         {/* Footer */}
         <div className="candidate-modal-footer">
           <Button size="large" onClick={onClose} className="modal-close-btn">
-            Close
+            Cerrar
           </Button>
         </div>
       </div>
@@ -384,11 +384,11 @@ const ConvocatoriaDetailsView: React.FC = () => {
         console.log(
           `⚠️ [ConvocatoriaDetailsView] Job ${jobId} not found`,
         );
-        message.error("Job posting not found");
+        message.error("Convocatoria no encontrada");
       }
     } catch (error: any) {
       console.error("Error loading convocatoria details:", error);
-      message.error("Error loading job posting details. Please check your connection and try again.");
+      message.error("Error al cargar los detalles de la convocatoria. Por favor verifica tu conexión e intenta de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -401,7 +401,7 @@ const ConvocatoriaDetailsView: React.FC = () => {
 
   const candidatesColumns = [
     {
-      title: "Candidate",
+      title: "Candidato",
       key: "candidate",
       width: 280,
       render: (_: any, record: Postulacion) => (
@@ -424,21 +424,21 @@ const ConvocatoriaDetailsView: React.FC = () => {
       ),
     },
     {
-      title: "Application Date",
+      title: "Fecha de Aplicación",
       dataIndex: "fechaPostulacion",
       key: "fechaPostulacion",
       width: 160,
       render: (date: string) => (
         <div className="table-date-cell">
           <div className="date-primary">
-            {dayjs(date).format("MMM DD, YYYY")}
+            {dayjs(date).format("DD [de] MMM [de] YYYY")}
           </div>
           <div className="date-time">{dayjs(date).format("HH:mm")}</div>
         </div>
       ),
     },
     {
-      title: "Status",
+      title: "Estado",
       dataIndex: "estado",
       key: "estado",
       width: 140,
@@ -456,17 +456,17 @@ const ConvocatoriaDetailsView: React.FC = () => {
           className="table-status-tag"
         >
           {status === "PENDIENTE"
-            ? "Pending"
+            ? "Pendiente"
             : status === "EN_EVALUACION"
-              ? "In Progress"
+              ? "En Progreso"
               : status === "COMPLETADA"
-                ? "Completed"
-                : "Rejected"}
+                ? "Completada"
+                : "Rechazada"}
         </Tag>
       ),
     },
     {
-      title: "Score",
+      title: "Puntuación",
       key: "score",
       width: 100,
       render: (_: any, record: Postulacion) => (
@@ -494,12 +494,12 @@ const ConvocatoriaDetailsView: React.FC = () => {
       ),
     },
     {
-      title: "Actions",
+      title: "Acciones",
       key: "actions",
       width: 160,
       render: (_: any, record: Postulacion) => (
         <Space>
-          <Tooltip title="View Details">
+          <Tooltip title="Ver Detalles">
             <Button
               type="primary"
               icon={<EyeOutlined />}
@@ -508,7 +508,7 @@ const ConvocatoriaDetailsView: React.FC = () => {
               className="table-action-btn primary"
             />
           </Tooltip>
-          <Tooltip title="Start Interview">
+          <Tooltip title="Iniciar Entrevista">
             <Button
               icon={<PlayCircleOutlined />}
               size="small"
@@ -521,12 +521,12 @@ const ConvocatoriaDetailsView: React.FC = () => {
               items: [
                 {
                   key: "message",
-                  label: "Send Message",
+                  label: "Enviar Mensaje",
                   icon: <MessageOutlined />,
                 },
                 {
                   key: "download",
-                  label: "Download CV",
+                  label: "Descargar CV",
                   icon: <DownloadOutlined />,
                 },
               ],
@@ -548,7 +548,7 @@ const ConvocatoriaDetailsView: React.FC = () => {
       <div className="details-loading-container">
         <Spin size="large" />
         <Title level={4} className="loading-text">
-          Loading job posting details...
+          Cargando detalles de la convocatoria...
         </Title>
       </div>
     );
@@ -558,7 +558,7 @@ const ConvocatoriaDetailsView: React.FC = () => {
     return (
       <div className="details-error-container">
         <Empty
-          description="Job posting not found"
+          description="Convocatoria no encontrada"
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         />
       </div>
@@ -567,25 +567,25 @@ const ConvocatoriaDetailsView: React.FC = () => {
 
   const stats = [
     {
-      title: "Total Applications",
+      title: "Total de Aplicaciones",
       value: postulaciones.length,
       icon: <TeamOutlined />,
       color: "#3b82f6",
     },
     {
-      title: "Pending Review",
+      title: "Revisión Pendiente",
       value: postulaciones.filter((p) => p.estado === "PENDIENTE").length,
       icon: <ClockCircleOutlined />,
       color: "#f59e0b",
     },
     {
-      title: "In Progress",
+      title: "En Progreso",
       value: postulaciones.filter((p) => p.estado === "EN_EVALUACION").length,
       icon: <RobotOutlined />,
       color: "#8b5cf6",
     },
     {
-      title: "Completed",
+      title: "Completadas",
       value: postulaciones.filter((p) => p.estado === "COMPLETADA").length,
       icon: <CheckCircleOutlined />,
       color: "#10b981",
@@ -604,14 +604,14 @@ const ConvocatoriaDetailsView: React.FC = () => {
               className="details-back-button"
               size="large"
             >
-              Back to Dashboard
+              Volver al Dashboard
             </Button>
             <div className="header-info">
               <Title level={3} className="details-header-title">
                 {convocatoria.titulo}
               </Title>
               <Text className="details-header-subtitle">
-                Job posting details and candidate management
+                Detalles de la convocatoria y gestión de candidatos
               </Text>
             </div>
           </div>
@@ -621,15 +621,15 @@ const ConvocatoriaDetailsView: React.FC = () => {
               <div className="meta-item">
                 <CalendarOutlined />
                 <span>
-                  <span>Closes:&nbsp;&nbsp;</span>
-                  {dayjs(convocatoria.fechaCierre).format("MMM DD, YYYY")}
+                  <span>Cierra:&nbsp;&nbsp;</span>
+                  {dayjs(convocatoria.fechaCierre).format("DD [de] MMM [de] YYYY")}
                 </span>
               </div>
               <Tag
                 color={convocatoria.activo ? "success" : "default"}
                 className="header-status-tag"
               >
-                {convocatoria.activo ? "Active" : "Closed"}
+                {convocatoria.activo ? "Activa" : "Cerrada"}
               </Tag>
             </div>
           </div>
@@ -682,25 +682,25 @@ const ConvocatoriaDetailsView: React.FC = () => {
             <Card className="details-info-card">
               <div className="info-card-header">
                 <Title level={4} className="info-card-title">
-                  Job Information
+                  Información del Trabajo
                 </Title>
               </div>
               <Row gutter={[32, 24]}>
                 <Col xs={24} lg={16}>
                   <div className="job-description-section">
                     <Title level={5} className="section-subtitle">
-                      Description
+                      Descripción
                     </Title>
                     <Paragraph className="job-description-text">
-                      {convocatoria.descripcion || "No description provided."}
+                      {convocatoria.descripcion || "No se proporcionó descripción."}
                     </Paragraph>
 
                     <Title level={5} className="section-subtitle">
-                      Requirements
+                      Requisitos
                     </Title>
                     <Paragraph className="job-requirements-text">
                       {convocatoria.puesto ||
-                        "No specific requirements listed."}
+                        "No se especificaron requisitos."}
                     </Paragraph>
                   </div>
                 </Col>
@@ -711,10 +711,10 @@ const ConvocatoriaDetailsView: React.FC = () => {
                         <CalendarOutlined />
                       </div>
                       <div className="detail-content">
-                        <Text className="detail-label">Created</Text>
+                        <Text className="detail-label">Creada</Text>
                         <Text className="detail-value">
                           {dayjs(convocatoria.fechaPublicacion).format(
-                            "MMM DD, YYYY",
+                            "DD [de] MMM [de] YYYY",
                           )}
                         </Text>
                       </div>
@@ -724,10 +724,10 @@ const ConvocatoriaDetailsView: React.FC = () => {
                         <ClockCircleOutlined />
                       </div>
                       <div className="detail-content">
-                        <Text className="detail-label">Closes</Text>
+                        <Text className="detail-label">Cierra</Text>
                         <Text className="detail-value">
                           {dayjs(convocatoria.fechaCierre).format(
-                            "MMM DD, YYYY",
+                            "DD [de] MMM [de] YYYY",
                           )}
                         </Text>
                       </div>
@@ -737,9 +737,9 @@ const ConvocatoriaDetailsView: React.FC = () => {
                         <StarOutlined />
                       </div>
                       <div className="detail-content">
-                        <Text className="detail-label">Difficulty</Text>
+                        <Text className="detail-label">Dificultad</Text>
                         <Text className="detail-value">
-                          Level {convocatoria.dificultad}/10
+                          Nivel {convocatoria.dificultad}/10
                         </Text>
                       </div>
                     </div>
@@ -748,9 +748,9 @@ const ConvocatoriaDetailsView: React.FC = () => {
                         <TeamOutlined />
                       </div>
                       <div className="detail-content">
-                        <Text className="detail-label">Applications</Text>
+                        <Text className="detail-label">Aplicaciones</Text>
                         <Text className="detail-value">
-                          {postulaciones.length} candidates
+                          {postulaciones.length} candidatos
                         </Text>
                       </div>
                     </div>
@@ -770,16 +770,16 @@ const ConvocatoriaDetailsView: React.FC = () => {
               <div className="candidates-card-header">
                 <div className="candidates-header-left">
                   <Title level={4} className="candidates-card-title">
-                    Candidates ({filteredPostulaciones.length})
+                    Candidatos ({filteredPostulaciones.length})
                   </Title>
                   <Text className="candidates-card-subtitle">
-                    Manage and review candidate applications
+                    Gestionar y revisar aplicaciones de candidatos
                   </Text>
                 </div>
                 <div className="candidates-header-right">
                   <Space size="middle">
                     <Input.Search
-                      placeholder="Search candidates..."
+                      placeholder="Buscar candidatos..."
                       value={searchText}
                       onChange={(e) => setSearchText(e.target.value)}
                       style={{ width: 250 }}
@@ -791,11 +791,11 @@ const ConvocatoriaDetailsView: React.FC = () => {
                       style={{ width: 150 }}
                       className="candidates-filter"
                     >
-                      <Option value="all">All Status</Option>
-                      <Option value="PENDIENTE">Pending</Option>
-                      <Option value="EN_EVALUACION">In Progress</Option>
-                      <Option value="COMPLETADA">Completed</Option>
-                      <Option value="RECHAZADA">Rejected</Option>
+                      <Option value="all">Todos los Estados</Option>
+                      <Option value="PENDIENTE">Pendiente</Option>
+                      <Option value="EN_EVALUACION">En Progreso</Option>
+                      <Option value="COMPLETADA">Completada</Option>
+                      <Option value="RECHAZADA">Rechazada</Option>
                     </Select>
                   </Space>
                 </div>
@@ -812,7 +812,7 @@ const ConvocatoriaDetailsView: React.FC = () => {
                       showQuickJumper: true,
                       showTotal: (total, range) => (
                         <span className="table-pagination-info">
-                          {`${range[0]}-${range[1]} of ${total} candidates`}
+                          {`${range[0]}-${range[1]} de ${total} candidatos`}
                         </span>
                       ),
                     }}
@@ -828,13 +828,13 @@ const ConvocatoriaDetailsView: React.FC = () => {
                       description={
                         <div>
                           <Text className="empty-title">
-                            No candidates found
+                            No se encontraron candidatos
                           </Text>
                           <br />
                           <Text className="empty-subtitle">
                             {searchText || statusFilter !== "all"
-                              ? "Try adjusting your search or filters"
-                              : "No candidates have applied for this position yet."}
+                              ? "Intenta ajustar tu búsqueda o filtros"
+                              : "Aún no hay candidatos que hayan aplicado para esta posición."}
                           </Text>
                         </div>
                       }

@@ -59,7 +59,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
       const response = type === "users" ? await usuarioAPI.getAll() : await empresaAPI.getAll()
       setData(response.data)
     } catch (error) {
-      message.error(`Error loading ${type}`)
+      message.error(`Error cargando ${type === "users" ? "usuarios" : "empresas"}`)
     } finally {
       setLoading(false)
     }
@@ -78,10 +78,10 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
       } else {
         await empresaAPI.delete(id)
       }
-      message.success(`${type === "users" ? "User" : "Company"} deleted successfully`)
+      message.success(`${type === "users" ? "Usuario" : "Empresa"} eliminado exitosamente`)
       loadData()
     } catch (error) {
-      message.error(`Error deleting ${type === "users" ? "user" : "company"}`)
+      message.error(`Error eliminando ${type === "users" ? "usuario" : "empresa"}`)
     }
   }
 
@@ -94,7 +94,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
         } else {
           await empresaAPI.update(editingRecord.id, values)
         }
-        message.success(`${type === "users" ? "User" : "Company"} updated successfully`)
+        message.success(`${type === "users" ? "Usuario" : "Empresa"} actualizado exitosamente`)
       } else {
         // Create new record
         if (type === "users") {
@@ -102,14 +102,14 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
         } else {
           await empresaAPI.create(values)
         }
-        message.success(`${type === "users" ? "User" : "Company"} created successfully`)
+        message.success(`${type === "users" ? "Usuario" : "Empresa"} creado exitosamente`)
       }
       setModalVisible(false)
       setEditingRecord(null)
       form.resetFields()
       loadData()
     } catch (error) {
-      message.error(`Error ${editingRecord ? "updating" : "creating"} ${type === "users" ? "user" : "company"}`)
+      message.error(`Error ${editingRecord ? "actualizando" : "creando"} ${type === "users" ? "usuario" : "empresa"}`)
     }
   }
 
@@ -117,44 +117,44 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
     items: [
       {
         key: "view",
-        label: "View Details",
+        label: "Ver Detalles",
         icon: <EyeOutlined />,
         onClick: () => {
           Modal.info({
-            title: `${type === "users" ? "User" : "Company"} Details`,
+            title: `Detalles del ${type === "users" ? "Usuario" : "Empresa"}`,
             content: (
               <div className="space-y-4 mt-4">
                 {type === "users" ? (
                   <>
                     <div>
-                      <strong>Name:</strong> {record.nombre} {record.apellidoPaterno} {record.apellidoMaterno}
+                      <strong>Nombre:</strong> {record.nombre} {record.apellidoPaterno} {record.apellidoMaterno}
                     </div>
                     <div>
                       <strong>Email:</strong> {record.email}
                     </div>
                     <div>
-                      <strong>Phone:</strong> {record.telefono}
+                      <strong>Teléfono:</strong> {record.telefono}
                     </div>
                     <div>
-                      <strong>Birth Date:</strong> {record.nacimiento}
+                      <strong>Fecha de Nacimiento:</strong> {record.nacimiento}
                     </div>
                   </>
                 ) : (
                   <>
                     <div>
-                      <strong>Company:</strong> {record.nombre}
+                      <strong>Empresa:</strong> {record.nombre}
                     </div>
                     <div>
                       <strong>Email:</strong> {record.email}
                     </div>
                     <div>
-                      <strong>Phone:</strong> {record.telefono}
+                      <strong>Teléfono:</strong> {record.telefono}
                     </div>
                     <div>
-                      <strong>Address:</strong> {record.direccion}
+                      <strong>Dirección:</strong> {record.direccion}
                     </div>
                     <div>
-                      <strong>Description:</strong> {record.descripcion}
+                      <strong>Descripción:</strong> {record.descripcion}
                     </div>
                   </>
                 )}
@@ -166,19 +166,19 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
       },
       {
         key: "edit",
-        label: "Edit",
+        label: "Editar",
         icon: <EditOutlined />,
         onClick: () => handleEdit(record),
       },
       {
         key: "delete",
-        label: "Delete",
+        label: "Eliminar",
         icon: <DeleteOutlined />,
         danger: true,
         onClick: () => {
           Modal.confirm({
-            title: `Delete ${type === "users" ? "User" : "Company"}`,
-            content: `Are you sure you want to delete this ${type === "users" ? "user" : "company"}?`,
+            title: `Eliminar ${type === "users" ? "Usuario" : "Empresa"}`,
+            content: `¿Estás seguro de que quieres eliminar este ${type === "users" ? "usuario" : "empresa"}?`,
             onOk: () => handleDelete(record.id),
           })
         },
@@ -188,7 +188,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
 
   const userColumns = [
     {
-      title: "User",
+      title: "Usuario",
       key: "user",
       render: (record: Usuario) => (
         <div className="flex items-center space-x-3">
@@ -203,23 +203,23 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
       ),
     },
     {
-      title: "Phone",
+      title: "Teléfono",
       dataIndex: "telefono",
       key: "telefono",
     },
     {
-      title: "Birth Date",
+      title: "Fecha de Nacimiento",
       dataIndex: "nacimiento",
       key: "nacimiento",
-      render: (date: string) => (date ? dayjs(date).format("MMM DD, YYYY") : "N/A"),
+      render: (date: string) => (date ? dayjs(date).format("DD [de] MMM [de] YYYY") : "N/A"),
     },
     {
-      title: "Status",
+      title: "Estado",
       key: "status",
-      render: () => <Tag color="success">Active</Tag>,
+      render: () => <Tag color="success">Activo</Tag>,
     },
     {
-      title: "Actions",
+      title: "Acciones",
       key: "actions",
       render: (record: Usuario) => (
         <Dropdown menu={actionMenu(record)} trigger={["click"]}>
@@ -231,7 +231,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
 
   const companyColumns = [
     {
-      title: "Company",
+      title: "Empresa",
       key: "company",
       render: (record: Empresa) => (
         <div className="flex items-center space-x-3">
@@ -244,23 +244,23 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
       ),
     },
     {
-      title: "Phone",
+      title: "Teléfono",
       dataIndex: "telefono",
       key: "telefono",
     },
     {
-      title: "Address",
+      title: "Dirección",
       dataIndex: "direccion",
       key: "direccion",
       ellipsis: true,
     },
     {
-      title: "Status",
+      title: "Estado",
       key: "status",
-      render: () => <Tag color="success">Active</Tag>,
+      render: () => <Tag color="success">Activa</Tag>,
     },
     {
-      title: "Actions",
+      title: "Acciones",
       key: "actions",
       render: (record: Empresa) => (
         <Dropdown menu={actionMenu(record)} trigger={["click"]}>
@@ -283,17 +283,17 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
 
   const stats = [
     {
-      title: type === "users" ? "Total Users" : "Total Companies",
+      title: type === "users" ? "Total de Usuarios" : "Total de Empresas",
       value: data.length,
       icon: type === "users" ? <UserOutlined /> : <TeamOutlined />,
     },
     {
-      title: "Active",
+      title: "Activos",
       value: data.length, // All are active for now
       icon: <CheckCircleOutlined />,
     },
     {
-      title: "This Month",
+      title: "Este Mes",
       value: Math.floor(data.length * 0.2), // Mock 20% growth
       icon: <ClockCircleOutlined />,
     },
@@ -314,21 +314,21 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
 
       {/* Main Table */}
       <Card
-        title={`${type === "users" ? "Users" : "Companies"} (${filteredData.length})`}
+        title={`${type === "users" ? "Usuarios" : "Empresas"} (${filteredData.length})`}
         extra={
           <Space>
             <Input.Search
-              placeholder={`Search ${type}...`}
+              placeholder={`Buscar ${type === "users" ? "usuarios" : "empresas"}...`}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               style={{ width: 200 }}
             />
             <Select value={statusFilter} onChange={setStatusFilter} style={{ width: 120 }}>
-              <Select.Option value="all">All Status</Select.Option>
-              <Select.Option value="active">Active</Select.Option>
-              <Select.Option value="inactive">Inactive</Select.Option>
+              <Select.Option value="all">Todos los Estados</Select.Option>
+              <Select.Option value="active">Activo</Select.Option>
+              <Select.Option value="inactive">Inactivo</Select.Option>
             </Select>
-            <Button icon={<ExportOutlined />}>Export</Button>
+            <Button icon={<ExportOutlined />}>Exportar</Button>
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -338,7 +338,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
                 setModalVisible(true)
               }}
             >
-              Add {type === "users" ? "User" : "Company"}
+              Agregar {type === "users" ? "Usuario" : "Empresa"}
             </Button>
           </Space>
         }
@@ -352,14 +352,14 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
             pageSize: 10,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+            showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} elementos`,
           }}
         />
       </Card>
 
       {/* Add/Edit Modal */}
       <Modal
-        title={`${editingRecord ? "Edit" : "Add"} ${type === "users" ? "User" : "Company"}`}
+        title={`${editingRecord ? "Editar" : "Agregar"} ${type === "users" ? "Usuario" : "Empresa"}`}
         open={modalVisible}
         onCancel={() => {
           setModalVisible(false)
@@ -376,8 +376,8 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
                 <Col span={12}>
                   <Form.Item
                     name="nombre"
-                    label="First Name"
-                    rules={[{ required: true, message: "Please enter first name" }]}
+                    label="Nombre"
+                    rules={[{ required: true, message: "Por favor ingresa el nombre" }]}
                   >
                     <Input />
                   </Form.Item>
@@ -385,37 +385,37 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
                 <Col span={12}>
                   <Form.Item
                     name="apellidoPaterno"
-                    label="Last Name"
-                    rules={[{ required: true, message: "Please enter last name" }]}
+                    label="Apellido Paterno"
+                    rules={[{ required: true, message: "Por favor ingresa el apellido paterno" }]}
                   >
                     <Input />
                   </Form.Item>
                 </Col>
               </Row>
-              <Form.Item name="apellidoMaterno" label="Mother's Last Name">
+              <Form.Item name="apellidoMaterno" label="Apellido Materno">
                 <Input />
               </Form.Item>
               <Form.Item
                 name="email"
                 label="Email"
                 rules={[
-                  { required: true, message: "Please enter email" },
-                  { type: "email", message: "Please enter valid email" },
+                  { required: true, message: "Por favor ingresa el email" },
+                  { type: "email", message: "Por favor ingresa un email válido" },
                 ]}
               >
                 <Input />
               </Form.Item>
               <Row gutter={16}>
                 <Col span={12}>
-                  <Form.Item name="telefono" label="Phone" rules={[{ required: true, message: "Please enter phone" }]}>
+                  <Form.Item name="telefono" label="Teléfono" rules={[{ required: true, message: "Por favor ingresa el teléfono" }]}>
                     <Input type="number" />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
                     name="nacimiento"
-                    label="Birth Date"
-                    rules={[{ required: true, message: "Please select birth date" }]}
+                    label="Fecha de Nacimiento"
+                    rules={[{ required: true, message: "Por favor selecciona la fecha de nacimiento" }]}
                   >
                     <DatePicker className="w-full" />
                   </Form.Item>
@@ -424,8 +424,8 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
               {!editingRecord && (
                 <Form.Item
                   name="password"
-                  label="Password"
-                  rules={[{ required: true, message: "Please enter password" }]}
+                  label="Contraseña"
+                  rules={[{ required: true, message: "Por favor ingresa la contraseña" }]}
                 >
                   <Input.Password />
                 </Form.Item>
@@ -435,8 +435,8 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
             <>
               <Form.Item
                 name="nombre"
-                label="Company Name"
-                rules={[{ required: true, message: "Please enter company name" }]}
+                label="Nombre de la Empresa"
+                rules={[{ required: true, message: "Por favor ingresa el nombre de la empresa" }]}
               >
                 <Input />
               </Form.Item>
@@ -444,23 +444,23 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
                 name="email"
                 label="Email"
                 rules={[
-                  { required: true, message: "Please enter email" },
-                  { type: "email", message: "Please enter valid email" },
+                  { required: true, message: "Por favor ingresa el email" },
+                  { type: "email", message: "Por favor ingresa un email válido" },
                 ]}
               >
                 <Input />
               </Form.Item>
               <Row gutter={16}>
                 <Col span={12}>
-                  <Form.Item name="telefono" label="Phone" rules={[{ required: true, message: "Please enter phone" }]}>
+                  <Form.Item name="telefono" label="Teléfono" rules={[{ required: true, message: "Por favor ingresa el teléfono" }]}>
                     <Input />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
                     name="direccion"
-                    label="Address"
-                    rules={[{ required: true, message: "Please enter address" }]}
+                    label="Dirección"
+                    rules={[{ required: true, message: "Por favor ingresa la dirección" }]}
                   >
                     <Input />
                   </Form.Item>
@@ -468,16 +468,16 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
               </Row>
               <Form.Item
                 name="descripcion"
-                label="Description"
-                rules={[{ required: true, message: "Please enter description" }]}
+                label="Descripción"
+                rules={[{ required: true, message: "Por favor ingresa la descripción" }]}
               >
                 <Input.TextArea rows={3} />
               </Form.Item>
               {!editingRecord && (
                 <Form.Item
                   name="password"
-                  label="Password"
-                  rules={[{ required: true, message: "Please enter password" }]}
+                  label="Contraseña"
+                  rules={[{ required: true, message: "Por favor ingresa la contraseña" }]}
                 >
                   <Input.Password />
                 </Form.Item>
@@ -487,9 +487,9 @@ const UserManagement: React.FC<UserManagementProps> = ({ type }) => {
 
           <Form.Item className="mb-0 flex justify-end">
             <Space>
-              <Button onClick={() => setModalVisible(false)}>Cancel</Button>
+              <Button onClick={() => setModalVisible(false)}>Cancelar</Button>
               <Button type="primary" htmlType="submit">
-                {editingRecord ? "Update" : "Create"}
+                {editingRecord ? "Actualizar" : "Crear"}
               </Button>
             </Space>
           </Form.Item>

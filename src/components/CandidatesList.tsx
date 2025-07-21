@@ -99,7 +99,7 @@ const CandidatesList: React.FC = () => {
 
   const handleViewEvaluation = async (postulacion: Postulacion) => {
     if (postulacion.estado !== EstadoPostulacion.COMPLETADA) {
-      message.warning("This candidate has not completed the interview yet.")
+      message.warning("Este candidato aún no ha completado la entrevista.")
       return
     }
 
@@ -112,7 +112,7 @@ const CandidatesList: React.FC = () => {
       setConsolidatedResults(evaluationResponse.data)
     } catch (error: any) {
       console.error("Error loading candidate evaluation:", error)
-      message.error("Failed to load candidate evaluation")
+      message.error("Error al cargar la evaluación del candidato")
     } finally {
       setEvaluationLoading(false)
     }
@@ -120,14 +120,14 @@ const CandidatesList: React.FC = () => {
 
   const getStatusTag = (status: EstadoPostulacion) => {
     const statusConfig = {
-      [EstadoPostulacion.PENDIENTE]: { color: "warning", text: "Pending", icon: <ClockCircleOutlined /> },
+      [EstadoPostulacion.PENDIENTE]: { color: "warning", text: "Pendiente", icon: <ClockCircleOutlined /> },
       [EstadoPostulacion.EN_EVALUACION]: {
         color: "processing",
-        text: "In Progress",
+        text: "En Progreso",
         icon: <ExclamationCircleOutlined />,
       },
-      [EstadoPostulacion.COMPLETADA]: { color: "success", text: "Completed", icon: <CheckCircleOutlined /> },
-      [EstadoPostulacion.RECHAZADA]: { color: "error", text: "Rejected", icon: <ExclamationCircleOutlined /> },
+      [EstadoPostulacion.COMPLETADA]: { color: "success", text: "Completada", icon: <CheckCircleOutlined /> },
+      [EstadoPostulacion.RECHAZADA]: { color: "error", text: "Rechazada", icon: <ExclamationCircleOutlined /> },
     }
     const config = statusConfig[status]
     return (
@@ -139,7 +139,7 @@ const CandidatesList: React.FC = () => {
 
   const columns = [
     {
-      title: "Candidate",
+      title: "Candidato",
       key: "candidate",
       render: (_: any, record: Postulacion) => (
         <div className="flex items-center space-x-3">
@@ -156,7 +156,7 @@ const CandidatesList: React.FC = () => {
       ),
     },
     {
-      title: "Application Date",
+      title: "Fecha de Postulación",
       dataIndex: "fechaPostulacion",
       key: "fechaPostulacion",
       render: (date: string) => (
@@ -167,13 +167,13 @@ const CandidatesList: React.FC = () => {
       ),
     },
     {
-      title: "Status",
+      title: "Estado",
       dataIndex: "estado",
       key: "estado",
       render: (status: EstadoPostulacion) => getStatusTag(status),
     },
     {
-      title: "Contact",
+      title: "Contacto",
       key: "contact",
       render: (_: any, record: Postulacion) => (
         <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -183,7 +183,7 @@ const CandidatesList: React.FC = () => {
       ),
     },
     {
-      title: "Actions",
+      title: "Acciones",
       key: "actions",
       render: (_: any, record: Postulacion) => (
         <Space>
@@ -195,7 +195,7 @@ const CandidatesList: React.FC = () => {
             disabled={record.estado !== EstadoPostulacion.COMPLETADA}
             className="btn-gradient"
           >
-            View Evaluation
+            Ver Evaluación
           </Button>
         </Space>
       ),
@@ -221,14 +221,14 @@ const CandidatesList: React.FC = () => {
               onClick={() => navigate(`/empresa/convocatoria/${id}`)}
               className="hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              Back to Job Details
+              Volver a Detalles del Trabajo
             </Button>
             <div>
               <Title level={4} className="mb-0">
-                Candidates List
+                Lista de Candidatos
               </Title>
               <Paragraph className="text-gray-500 dark:text-gray-400 text-sm mb-0">
-                {convocatoria?.titulo} - {postulaciones.length} applications
+                {convocatoria?.titulo} - {postulaciones.length} postulaciones
               </Paragraph>
             </div>
           </div>
@@ -258,7 +258,7 @@ const CandidatesList: React.FC = () => {
                   <Title level={3} className="mb-0">
                     {postulaciones.length}
                   </Title>
-                  <Paragraph className="text-gray-600 dark:text-gray-400 mb-0">Total Applications</Paragraph>
+                  <Paragraph className="text-gray-600 dark:text-gray-400 mb-0">Postulaciones Totales</Paragraph>
                 </Card>
               </Col>
               <Col xs={24} sm={6}>
@@ -269,7 +269,7 @@ const CandidatesList: React.FC = () => {
                   <Title level={3} className="mb-0">
                     {postulaciones.filter((p) => p.estado === EstadoPostulacion.PENDIENTE).length}
                   </Title>
-                  <Paragraph className="text-gray-600 dark:text-gray-400 mb-0">Pending</Paragraph>
+                  <Paragraph className="text-gray-600 dark:text-gray-400 mb-0">Pendientes</Paragraph>
                 </Card>
               </Col>
               <Col xs={24} sm={6}>
@@ -280,7 +280,7 @@ const CandidatesList: React.FC = () => {
                   <Title level={3} className="mb-0">
                     {postulaciones.filter((p) => p.estado === EstadoPostulacion.EN_EVALUACION).length}
                   </Title>
-                  <Paragraph className="text-gray-600 dark:text-gray-400 mb-0">In Progress</Paragraph>
+                  <Paragraph className="text-gray-600 dark:text-gray-400 mb-0">En Progreso</Paragraph>
                 </Card>
               </Col>
               <Col xs={24} sm={6}>
@@ -291,7 +291,7 @@ const CandidatesList: React.FC = () => {
                   <Title level={3} className="mb-0">
                     {postulaciones.filter((p) => p.estado === EstadoPostulacion.COMPLETADA).length}
                   </Title>
-                  <Paragraph className="text-gray-600 dark:text-gray-400 mb-0">Completed</Paragraph>
+                  <Paragraph className="text-gray-600 dark:text-gray-400 mb-0">Completadas</Paragraph>
                 </Card>
               </Col>
             </Row>
@@ -301,7 +301,7 @@ const CandidatesList: React.FC = () => {
               title={
                 <div className="flex justify-between items-center">
                   <Title level={4} className="mb-0">
-                    Candidate Applications
+                    Postulaciones de Candidatos
                   </Title>
                   <Tag color="blue">{postulaciones.length} total</Tag>
                 </div>
@@ -316,7 +316,7 @@ const CandidatesList: React.FC = () => {
                   pageSize: 10,
                   showSizeChanger: true,
                   showQuickJumper: true,
-                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} candidates`,
+                  showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} candidatos`,
                 }}
                 className="custom-table"
                 scroll={{ x: 800 }}
@@ -332,7 +332,7 @@ const CandidatesList: React.FC = () => {
         title={
           <div className="flex items-center space-x-3">
             <TrophyOutlined className="text-indigo-600" />
-            <span>Candidate Evaluation Results</span>
+            <span>Resultados de Evaluación del Candidato</span>
           </div>
         }
         open={evaluationModalVisible}
@@ -360,7 +360,7 @@ const CandidatesList: React.FC = () => {
                     <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                       <span>📞 {selectedCandidate.usuario?.telefono}</span>
                       <span>🎂 {dayjs(selectedCandidate.usuario?.nacimiento).format("MMM DD, YYYY")}</span>
-                      <span>📅 Applied: {dayjs(selectedCandidate.fechaPostulacion).format("MMM DD, YYYY")}</span>
+                      <span>📅 Postulado: {dayjs(selectedCandidate.fechaPostulacion).format("MMM DD, YYYY")}</span>
                     </div>
                   </div>
                 </div>
@@ -379,7 +379,7 @@ const CandidatesList: React.FC = () => {
             {evaluationLoading ? (
               <div className="text-center py-8">
                 <Spin size="large" />
-                <Paragraph className="mt-4">Loading evaluation results...</Paragraph>
+                <Paragraph className="mt-4">Cargando resultados de evaluación...</Paragraph>
               </div>
             ) : consolidatedResults ? (
               <>
@@ -392,7 +392,7 @@ const CandidatesList: React.FC = () => {
                         <Title level={2} className="mb-0 text-indigo-800 dark:text-indigo-300">
                           {consolidatedResults?.puntajeFinal?.toFixed(1) || "N/A"}/100
                         </Title>
-                        <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-0">Overall Score</Paragraph>
+                        <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-0">Puntuación General</Paragraph>
                       </div>
                     </div>
                     <Tag
@@ -406,10 +406,10 @@ const CandidatesList: React.FC = () => {
                       className="text-lg px-4 py-2"
                     >
                       {(consolidatedResults?.puntajeFinal || 0) >= 80
-                        ? "Excellent Candidate"
+                        ? "Candidato Excelente"
                         : (consolidatedResults?.puntajeFinal || 0) >= 60
-                          ? "Good Candidate"
-                          : "Needs Improvement"}
+                          ? "Buen Candidato"
+                          : "Necesita Mejoras"}
                     </Tag>
                   </div>
 
@@ -418,28 +418,28 @@ const CandidatesList: React.FC = () => {
                     <Col xs={24} lg={12}>
                       <div className="text-center">
                         <Title level={5} className="mb-4">
-                          Skills Assessment
+                          Evaluación de Competencias
                         </Title>
                         <ResponsiveContainer width="100%" height={250}>
                           <RadarChart
                             data={[
                               {
-                                subject: "Clarity",
+                                subject: "Claridad",
                                 A: consolidatedResults?.resumenPorCriterio?.claridad_estructura / 10 || 0,
                                 fullMark: 10,
                               },
                               {
-                                subject: "Technical",
+                                subject: "Técnico",
                                 A: consolidatedResults?.resumenPorCriterio?.dominio_tecnico / 10 || 0,
                                 fullMark: 10,
                               },
                               {
-                                subject: "Relevance",
+                                subject: "Relevancia",
                                 A: consolidatedResults?.resumenPorCriterio?.pertinencia / 10 || 0,
                                 fullMark: 10,
                               },
                               {
-                                subject: "Communication",
+                                subject: "Comunicación",
                                 A: consolidatedResults?.resumenPorCriterio?.comunicacion_seguridad / 10 || 0,
                                 fullMark: 10,
                               },
@@ -455,11 +455,11 @@ const CandidatesList: React.FC = () => {
                     </Col>
                     <Col xs={24} lg={12}>
                       <div className="space-y-4">
-                        <Title level={5}>Skill Breakdown</Title>
+                        <Title level={5}>Desglose de Competencias</Title>
                         <div className="space-y-3">
                           <div>
                             <div className="flex justify-between mb-1">
-                              <span>Clarity & Structure</span>
+                              <span>Claridad y Estructura</span>
                               <span>
                                 {(consolidatedResults?.resumenPorCriterio?.claridad_estructura || 0).toFixed(1)}/10
                               </span>
@@ -471,7 +471,7 @@ const CandidatesList: React.FC = () => {
                           </div>
                           <div>
                             <div className="flex justify-between mb-1">
-                              <span>Technical Knowledge</span>
+                              <span>Conocimiento Técnico</span>
                               <span>
                                 {(consolidatedResults?.resumenPorCriterio?.dominio_tecnico || 0).toFixed(1)}/10
                               </span>
@@ -483,7 +483,7 @@ const CandidatesList: React.FC = () => {
                           </div>
                           <div>
                             <div className="flex justify-between mb-1">
-                              <span>Relevance</span>
+                              <span>Relevancia</span>
                               <span>{(consolidatedResults?.resumenPorCriterio?.pertinencia || 0).toFixed(1)}/10</span>
                             </div>
                             <Progress
@@ -493,7 +493,7 @@ const CandidatesList: React.FC = () => {
                           </div>
                           <div>
                             <div className="flex justify-between mb-1">
-                              <span>Communication</span>
+                              <span>Comunicación</span>
                               <span>
                                 {(consolidatedResults?.resumenPorCriterio?.comunicacion_seguridad || 0).toFixed(1)}/10
                               </span>
@@ -510,31 +510,31 @@ const CandidatesList: React.FC = () => {
                 </Card>
 
                 {/* Detailed Question Results */}
-                <Card title="Question-by-Question Analysis">
+                <Card title="Análisis Pregunta por Pregunta">
                   <div className="space-y-4">
                     {consolidatedResults?.evaluacionesPorPregunta?.map((item: any, index: number) => (
                       <Card key={index} size="small" className="bg-gray-50 dark:bg-gray-800">
                         <Row gutter={[16, 16]}>
                           <Col xs={24} lg={16}>
-                            <Title level={5}>Question {index + 1}</Title>
+                            <Title level={5}>Pregunta {index + 1}</Title>
                             <Paragraph className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                              {item.pregunta?.texto || "Question text not available"}
+                              {item.pregunta?.texto || "Texto de pregunta no disponible"}
                             </Paragraph>
                             <div className="grid grid-cols-2 gap-4 mb-3">
                               <div>
-                                <span className="text-sm text-gray-600 dark:text-gray-400">Clarity:</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Claridad:</span>
                                 <Progress percent={(item.evaluacion?.claridadEstructura || 0) * 10} size="small" />
                               </div>
                               <div>
-                                <span className="text-sm text-gray-600 dark:text-gray-400">Technical:</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Técnico:</span>
                                 <Progress percent={(item.evaluacion?.dominioTecnico || 0) * 10} size="small" />
                               </div>
                               <div>
-                                <span className="text-sm text-gray-600 dark:text-gray-400">Relevance:</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Relevancia:</span>
                                 <Progress percent={(item.evaluacion?.pertinencia || 0) * 10} size="small" />
                               </div>
                               <div>
-                                <span className="text-sm text-gray-600 dark:text-gray-400">Communication:</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Comunicación:</span>
                                 <Progress percent={(item.evaluacion?.comunicacionSeguridad || 0) * 10} size="small" />
                               </div>
                             </div>
@@ -553,10 +553,10 @@ const CandidatesList: React.FC = () => {
                               }
                             >
                               {item.evaluacion?.puntuacionFinal >= 8
-                                ? "Excellent"
+                                ? "Excelente"
                                 : item.evaluacion?.puntuacionFinal >= 6
-                                  ? "Good"
-                                  : "Poor"}
+                                  ? "Bueno"
+                                  : "Deficiente"}
                             </Tag>
                           </Col>
                         </Row>
@@ -568,7 +568,7 @@ const CandidatesList: React.FC = () => {
                                 <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded border border-green-200 dark:border-green-800">
                                   <div className="flex items-center space-x-2 mb-2">
                                     <StarOutlined className="text-green-600" />
-                                    <span className="font-medium text-green-800 dark:text-green-300">Strengths</span>
+                                    <span className="font-medium text-green-800 dark:text-green-300">Fortalezas</span>
                                   </div>
                                   <Paragraph className="text-green-700 dark:text-green-400 mb-0 text-sm">
                                     {item.evaluacion.fortalezas}
@@ -582,7 +582,7 @@ const CandidatesList: React.FC = () => {
                                   <div className="flex items-center space-x-2 mb-2">
                                     <ExclamationCircleOutlined className="text-orange-600" />
                                     <span className="font-medium text-orange-800 dark:text-orange-300">
-                                      Areas for Improvement
+                                      Áreas de Mejora
                                     </span>
                                   </div>
                                   <Paragraph className="text-orange-700 dark:text-orange-400 mb-0 text-sm">
@@ -596,7 +596,7 @@ const CandidatesList: React.FC = () => {
                       </Card>
                     )) || (
                       <Paragraph className="text-center text-gray-500 dark:text-gray-400">
-                        No detailed question results available.
+                        No hay resultados detallados de preguntas disponibles.
                       </Paragraph>
                     )}
                   </div>
@@ -607,10 +607,10 @@ const CandidatesList: React.FC = () => {
                 <div className="text-center py-8">
                   <ExclamationCircleOutlined className="text-4xl text-gray-400 mb-4" />
                   <Title level={4} className="text-gray-600 dark:text-gray-400">
-                    No Evaluation Available
+                    Evaluación No Disponible
                   </Title>
                   <Paragraph className="text-gray-500 dark:text-gray-400">
-                    This candidate has not completed the interview yet or evaluation data is not available.
+                    Este candidato aún no ha completado la entrevista o los datos de evaluación no están disponibles.
                   </Paragraph>
                 </div>
               </Card>

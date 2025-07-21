@@ -110,7 +110,7 @@ const Interview: React.FC = () => {
       const timer = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
-            message.warning("Time is up! Submitting your interview...")
+            message.warning("¡Se acabó el tiempo! Enviando tu entrevista...")
             handleSubmitInterview()
             return 0
           }
@@ -713,31 +713,31 @@ const Interview: React.FC = () => {
               <RobotOutlined />
             </div>
             <Title level={2} className="loading-title">
-              Preparing Your AI Interview
+              Preparando tu Entrevista IA
             </Title>
             <Paragraph className="loading-message">
-              Preparing interview questions...
+              Preparando preguntas de entrevista...
             </Paragraph>
             <div className="loading-progress">
-              <Progress percent={50} strokeColor="#6366f1" showInfo={true} format={() => '50% Complete'} />
+              <Progress percent={50} strokeColor="#6366f1" showInfo={true} format={() => '50% Completado'} />
             </div>
             <div className="loading-details">
               <div className="detail-item">
-                <Text strong>Position:</Text>
-                <Text>{postulacion?.convocatoria?.titulo || 'Loading...'}</Text>
+                <Text strong>Posición:</Text>
+                <Text>{postulacion?.convocatoria?.titulo || 'Cargando...'}</Text>
               </div>
               <div className="detail-item">
-                <Text strong>Company:</Text>
-                <Text>{postulacion?.convocatoria?.empresa?.nombre || 'Loading...'}</Text>
+                <Text strong>Empresa:</Text>
+                <Text>{postulacion?.convocatoria?.empresa?.nombre || 'Cargando...'}</Text>
               </div>
             </div>
             <div className="loading-tips">
               <div className="loading-tips-title">
                 <InfoCircleOutlined />
-                <span>Interview Tips</span>
+                <span>Consejos de Entrevista</span>
               </div>
               <Paragraph className="loading-tips-text">
-                Our AI will evaluate your responses based on clarity, technical knowledge, problem-solving approach, and communication skills. Take your time to provide thoughtful, detailed answers.
+                Nuestra IA evaluará tus respuestas basándose en claridad, conocimiento técnico, enfoque de resolución de problemas y habilidades de comunicación. Tómate tu tiempo para proporcionar respuestas reflexivas y detalladas.
               </Paragraph>
             </div>
           </motion.div>
@@ -824,13 +824,13 @@ const Interview: React.FC = () => {
                 onClick={() => navigate("/usuario/dashboard")}
                 className="hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                Back to Dashboard
+                Volver al Panel
               </Button>
               <div className="flex items-center space-x-3">
                 <div className="logo-icon text-lg">
                   <RobotOutlined />
                 </div>
-                <span className="font-semibold">Interview Results</span>
+                <span className="font-semibold">Resultados de Entrevista</span>
               </div>
             </div>
 
@@ -861,11 +861,11 @@ const Interview: React.FC = () => {
                     <CheckCircleOutlined className="text-6xl text-green-600 mb-4" />
                   </motion.div>
                   <Title level={2} className="mb-4">
-                    Interview Completed!
+                    ¡Entrevista Completada!
                   </Title>
                   <Paragraph className="text-lg text-gray-600 dark:text-gray-300">
-                    Congratulations! You have successfully completed the AI interview for{" "}
-                    <strong>{postulacion?.convocatoria?.titulo}</strong> at{" "}
+                    ¡Felicitaciones! Has completado exitosamente la entrevista de IA para{" "}
+                    <strong>{postulacion?.convocatoria?.titulo}</strong> en{" "}
                     <strong>{postulacion?.convocatoria?.empresa?.nombre}</strong>.
                   </Paragraph>
 
@@ -880,14 +880,14 @@ const Interview: React.FC = () => {
                       <TrophyOutlined className="text-3xl text-indigo-600" />
                       <div>
                         <Title level={3} className="mb-0 text-indigo-800 dark:text-indigo-300">
-                          Final Score: {consolidatedResults?.puntajeFinal?.toFixed(1) || "N/A"}/100
+                          Puntaje Final: {consolidatedResults?.puntajeFinal?.toFixed(1) || "N/A"}/100
                         </Title>
                         <Paragraph className="text-indigo-600 dark:text-indigo-400 mb-0">
                           {(consolidatedResults?.puntajeFinal || 0) >= 80
-                            ? "Excellent Performance!"
+                            ? "¡Excelente Desempeño!"
                             : (consolidatedResults?.puntajeFinal || 0) >= 60
-                              ? "Good Performance!"
-                              : "Room for Improvement"}
+                              ? "¡Buen Desempeño!"
+                              : "Hay Espacio para Mejorar"}
                         </Paragraph>
                       </div>
                     </div>
@@ -904,7 +904,7 @@ const Interview: React.FC = () => {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.6, delay: 0.1 }}
                         >
-                          <Card title="Overall Performance" className="h-full">
+                          <Card title="Desempeño General" className="h-full">
                             <ResponsiveContainer width="100%" height={400}>
                               <RadarChart data={radarData}>
                                 <PolarGrid />
@@ -925,7 +925,7 @@ const Interview: React.FC = () => {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.6, delay: 0.2 }}
                         >
-                          <Card title="Question Scores" className="h-full">
+                          <Card title="Puntajes por Pregunta" className="h-full">
                             <ResponsiveContainer width="100%" height={400}>
                               <LineChart data={lineData}>
                                 <CartesianGrid strokeDasharray="3 3" />
@@ -946,7 +946,7 @@ const Interview: React.FC = () => {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.6, delay: 0.3 }}
                         >
-                          <Card title="Skills Breakdown" className="h-full">
+                          <Card title="Desglose de Habilidades" className="h-full">
                             <ResponsiveContainer width="100%" height={400}>
                               <BarChart data={barData}>
                                 <CartesianGrid strokeDasharray="3 3" />
@@ -976,7 +976,7 @@ const Interview: React.FC = () => {
                             <Card className="h-full">
                               <div className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                  <Title level={4}>Question {index + 1} Results</Title>
+                                  <Title level={4}>Resultados Pregunta {index + 1}</Title>
                                   <Tag
                                     color={
                                       item.evaluacion?.puntuacionFinal >= 8
@@ -993,7 +993,7 @@ const Interview: React.FC = () => {
                                 <div className="space-y-3">
                                   <div>
                                     <Paragraph className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                      Clarity & Structure
+                                      Claridad y Estructura
                                     </Paragraph>
                                     <Progress
                                       percent={(item.evaluacion?.claridadEstructura || 0) * 10}
@@ -1004,7 +1004,7 @@ const Interview: React.FC = () => {
 
                                   <div>
                                     <Paragraph className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                      Technical Knowledge
+                                      Conocimiento Técnico
                                     </Paragraph>
                                     <Progress
                                       percent={(item.evaluacion?.dominioTecnico || 0) * 10}
@@ -1015,7 +1015,7 @@ const Interview: React.FC = () => {
 
                                   <div>
                                     <Paragraph className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                      Relevance
+                                      Pertinencia
                                     </Paragraph>
                                     <Progress
                                       percent={(item.evaluacion?.pertinencia || 0) * 10}
@@ -1026,7 +1026,7 @@ const Interview: React.FC = () => {
 
                                   <div>
                                     <Paragraph className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                      Communication
+                                      Comunicación
                                     </Paragraph>
                                     <Progress
                                       percent={(item.evaluacion?.comunicacionSeguridad || 0) * 10}
@@ -1039,7 +1039,7 @@ const Interview: React.FC = () => {
                                 {item.evaluacion?.feedback && (
                                   <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
                                     <Paragraph className="text-blue-800 dark:text-blue-300 text-sm mb-0">
-                                      <strong>AI Feedback:</strong> {item.evaluacion.feedback}
+                                      <strong>Retroalimentación IA:</strong> {item.evaluacion.feedback}
                                     </Paragraph>
                                   </div>
                                 )}
@@ -1053,7 +1053,7 @@ const Interview: React.FC = () => {
                     {/* Strengths and Improvement Areas */}
                     <Row gutter={[24, 24]} className="mb-8">
                       <Col xs={24} lg={12}>
-                        <Card title="Strengths" className="h-full" extra={<StarOutlined className="text-green-600" />}>
+                        <Card title="Fortalezas" className="h-full" extra={<StarOutlined className="text-green-600" />}>
                           <div className="space-y-3">
                             {consolidatedResults?.fortalezas?.map((strength: string, index: number) => (
                               <motion.div
@@ -1067,7 +1067,7 @@ const Interview: React.FC = () => {
                               </motion.div>
                             )) || (
                               <Paragraph className="text-gray-500 dark:text-gray-400">
-                                No specific strengths identified.
+                                No se identificaron fortalezas específicas.
                               </Paragraph>
                             )}
                           </div>
@@ -1075,7 +1075,7 @@ const Interview: React.FC = () => {
                       </Col>
                       <Col xs={24} lg={12}>
                         <Card
-                          title="Areas for Improvement"
+                          title="Áreas de Mejora"
                           className="h-full"
                           extra={<BulbOutlined className="text-orange-600" />}
                         >
@@ -1094,7 +1094,7 @@ const Interview: React.FC = () => {
                               </motion.div>
                             )) || (
                               <Paragraph className="text-gray-500 dark:text-gray-400">
-                                No specific improvement areas identified.
+                                No se identificaron áreas de mejora específicas.
                               </Paragraph>
                             )}
                           </div>
@@ -1112,7 +1112,7 @@ const Interview: React.FC = () => {
                       className="btn-gradient"
                       onClick={() => navigate("/usuario/dashboard")}
                     >
-                      Back to Dashboard
+                      Volver al Panel
                     </Button>
                     <PrintReport
                       data={consolidatedResults}
@@ -1171,9 +1171,9 @@ const Interview: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center">
         <Card className="text-center p-8">
           <Spin size="large" />
-          <Title level={4} className="mt-4">Generating your interview questions...</Title>
+          <Title level={4} className="mt-4">Generando preguntas de entrevista...</Title>
           <Paragraph className="text-gray-600">
-            mirAI is creating personalized questions based on the job requirements.
+            mirAI está creando preguntas personalizadas basadas en los requisitos del trabajo.
           </Paragraph>
         </Card>
       </div>
@@ -1185,16 +1185,16 @@ const Interview: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="text-center p-8">
-          <Title level={4}>No questions available</Title>
+          <Title level={4}>No hay preguntas disponibles</Title>
           <Paragraph className="text-gray-600">
-            Unable to load interview questions. Please try again.
+            No se pudieron cargar las preguntas de la entrevista. Por favor, inténtalo de nuevo.
           </Paragraph>
           <Button 
             type="primary" 
             onClick={() => navigate("/usuario/dashboard")}
             className="btn-gradient"
           >
-            Return to Dashboard
+            Volver al Panel
           </Button>
         </Card>
       </div>
@@ -1205,43 +1205,43 @@ const Interview: React.FC = () => {
   const getQuestionTypeTips = () => {
     const tipsByType: Record<string, { tip: string; practice: string }> = {
       'technical_knowledge': {
-        tip: '💻 Focus on specific technologies, frameworks, and best practices. Provide concrete examples from your experience.',
-        practice: '⚡ Mention specific tools, versions, and implementation details to demonstrate deep technical knowledge.'
+        tip: '💻 Enfócate en tecnologías específicas, frameworks y mejores prácticas. Proporciona ejemplos concretos de tu experiencia.',
+        practice: '⚡ Menciona herramientas específicas, versiones y detalles de implementación para demostrar conocimiento técnico profundo.'
       },
       'experience': {
-        tip: '📈 Share specific projects and roles. Use the STAR method (Situation, Task, Action, Result) to structure your answer.',
-        practice: '🎯 Quantify your achievements with metrics, timelines, and measurable outcomes whenever possible.'
+        tip: '📈 Comparte proyectos y roles específicos. Usa el método STAR (Situación, Tarea, Acción, Resultado) para estructurar tu respuesta.',
+        practice: '🎯 Cuantifica tus logros con métricas, cronogramas y resultados medibles siempre que sea posible.'
       },
       'problem_solving': {
-        tip: '🧩 Break down your approach step-by-step. Explain your thought process and reasoning clearly.',
-        practice: '🔍 Consider multiple solutions, explain trade-offs, and mention how you would validate your approach.'
+        tip: '🧩 Desglosa tu enfoque paso a paso. Explica tu proceso de pensamiento y razonamiento claramente.',
+        practice: '🔍 Considera múltiples soluciones, explica trade-offs y menciona cómo validarías tu enfoque.'
       },
       'tools': {
-        tip: '🛠️ Be specific about which tools you\'ve used, for how long, and in what contexts (personal, professional, team).',
-        practice: '⚙️ Mention integrations, configurations, and how these tools improved your workflow or project outcomes.'
+        tip: '🛠️ Sé específico sobre qué herramientas has usado, por cuánto tiempo y en qué contextos (personal, profesional, equipo).',
+        practice: '⚙️ Menciona integraciones, configuraciones y cómo estas herramientas mejoraron tu flujo de trabajo o resultados del proyecto.'
       },
       'methodology': {
-        tip: '📋 Explain the methodologies you prefer and why. Give examples of how you\'ve applied them in real projects.',
-        practice: '🔄 Discuss adaptability - how you adjust methodologies based on team size, project requirements, or constraints.'
+        tip: '📋 Explica las metodologías que prefieres y por qué. Da ejemplos de cómo las has aplicado en proyectos reales.',
+        practice: '🔄 Discute adaptabilidad - cómo ajustas metodologías basándote en el tamaño del equipo, requisitos del proyecto o restricciones.'
       },
       'teamwork': {
-        tip: '👥 Share specific examples of collaboration, communication strategies, and conflict resolution.',
-        practice: '🤝 Highlight leadership moments, mentoring experiences, and how you contribute to team culture.'
+        tip: '👥 Comparte ejemplos específicos de colaboración, estrategias de comunicación y resolución de conflictos.',
+        practice: '🤝 Destaca momentos de liderazgo, experiencias de mentoría y cómo contribuyes a la cultura del equipo.'
       },
       'challenge': {
-        tip: '⛰️ Describe the challenge clearly, your approach to solving it, and the lessons learned.',
-        practice: '💪 Focus on your problem-solving process, resilience, and how the experience made you a better professional.'
+        tip: '⛰️ Describe el desafío claramente, tu enfoque para resolverlo y las lecciones aprendidas.',
+        practice: '💪 Enfócate en tu proceso de resolución de problemas, resistencia y cómo la experiencia te hizo mejor profesional.'
       },
       'best_practices': {
-        tip: '✅ Discuss coding standards, code review processes, testing strategies, and quality assurance methods.',
-        practice: '📊 Mention specific tools for code quality, monitoring, documentation, and how you ensure maintainability.'
+        tip: '✅ Discute estándares de código, procesos de revisión de código, estrategias de testing y métodos de aseguramiento de calidad.',
+        practice: '📊 Menciona herramientas específicas para calidad de código, monitoreo, documentación y cómo aseguras la mantenibilidad.'
       }
     };
 
     const questionTypeKey = currentQ?.typeKey || currentQ?.tipo?.toLowerCase().replace(/\s+/g, '_') || '';
     return tipsByType[questionTypeKey] || {
-      tip: '💡 Be specific and provide concrete examples when possible. The AI evaluates clarity, technical accuracy, relevance, and communication skills.',
-      practice: '⭐ Structure your answers clearly, explain your reasoning, and don\'t hesitate to mention alternative approaches or trade-offs.'
+      tip: '💡 Sé específico y proporciona ejemplos concretos cuando sea posible. La IA evalúa claridad, precisión técnica, relevancia y habilidades de comunicación.',
+      practice: '⭐ Estructura tus respuestas claramente, explica tu razonamiento y no dudes en mencionar enfoques alternativos o trade-offs.'
     };
   };
 
@@ -1259,13 +1259,13 @@ const Interview: React.FC = () => {
               onClick={() => navigate("/usuario/dashboard")}
               className="hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              Back to Dashboard
+              Volver al Panel
             </Button>
             <div className="flex items-center space-x-3">
               <div className="logo-icon text-lg">
                 <RobotOutlined />
               </div>
-              <span className="font-semibold">AI Interview Assessment</span>
+              <span className="font-semibold">Evaluación de Entrevista IA</span>
             </div>
           </div>
 
@@ -1291,11 +1291,11 @@ const Interview: React.FC = () => {
               <Row justify="space-between" align="middle" className="mb-0">
                 <Col>
                   <Title level={4} className="mb-0">
-                    Question {questions.length > 0 ? currentQuestion + 1 : 0} of {questions.length}
+                    Pregunta {questions.length > 0 ? currentQuestion + 1 : 0} de {questions.length}
                     {currentQ?.respondida && (
                       <Tag color="green" className="ml-2">
                         <CheckCircleOutlined className="mr-1" />
-                        Answered
+                        Respondida
                       </Tag>
                     )}
                   </Title>
@@ -1304,10 +1304,10 @@ const Interview: React.FC = () => {
                   </Paragraph>
                   <div className="mt-1">
                     <Text className="text-sm text-gray-500 dark:text-gray-400">
-                      Progress: {questions.filter(q => q.respondida).length} answered, {questions.filter(q => !q.respondida).length} remaining
+                      Progreso: {questions.filter(q => q.respondida).length} respondidas, {questions.filter(q => !q.respondida).length} restantes
                       {questions.length > 0 && (
                         <span className="ml-2">
-                          ({Math.round((questions.filter(q => q.respondida).length / questions.length) * 100)}% complete)
+                          ({Math.round((questions.filter(q => q.respondida).length / questions.length) * 100)}% completado)
                         </span>
                       )}
                     </Text>
@@ -1316,15 +1316,15 @@ const Interview: React.FC = () => {
                 <Col>
                   <Space size="middle">
                     <Tag color="blue" className="px-3 py-1 text-sm font-medium">
-                      {currentQ?.tipo || "Technical"}
+                      {currentQ?.tipo || "Técnica"}
                     </Tag>
                     {currentQ?.score && (
                       <Tag color="purple" className="px-3 py-1 text-sm font-medium">
-                        Score: {currentQ.score}
+                        Puntaje: {currentQ.score}
                       </Tag>
                     )}
                     <Tag color="orange" className="px-3 py-1 text-sm font-medium">
-                      Difficulty: {currentQ?.dificultad || 5}/10
+                      Dificultad: {currentQ?.dificultad || 5}/10
                     </Tag>
                   </Space>
                 </Col>
@@ -1346,11 +1346,11 @@ const Interview: React.FC = () => {
                   <div className="flex items-center space-x-2">
                     <CheckCircleOutlined className="text-green-600" />
                     <span className="font-medium text-green-800 dark:text-green-300">
-                      Question Already Answered
+                      Pregunta Ya Respondida
                     </span>
                   </div>
                   <Paragraph className="text-green-700 dark:text-green-400 mb-0 mt-2">
-                    You have already answered this question. You can review or modify your answer below.
+                    Ya has respondido esta pregunta. Puedes revisar o modificar tu respuesta abajo.
                   </Paragraph>
                 </div>
               )}
@@ -1363,15 +1363,15 @@ const Interview: React.FC = () => {
                 <div className="flex-1">
                   <div className="ai-message">
                     <Title level={5} className="mb-3 text-indigo-800 dark:text-indigo-300">
-                      mirAI asks:
+                      mirAI pregunta:
                     </Title>
                     <Paragraph className="text-lg mb-0 leading-relaxed">
-                      {currentQ?.pregunta || "Loading question..."}
+                      {currentQ?.pregunta || "Cargando pregunta..."}
                     </Paragraph>
                   </div>
                   <div className="mt-3 flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                     <RobotOutlined className="text-indigo-500" />
-                    <span>mirAI will analyze your response for technical accuracy and clarity...</span>
+                    <span>mirAI analizará tu respuesta por precisión técnica y claridad...</span>
                   </div>
                 </div>
               </div>
@@ -1382,15 +1382,15 @@ const Interview: React.FC = () => {
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <Title level={5} className="mb-0">
-                    Your Answer:
+                    Tu Respuesta:
                   </Title>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">{currentAnswer.length} characters</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{currentAnswer.length} caracteres</div>
                 </div>
 
                 <TextArea
                   value={currentAnswer}
                   onChange={(e) => setCurrentAnswer(e.target.value)}
-                  placeholder="Type your detailed answer here... Be specific and provide examples where possible."
+                  placeholder="Escribe tu respuesta detallada aquí... Sé específico y proporciona ejemplos cuando sea posible."
                   rows={10}
                   className="text-base"
                   style={{ resize: "none" }}
@@ -1400,18 +1400,18 @@ const Interview: React.FC = () => {
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                   <div className="flex items-center space-x-2 mb-2">
                     <BulbOutlined className="text-blue-600" />
-                    <span className="font-medium text-blue-800 dark:text-blue-300">Tip:</span>
+                    <span className="font-medium text-blue-800 dark:text-blue-300">Consejo:</span>
                   </div>
                   <Paragraph className="text-blue-700 dark:text-blue-400 mb-0">
-                    Provide specific examples, explain your reasoning, and structure your answer clearly. The AI
-                    evaluates technical accuracy, clarity, relevance, and communication skills.
+                    Proporciona ejemplos específicos, explica tu razonamiento y estructura tu respuesta claramente. La IA
+                    evalúa precisión técnica, claridad, relevancia y habilidades de comunicación.
                   </Paragraph>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="flex justify-between items-center pt-4">
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    Question {currentQuestion + 1} of {questions.length}
+                    Pregunta {currentQuestion + 1} de {questions.length}
                   </div>
                   <Button
                     type="primary"
@@ -1431,12 +1431,12 @@ const Interview: React.FC = () => {
                     disabled={!currentAnswer.trim()}
                   >
                     {isSubmitting
-                      ? "Analyzing Answer..."
+                      ? "Analizando Respuesta..."
                       : (currentQuestion === questions.length - 1 || questions.filter(q => !q.respondida).length <= 1)
-                        ? "Complete & View Results"
+                        ? "Completar y Ver Resultados"
                         : currentQ?.respondida 
-                          ? "Update Answer & Next"
-                          : "Submit & Next"}
+                          ? "Actualizar Respuesta y Siguiente"
+                          : "Enviar y Siguiente"}
                   </Button>
                 </div>
               </div>
@@ -1455,7 +1455,7 @@ const Interview: React.FC = () => {
                   <div className="flex items-center space-x-3 mb-4">
                     <RobotOutlined className="text-indigo-600 text-xl" />
                     <Title level={5} className="mb-0 text-indigo-800 dark:text-indigo-300">
-                      mirAI Tips for {currentQ?.tipo || 'this question'}
+                      Consejos mirAI para {currentQ?.tipo || 'esta pregunta'}
                     </Title>
                   </div>
                   <Paragraph className="text-indigo-700 dark:text-indigo-400 mb-0">
@@ -1468,7 +1468,7 @@ const Interview: React.FC = () => {
                   <div className="flex items-center space-x-3 mb-4">
                     <StarOutlined className="text-green-600 text-xl" />
                     <Title level={5} className="mb-0 text-green-800 dark:text-green-300">
-                      Best Practices
+                      Mejores Prácticas
                     </Title>
                   </div>
                   <Paragraph className="text-green-700 dark:text-green-400 mb-0">

@@ -388,34 +388,34 @@ const Landing: React.FC = () => {
 
   const navigationItems = [
     {
-      label: "Home",
+      label: "Inicio",
       href: "#home",
       icon: <HomeOutlined />,
-      description: "Back to top",
+      description: "Volver arriba",
     },
     {
-      label: "Features",
+      label: "Características",
       href: "#features",
       icon: <BulbOutlined />,
-      description: "Explore our capabilities",
+      description: "Explora nuestras capacidades",
     },
     {
-      label: "Pricing",
+      label: "Precios",
       href: "#pricing",
       icon: <DollarOutlined />,
-      description: "View pricing plans",
+      description: "Ver planes de precios",
     },
     {
-      label: "About",
+      label: "Acerca de",
       href: "#about",
       icon: <InfoCircleOutlined />,
-      description: "Learn about mirAI",
+      description: "Conoce más sobre mirAI",
     },
     {
-      label: "Contact",
+      label: "Contacto",
       href: "#contact",
       icon: <PhoneOutlined />,
-      description: "Get in touch",
+      description: "Ponte en contacto",
     },
   ];
 
@@ -437,7 +437,7 @@ const Landing: React.FC = () => {
               <div className="landing-logo-content">
                 <span className="landing-logo-text">mirAI</span>
                 <span className="landing-logo-subtitle">
-                  Interview Platform
+                  Plataforma de Entrevistas
                 </span>
               </div>
             </div>
@@ -476,7 +476,7 @@ const Landing: React.FC = () => {
                 type="text"
                 onClick={() => navigate("/login")}
               >
-                Sign In
+                Iniciar Sesión
               </Button>
             </motion.div>
             <motion.div
@@ -488,7 +488,7 @@ const Landing: React.FC = () => {
                 className="landing-cta-simple"
                 onClick={() => navigate("/login")}
               >
-                Get Started
+                Comenzar
               </Button>
             </motion.div>
           </div>
@@ -550,7 +550,7 @@ const Landing: React.FC = () => {
 
           {/* Enhanced Action Buttons */}
           <div className="landing-nav-section">
-            <div className="landing-section-title">Account</div>
+            <div className="landing-section-title">Cuenta</div>
             <div className="landing-mobile-actions">
               <Button
                 className="landing-mobile-signin"
@@ -562,7 +562,7 @@ const Landing: React.FC = () => {
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-3">
                     <UserOutlined />
-                    <span>Sign In</span>
+                    <span>Iniciar Sesión</span>
                   </div>
                   <ArrowRightOutlined className="text-sm opacity-50" />
                 </div>
@@ -576,7 +576,7 @@ const Landing: React.FC = () => {
                   setMobileMenuVisible(false);
                 }}
               >
-                Get Started Free
+                Comenzar Gratis
               </Button>
             </div>
           </div>
@@ -589,23 +589,23 @@ const Landing: React.FC = () => {
                 <div className="landing-status-indicator"></div>
               </div>
               <div className="landing-status-info">
-                <div className="landing-status-title">mirAI Assistant</div>
+                <div className="landing-status-title">Asistente mirAI</div>
                 <div className="landing-status-desc">
-                  AI-powered interview platform ready to transform your hiring
-                  process
+                  Plataforma de entrevistas impulsada por IA lista para transformar 
+                  tu proceso de contratación
                 </div>
                 <div className="landing-status-stats">
                   <div className="landing-stat-item">
                     <div className="landing-stat-number">250+</div>
-                    <div className="landing-stat-label">Companies</div>
+                    <div className="landing-stat-label">Empresas</div>
                   </div>
                   <div className="landing-stat-item">
                     <div className="landing-stat-number">12.5K+</div>
-                    <div className="landing-stat-label">Interviews</div>
+                    <div className="landing-stat-label">Entrevistas</div>
                   </div>
                   <div className="landing-stat-item">
                     <div className="landing-stat-number">94%</div>
-                    <div className="landing-stat-label">Accuracy</div>
+                    <div className="landing-stat-label">Precisión</div>
                   </div>
                 </div>
               </div>
@@ -628,17 +628,16 @@ const Landing: React.FC = () => {
                 >
                   <motion.div variants={itemVariants}>
                     <Title className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight text-gray-900 dark:text-white mb-8">
-                      The Future of{" "}
-                      <span className="gradient-text">AI Interviews</span>
+                      El Futuro de las{" "}
+                      <span className="gradient-text">Entrevistas IA</span>
                     </Title>
                   </motion.div>
 
                   <motion.div variants={itemVariants}>
                     <Paragraph className="text-xl sm:text-2xl lg:text-3xl text-gray-600 dark:text-gray-300 leading-relaxed font-medium max-w-3xl mx-auto lg:mx-0 mb-8">
-                      mirAI revolutionizes hiring with intelligent interview
-                      assistance. Generate personalized questions, evaluate
-                      candidates with AI precision, and make better hiring
-                      decisions faster than ever before.
+                      mirAI revoluciona la contratación con asistencia inteligente de entrevistas. 
+                      Genera preguntas personalizadas, evalúa candidatos con precisión de IA, 
+                      y toma mejores decisiones de contratación más rápido que nunca.
                     </Paragraph>
                   </motion.div>
 
@@ -652,14 +651,14 @@ const Landing: React.FC = () => {
                         icon={<RocketOutlined />}
                         onClick={() => navigate("/login")}
                       >
-                        Start Free Trial
+                        Comenzar Prueba Gratuita
                       </Button>
                       <Button
                         size="large"
                         className="h-20 px-12 text-xl font-bold border-2 border-indigo-200 hover:border-indigo-400 dark:border-indigo-700 dark:hover:border-indigo-500 rounded-2xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl"
                         icon={<PlayCircleOutlined />}
                       >
-                        Watch Demo
+                        Ver Demostración
                       </Button>
                     </div>
                   </motion.div>
@@ -673,10 +672,10 @@ const Landing: React.FC = () => {
                         <div className="trust-content">
                           <div className="trust-stat">250+</div>
                           <div className="trust-label">
-                            Enterprise Companies
+                            Empresas Corporativas
                           </div>
                           <div className="trust-description">
-                            Trust our AI platform
+                            Confían en nuestra plataforma IA
                           </div>
                         </div>
                       </div>
@@ -687,7 +686,7 @@ const Landing: React.FC = () => {
                             <StarOutlined className="text-yellow-500" />
                           </div>
                           <span className="indicator-text">
-                            Enterprise Grade
+                            Nivel Empresarial
                           </span>
                         </div>
                         <div className="indicator-item">
@@ -695,7 +694,7 @@ const Landing: React.FC = () => {
                             <SafetyOutlined className="text-green-500" />
                           </div>
                           <span className="indicator-text">
-                            SOC 2 Compliant
+                            Cumple SOC 2
                           </span>
                         </div>
                         <div className="indicator-item">
@@ -748,9 +747,9 @@ const Landing: React.FC = () => {
                         </div>
                         <div className="text-content">
                           <div className="metric-value">94%</div>
-                          <div className="metric-label">AI Accuracy</div>
+                          <div className="metric-label">Precisión IA</div>
                           <div className="metric-description">
-                            Precision Rate
+                            Tasa de Precisión
                           </div>
                         </div>
                       </div>
@@ -777,9 +776,9 @@ const Landing: React.FC = () => {
                         </div>
                         <div className="text-content">
                           <div className="metric-value">85%</div>
-                          <div className="metric-label">Faster Process</div>
+                          <div className="metric-label">Proceso Más Rápido</div>
                           <div className="metric-description">
-                            Time Reduction
+                            Reducción de Tiempo
                           </div>
                         </div>
                       </div>
@@ -806,8 +805,8 @@ const Landing: React.FC = () => {
                         </div>
                         <div className="text-content">
                           <div className="metric-value">12.5K+</div>
-                          <div className="metric-label">Interviews</div>
-                          <div className="metric-description">Completed</div>
+                          <div className="metric-label">Entrevistas</div>
+                          <div className="metric-description">Completadas</div>
                         </div>
                       </div>
                       <div className="card-pattern"></div>
@@ -840,21 +839,20 @@ const Landing: React.FC = () => {
             >
               <div className="performance-badge">
                 <BarChartOutlined className="performance-badge-icon" />
-                <span>Live Performance</span>
+                <span>Rendimiento en Vivo</span>
                 <div className="live-indicator">
                   <div className="pulse-dot"></div>
-                  <span>LIVE</span>
+                  <span>EN VIVO</span>
                 </div>
               </div>
 
               <Title level={2} className="dashboard-title">
-                Real-time Platform
-                <span className="dashboard-title-gradient"> Metrics</span>
+                Métricas de Plataforma
+                <span className="dashboard-title-gradient"> en Tiempo Real</span>
               </Title>
 
               <Paragraph className="dashboard-subtitle">
-                Watch our AI platform perform in real-time across global
-                enterprises
+                Observa nuestra plataforma IA funcionar en tiempo real a través de empresas globales
               </Paragraph>
             </motion.div>
 
@@ -928,7 +926,7 @@ const Landing: React.FC = () => {
 
                         <div className="metric-change">
                           <ArrowRightOutlined className="change-arrow" />
-                          <span className="change-text">+12% this month</span>
+                          <span className="change-text">+12% este mes</span>
                         </div>
                       </div>
 
@@ -957,7 +955,7 @@ const Landing: React.FC = () => {
                               ></motion.div>
                             ))}
                           </div>
-                          <div className="chart-label">Trending Up</div>
+                          <div className="chart-label">Tendencia Ascendente</div>
                         </div>
                       </div>
                     </div>
@@ -980,11 +978,11 @@ const Landing: React.FC = () => {
                 <div className="activity-header">
                   <div className="activity-title">
                     <GlobalOutlined className="activity-icon" />
-                    <span>Global Activity</span>
+                    <span>Actividad Global</span>
                   </div>
                   <div className="activity-status">
                     <div className="status-dot active"></div>
-                    <span>1,247 active sessions</span>
+                    <span>1,247 sesiones activas</span>
                   </div>
                 </div>
 
@@ -995,8 +993,8 @@ const Landing: React.FC = () => {
                     transition={{ duration: 2, repeat: Infinity }}
                   >
                     <div className="activity-dot"></div>
-                    <span>New interview completed in San Francisco</span>
-                    <span className="activity-time">2s ago</span>
+                    <span>Nueva entrevista completada en San Francisco</span>
+                    <span className="activity-time">hace 2s</span>
                   </motion.div>
 
                   <motion.div
@@ -1005,8 +1003,8 @@ const Landing: React.FC = () => {
                     transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
                   >
                     <div className="activity-dot"></div>
-                    <span>AI assessment generated for TechCorp</span>
-                    <span className="activity-time">5s ago</span>
+                    <span>Evaluación IA generada para TechCorp</span>
+                    <span className="activity-time">hace 5s</span>
                   </motion.div>
 
                   <motion.div
@@ -1015,8 +1013,8 @@ const Landing: React.FC = () => {
                     transition={{ duration: 2, repeat: Infinity, delay: 1.0 }}
                   >
                     <div className="activity-dot"></div>
-                    <span>Candidate matched in London</span>
-                    <span className="activity-time">8s ago</span>
+                    <span>Candidato encontrado en Londres</span>
+                    <span className="activity-time">hace 8s</span>
                   </motion.div>
                 </div>
               </motion.div>
@@ -1040,18 +1038,18 @@ const Landing: React.FC = () => {
             >
               <div className="features-badge">
                 <BulbOutlined className="features-badge-icon" />
-                <span>Key Features</span>
+                <span>Características Clave</span>
               </div>
               <Title level={2} className="features-title">
-                Experience the Future of
+                Experimenta el Futuro de la
                 <span className="features-title-gradient">
                   {" "}
-                  AI-Powered Hiring
+                  Contratación Impulsada por IA
                 </span>
               </Title>
               <Paragraph className="features-subtitle">
-                Revolutionary technology that transforms how you discover,
-                evaluate, and hire exceptional talent
+                Tecnología revolucionaria que transforma cómo descubres,
+                evalúas y contratas talento excepcional
               </Paragraph>
             </motion.div>
 
@@ -1080,7 +1078,7 @@ const Landing: React.FC = () => {
                         )
                       }
                     >
-                      {isAutoPlaying ? "Auto-playing" : "Paused"}
+                      {isAutoPlaying ? "Reproducción automática" : "Pausado"}
                     </Button>
                   </div>
                 </div>
@@ -1160,7 +1158,7 @@ const Landing: React.FC = () => {
                           {/* Capabilities List */}
                           <div className="feature-capabilities">
                             <h4 className="capabilities-title">
-                              Key Capabilities
+                              Capacidades Clave
                             </h4>
                             <div className="capabilities-list">
                               {feature.capabilities.map(
@@ -1198,7 +1196,7 @@ const Landing: React.FC = () => {
                               <span>{feature.demoFeature}</span>
                             </Button>
                             <Button className="learn-more-button">
-                              <span>Documentation</span>
+                              <span>Documentación</span>
                               <ArrowRightOutlined />
                             </Button>
                           </div>
@@ -1258,9 +1256,9 @@ const Landing: React.FC = () => {
                     />
                   </div>
                   <div className="progress-labels">
-                    <span>Features</span>
+                    <span>Características</span>
                     <span>
-                      {activeFeatureIndex + 1} of {features.length}
+                      {activeFeatureIndex + 1} de {features.length}
                     </span>
                   </div>
                 </div>
@@ -1290,21 +1288,21 @@ const Landing: React.FC = () => {
             >
               <div className="testimonials-badge">
                 <HeartOutlined className="testimonials-badge-icon" />
-                <span>Customer Stories</span>
+                <span>Historias de Clientes</span>
               </div>
               <Title level={2} className="testimonials-title">
-                Loved by Industry
-                <span className="testimonials-title-gradient"> Leaders</span>
+                Amado por Líderes
+                <span className="testimonials-title-gradient"> de la Industria</span>
               </Title>
               <Paragraph className="testimonials-subtitle">
-                Discover how leading companies are transforming their hiring
-                process with mirAI
+                Descubre cómo las empresas líderes están transformando su proceso
+                de contratación con mirAI
               </Paragraph>
 
               <div className="testimonials-stats">
                 <div className="stat-item">
                   <div className="stat-number">4.9</div>
-                  <div className="stat-label">Average Rating</div>
+                  <div className="stat-label">Calificación Promedio</div>
                   <div className="stat-stars">
                     {[...Array(5)].map((_, i) => (
                       <StarOutlined key={i} className="star-icon" />
@@ -1314,12 +1312,12 @@ const Landing: React.FC = () => {
                 <div className="stat-divider"></div>
                 <div className="stat-item">
                   <div className="stat-number">250+</div>
-                  <div className="stat-label">Happy Clients</div>
+                  <div className="stat-label">Clientes Satisfechos</div>
                 </div>
                 <div className="stat-divider"></div>
                 <div className="stat-item">
                   <div className="stat-number">98%</div>
-                  <div className="stat-label">Satisfaction</div>
+                  <div className="stat-label">Satisfacción</div>
                 </div>
               </div>
             </motion.div>
@@ -1406,7 +1404,7 @@ const Landing: React.FC = () => {
                           </div>
                           <div className="company-badge">
                             <CrownOutlined className="company-icon" />
-                            <span>Verified Customer</span>
+                            <span>Cliente Verificado</span>
                           </div>
                         </div>
                       </div>
@@ -1476,21 +1474,21 @@ const Landing: React.FC = () => {
                   viewport={{ once: true }}
                 >
                   <RocketOutlined className="connection-badge-icon" />
-                  <span>Ready When You Are</span>
+                  <span>Listos Cuando Tú Lo Estés</span>
                 </motion.div>
 
                 <Title level={2} className="connection-title">
-                  Let's Build the Future of
+                  Construyamos Juntos el Futuro de la
                   <span className="connection-title-gradient">
                     {" "}
-                    Hiring Together
+                    Contratación
                   </span>
                 </Title>
 
                 <Paragraph className="connection-subtitle">
-                  Join the AI revolution that's reshaping how companies discover
-                  exceptional talent. Your journey towards smarter hiring starts
-                  here.
+                  Únete a la revolución de IA que está reformando cómo las empresas
+                  descubren talento excepcional. Tu viaje hacia una contratación más
+                  inteligente comienza aquí.
                 </Paragraph>
               </div>
 
@@ -1512,37 +1510,37 @@ const Landing: React.FC = () => {
                       </div>
                       <div className="card-status">
                         <div className="status-indicator"></div>
-                        <span>Instant Access</span>
+                        <span>Acceso Instantáneo</span>
                       </div>
                     </div>
 
                     <div className="card-info">
-                      <h3 className="card-title">Get Started Now</h3>
+                      <h3 className="card-title">Comienza Ahora</h3>
                       <p className="card-description">
-                        Join our platform and start experiencing the power of
-                        AI-driven interviews immediately. Perfect for teams
-                        ready to innovate.
+                        Únete a nuestra plataforma y comienza a experimentar el poder de
+                        las entrevistas impulsadas por IA inmediatamente. Perfecto para
+                        equipos listos para innovar.
                       </p>
 
                       <div className="card-features">
                         <div className="feature-item">
                           <CheckCircleOutlined className="feature-icon" />
-                          <span>Immediate platform access</span>
+                          <span>Acceso inmediato a la plataforma</span>
                         </div>
                         <div className="feature-item">
                           <CheckCircleOutlined className="feature-icon" />
-                          <span>Full feature availability</span>
+                          <span>Disponibilidad completa de funciones</span>
                         </div>
                         <div className="feature-item">
                           <CheckCircleOutlined className="feature-icon" />
-                          <span>24/7 AI assistance</span>
+                          <span>Asistencia IA 24/7</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="card-action">
                       <Button className="connection-button primary-button">
-                        <span>Begin Your Journey</span>
+                        <span>Comienza Tu Viaje</span>
                         <ArrowRightOutlined className="button-arrow" />
                       </Button>
                     </div>
@@ -1565,37 +1563,37 @@ const Landing: React.FC = () => {
                       </div>
                       <div className="card-status">
                         <div className="status-indicator secondary"></div>
-                        <span>Personalized</span>
+                        <span>Personalizado</span>
                       </div>
                     </div>
 
                     <div className="card-info">
-                      <h3 className="card-title">Expert Consultation</h3>
+                      <h3 className="card-title">Consulta de Expertos</h3>
                       <p className="card-description">
-                        Let our specialists craft a customized solution for your
-                        unique hiring challenges. Ideal for enterprise teams
-                        with specific requirements.
+                        Deja que nuestros especialistas diseñen una solución
+                        personalizada para tus desafíos únicos de contratación. Ideal
+                        para equipos empresariales con requisitos específicos.
                       </p>
 
                       <div className="card-features">
                         <div className="feature-item">
                           <StarOutlined className="feature-icon secondary" />
-                          <span>Custom implementation plan</span>
+                          <span>Plan de implementación personalizado</span>
                         </div>
                         <div className="feature-item">
                           <StarOutlined className="feature-icon secondary" />
-                          <span>Dedicated success manager</span>
+                          <span>Gerente de éxito dedicado</span>
                         </div>
                         <div className="feature-item">
                           <StarOutlined className="feature-icon secondary" />
-                          <span>Priority enterprise support</span>
+                          <span>Soporte empresarial prioritario</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="card-action">
                       <Button className="connection-button secondary-button">
-                        <span>Connect With Expert</span>
+                        <span>Conectar con Experto</span>
                         <ArrowRightOutlined className="button-arrow" />
                       </Button>
                     </div>
@@ -1613,8 +1611,8 @@ const Landing: React.FC = () => {
                 <div className="trust-message">
                   <GlobalOutlined className="trust-icon" />
                   <span>
-                    Trusted by 250+ companies worldwide • Built with enterprise
-                    security • Available in 15+ languages
+                    Confiado por más de 250 empresas en todo el mundo • Construido con
+                    seguridad empresarial • Disponible en más de 15 idiomas
                   </span>
                 </div>
               </motion.div>
@@ -1647,28 +1645,29 @@ const Landing: React.FC = () => {
                 <div className="footer-logo-content">
                   <span className="footer-logo-text">mirAI</span>
                   <span className="footer-logo-subtitle">
-                    Interview Platform
+                    Plataforma de Entrevistas
                   </span>
                 </div>
               </div>
 
               <Paragraph className="footer-description">
-                Revolutionizing the future of hiring with AI-powered interview
-                intelligence. Trusted by leading companies worldwide.
+                Revolucionando el futuro de la contratación con inteligencia de
+                entrevistas impulsada por IA. Confiado por empresas líderes en todo
+                el mundo.
               </Paragraph>
 
               <div className="footer-stats">
                 <div className="footer-stat">
                   <div className="stat-value">250+</div>
-                  <div className="stat-label">Companies</div>
+                  <div className="stat-label">Empresas</div>
                 </div>
                 <div className="footer-stat">
                   <div className="stat-value">12.5K+</div>
-                  <div className="stat-label">Interviews</div>
+                  <div className="stat-label">Entrevistas</div>
                 </div>
                 <div className="footer-stat">
                   <div className="stat-value">94%</div>
-                  <div className="stat-label">Accuracy</div>
+                  <div className="stat-label">Precisión</div>
                 </div>
               </div>
             </motion.div>
@@ -1682,7 +1681,7 @@ const Landing: React.FC = () => {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 viewport={{ once: true }}
               >
-                <h4 className="footer-nav-title">Platform</h4>
+                <h4 className="footer-nav-title">Plataforma</h4>
                 <div className="footer-nav-links">
                   <button
                     onClick={() => scrollToSection("#features")}
@@ -1697,7 +1696,7 @@ const Landing: React.FC = () => {
                     }}
                   >
                     <BulbOutlined className="link-icon" />
-                    <span>Features</span>
+                    <span>Características</span>
                   </button>
                   <button
                     onClick={() => scrollToSection("#performance")}
@@ -1712,7 +1711,7 @@ const Landing: React.FC = () => {
                     }}
                   >
                     <BarChartOutlined className="link-icon" />
-                    <span>Performance</span>
+                    <span>Rendimiento</span>
                   </button>
                   <button
                     onClick={() => scrollToSection("#testimonials")}
@@ -1727,7 +1726,7 @@ const Landing: React.FC = () => {
                     }}
                   >
                     <HeartOutlined className="link-icon" />
-                    <span>Customer Stories</span>
+                    <span>Historias de Clientes</span>
                   </button>
                 </div>
               </motion.div>
@@ -1739,7 +1738,7 @@ const Landing: React.FC = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 viewport={{ once: true }}
               >
-                <h4 className="footer-nav-title">Connect</h4>
+                <h4 className="footer-nav-title">Conectar</h4>
                 <div className="footer-nav-links">
                   <button
                     className="footer-nav-link"
@@ -1754,15 +1753,15 @@ const Landing: React.FC = () => {
                     }}
                   >
                     <UserOutlined className="link-icon" />
-                    <span>Get Started</span>
+                    <span>Comenzar</span>
                   </button>
                   <a href="#support" className="footer-nav-link">
                     <TeamOutlined className="link-icon" />
-                    <span>Expert Consultation</span>
+                    <span>Consulta de Expertos</span>
                   </a>
                   <a href="#help" className="footer-nav-link">
                     <SafetyOutlined className="link-icon" />
-                    <span>Help Center</span>
+                    <span>Centro de Ayuda</span>
                   </a>
                 </div>
               </motion.div>
@@ -1774,19 +1773,19 @@ const Landing: React.FC = () => {
                 transition={{ duration: 0.6, delay: 0.3 }}
                 viewport={{ once: true }}
               >
-                <h4 className="footer-nav-title">Resources</h4>
+                <h4 className="footer-nav-title">Recursos</h4>
                 <div className="footer-nav-links">
                   <a href="#documentation" className="footer-nav-link">
                     <InfoCircleOutlined className="link-icon" />
-                    <span>Documentation</span>
+                    <span>Documentación</span>
                   </a>
                   <a href="#api" className="footer-nav-link">
                     <ThunderboltOutlined className="link-icon" />
-                    <span>API Reference</span>
+                    <span>Referencia API</span>
                   </a>
                   <a href="#security" className="footer-nav-link">
                     <SafetyOutlined className="link-icon" />
-                    <span>Security</span>
+                    <span>Seguridad</span>
                   </a>
                 </div>
               </motion.div>
@@ -1801,16 +1800,16 @@ const Landing: React.FC = () => {
               viewport={{ once: true }}
             >
               <div className="footer-cta">
-                <h4 className="footer-cta-title">Ready to Transform Hiring?</h4>
+                <h4 className="footer-cta-title">¿Listo para Transformar la Contratación?</h4>
                 <p className="footer-cta-text">
-                  Join the AI revolution and discover how mirAI can enhance your
-                  recruitment process.
+                  Únete a la revolución de IA y descubre cómo mirAI puede mejorar tu
+                  proceso de reclutamiento.
                 </p>
                 <Button
                   className="footer-cta-button"
                   onClick={() => navigate("/login")}
                 >
-                  <span>Explore Platform</span>
+                  <span>Explorar Plataforma</span>
                   <ArrowRightOutlined className="cta-arrow" />
                 </Button>
               </div>
@@ -1827,7 +1826,7 @@ const Landing: React.FC = () => {
           >
             <div className="footer-bottom-content">
               <div className="footer-copyright">
-                <span>© 2024 mirAI. All rights reserved.</span>
+                <span>© 2024 mirAI. Todos los derechos reservados.</span>
                 <div className="footer-status">
                   <div
                     className={`status-dot-footer ${getStatusInfo(serviceStatus.status).dotClass}`}
@@ -1836,7 +1835,7 @@ const Landing: React.FC = () => {
                     style={{ color: getStatusInfo(serviceStatus.status).color }}
                   >
                     {serviceStatus.loading
-                      ? "Checking status..."
+                      ? "Verificando estado..."
                       : getStatusInfo(serviceStatus.status).text}
                   </span>
                 </div>
@@ -1844,10 +1843,10 @@ const Landing: React.FC = () => {
 
               <div className="footer-legal">
                 <a href="#privacy" className="footer-legal-link">
-                  Privacy
+                  Privacidad
                 </a>
                 <a href="#terms" className="footer-legal-link">
-                  Terms
+                  Términos
                 </a>
                 <a href="#security" className="footer-legal-link">
                   Security

@@ -161,7 +161,7 @@ const Login: React.FC = () => {
           onClick={() => navigate("/")}
           icon={<ArrowLeftOutlined />}
         >
-          Back to Home
+          Volver al Inicio
         </Button>
       </motion.div>
 
@@ -186,7 +186,7 @@ const Login: React.FC = () => {
               </div>
               <div className="login-logo-text-modern">
                 <span className="login-brand-name">mirAI</span>
-                <span className="login-brand-subtitle">Interview Platform</span>
+                <span className="login-brand-subtitle">Plataforma de Entrevistas</span>
               </div>
             </div>
           </motion.div>
@@ -201,12 +201,12 @@ const Login: React.FC = () => {
             {/* Header */}
             <div className="login-form-header">
               <Title level={2} className="login-form-title">
-                {activeTab === "login" ? "Welcome Back" : "Join mirAI"}
+                {activeTab === "login" ? "Bienvenido de vuelta" : "Únete a mirAI"}
               </Title>
               <Paragraph className="login-form-subtitle">
                 {activeTab === "login"
-                  ? "Sign in to your account and continue your AI-powered hiring journey"
-                  : "Create your account and start transforming your hiring process"}
+                  ? "Inicia sesión en tu cuenta y continúa tu viaje de contratación impulsado por IA"
+                  : "Crea tu cuenta y comienza a transformar tu proceso de contratación"}
               </Paragraph>
             </div>
 
@@ -225,13 +225,13 @@ const Login: React.FC = () => {
                 className={`tab-selector-button ${activeTab === "login" ? "active" : ""}`}
                 onClick={() => setActiveTab("login")}
               >
-                Sign In
+                Iniciar Sesión
               </button>
               <button
                 className={`tab-selector-button ${activeTab === "register" ? "active" : ""}`}
                 onClick={() => setActiveTab("register")}
               >
-                Sign Up
+                Registrarse
               </button>
             </div>
 
@@ -244,7 +244,7 @@ const Login: React.FC = () => {
               >
                 <div className="error-icon">⚠️</div>
                 <div className="error-content">
-                  <div className="error-title">Authentication Error</div>
+                  <div className="error-title">Error de Autenticación</div>
                   <div className="error-message">{error}</div>
                 </div>
                 <button className="error-close" onClick={() => setError("")}>
@@ -272,8 +272,8 @@ const Login: React.FC = () => {
                   <Form.Item
                     name="email"
                     rules={[
-                      { required: true, message: "Please enter your email" },
-                      { type: "email", message: "Please enter a valid email" },
+                      { required: true, message: "Por favor ingrese su correo electrónico" },
+                      { type: "email", message: "Por favor ingrese un correo electrónico válido" },
                     ]}
                   >
                     <div className="login-input-wrapper">
@@ -281,7 +281,7 @@ const Login: React.FC = () => {
                         <MailOutlined />
                       </div>
                       <Input
-                        placeholder="Enter your email address"
+                        placeholder="Ingrese su dirección de correo electrónico"
                         className="login-input-modern"
                         autoComplete="email"
                       />
@@ -292,7 +292,7 @@ const Login: React.FC = () => {
                   <Form.Item
                     name="password"
                     rules={[
-                      { required: true, message: "Please enter your password" },
+                      { required: true, message: "Por favor ingrese su contraseña" },
                     ]}
                   >
                     <div className="login-input-wrapper">
@@ -300,7 +300,7 @@ const Login: React.FC = () => {
                         <LockOutlined />
                       </div>
                       <Input.Password
-                        placeholder="Enter your password"
+                        placeholder="Ingrese su contraseña"
                         className="login-input-modern"
                         autoComplete="current-password"
                       />
@@ -316,7 +316,7 @@ const Login: React.FC = () => {
                       className="login-button-modern"
                       block
                     >
-                      <span>{loading ? "Signing In..." : "Sign In"}</span>
+                      <span>{loading ? "Iniciando sesión..." : "Iniciar Sesión"}</span>
                       <ThunderboltOutlined className="button-icon" />
                     </Button>
                   </Form.Item>
@@ -325,7 +325,7 @@ const Login: React.FC = () => {
                 {/* Security Badge */}
                 <div className="login-security-badge">
                   <SafetyOutlined className="security-icon" />
-                  <span>Enterprise-grade security & privacy protection</span>
+                  <span>Seguridad y protección de privacidad de nivel empresarial</span>
                 </div>
               </motion.div>
             )}
@@ -351,7 +351,7 @@ const Login: React.FC = () => {
                     rules={[
                       {
                         required: true,
-                        message: "Please enter your first name",
+                        message: "Por favor ingrese su nombre",
                       },
                     ]}
                   >
@@ -360,7 +360,7 @@ const Login: React.FC = () => {
                         <UserOutlined />
                       </div>
                       <Input
-                        placeholder="Enter your first name"
+                        placeholder="Ingrese su nombre"
                         className="login-input-modern"
                         autoComplete="given-name"
                       />
@@ -374,7 +374,7 @@ const Login: React.FC = () => {
                       rules={[
                         {
                           required: true,
-                          message: "Please enter your paternal surname",
+                          message: "Por favor ingrese su apellido paterno",
                         },
                       ]}
                     >
@@ -383,7 +383,7 @@ const Login: React.FC = () => {
                           <UserOutlined />
                         </div>
                         <Input
-                          placeholder="Paternal surname"
+                          placeholder="Apellido paterno"
                           className="login-input-modern"
                           autoComplete="family-name"
                         />
@@ -396,7 +396,7 @@ const Login: React.FC = () => {
                       rules={[
                         {
                           required: true,
-                          message: "Please enter your maternal surname",
+                          message: "Por favor ingrese su apellido materno",
                         },
                       ]}
                     >
@@ -405,7 +405,7 @@ const Login: React.FC = () => {
                           <UserOutlined />
                         </div>
                         <Input
-                          placeholder="Maternal surname"
+                          placeholder="Apellido materno"
                           className="login-input-modern"
                           autoComplete="family-name"
                         />
@@ -417,8 +417,8 @@ const Login: React.FC = () => {
                   <Form.Item
                     name="email"
                     rules={[
-                      { required: true, message: "Please enter your email" },
-                      { type: "email", message: "Please enter a valid email" },
+                      { required: true, message: "Por favor ingrese su correo electrónico" },
+                      { type: "email", message: "Por favor ingrese un correo electrónico válido" },
                     ]}
                   >
                     <div className="login-input-wrapper">
@@ -426,7 +426,7 @@ const Login: React.FC = () => {
                         <MailOutlined />
                       </div>
                       <Input
-                        placeholder="Enter your email address"
+                        placeholder="Ingrese su dirección de correo electrónico"
                         className="login-input-modern"
                         autoComplete="email"
                       />
@@ -438,10 +438,10 @@ const Login: React.FC = () => {
                     <Form.Item
                       name="password"
                       rules={[
-                        { required: true, message: "Please enter password" },
+                        { required: true, message: "Por favor ingrese una contraseña" },
                         {
                           min: 8,
-                          message: "Password must be at least 8 characters",
+                          message: "La contraseña debe tener al menos 8 caracteres",
                         },
                       ]}
                     >
@@ -450,7 +450,7 @@ const Login: React.FC = () => {
                           <LockOutlined />
                         </div>
                         <Input.Password
-                          placeholder="Create password"
+                          placeholder="Crear contraseña"
                           className="login-input-modern"
                           autoComplete="new-password"
                         />
@@ -462,14 +462,14 @@ const Login: React.FC = () => {
                       name="confirmPassword"
                       dependencies={["password"]}
                       rules={[
-                        { required: true, message: "Please confirm password" },
+                        { required: true, message: "Por favor confirme la contraseña" },
                         ({ getFieldValue }) => ({
                           validator(_, value) {
                             if (!value || getFieldValue("password") === value) {
                               return Promise.resolve();
                             }
                             return Promise.reject(
-                              new Error("Passwords do not match!"),
+                              new Error("¡Las contraseñas no coinciden!"),
                             );
                           },
                         }),
@@ -480,7 +480,7 @@ const Login: React.FC = () => {
                           <LockOutlined />
                         </div>
                         <Input.Password
-                          placeholder="Confirm password"
+                          placeholder="Confirmar contraseña"
                           className="login-input-modern"
                           autoComplete="new-password"
                         />
@@ -493,10 +493,10 @@ const Login: React.FC = () => {
                     <Form.Item
                       name="telefono"
                       rules={[
-                        { required: true, message: "Please enter phone number" },
+                        { required: true, message: "Por favor ingrese su número de teléfono" },
                         { 
                           pattern: /^9\d{8}$/, 
-                          message: "Phone number must start with 9 and have exactly 9 digits" 
+                          message: "El número de teléfono debe comenzar con 9 y tener exactamente 9 dígitos" 
                         },
                       ]}
                     >
@@ -505,7 +505,7 @@ const Login: React.FC = () => {
                           <PhoneOutlined />
                         </div>
                         <Input
-                          placeholder="Phone number (9XXXXXXXX)"
+                          placeholder="Número de teléfono (9XXXXXXXX)"
                           className="login-input-modern"
                           autoComplete="tel"
                           maxLength={9}
@@ -517,7 +517,7 @@ const Login: React.FC = () => {
                     <Form.Item
                       name="nacimiento"
                       rules={[
-                        { required: true, message: "Please select your birth date" },
+                        { required: true, message: "Por favor seleccione su fecha de nacimiento" },
                         {
                           validator: (_, value) => {
                             if (!value) {
@@ -530,7 +530,7 @@ const Login: React.FC = () => {
                             const age = today.diff(birthDate, 'year');
                             
                             if (age < 18) {
-                              return Promise.reject(new Error('You must be at least 18 years old to register'));
+                              return Promise.reject(new Error('Debe tener al menos 18 años para registrarse'));
                             }
                             return Promise.resolve();
                           },
@@ -543,7 +543,7 @@ const Login: React.FC = () => {
                         </div>
                         <Input
                           type="date"
-                          placeholder="Select your birth date"
+                          placeholder="Seleccione su fecha de nacimiento"
                           className="login-input-modern"
                           style={{ width: '100%' }}
                           max={dayjs().subtract(18, 'year').format('YYYY-MM-DD')}
@@ -562,7 +562,7 @@ const Login: React.FC = () => {
                       block
                     >
                       <span>
-                        {loading ? "Creating Account..." : "Create Account"}
+                        {loading ? "Creando cuenta..." : "Crear Cuenta"}
                       </span>
                       <StarOutlined className="button-icon" />
                     </Button>
@@ -573,8 +573,7 @@ const Login: React.FC = () => {
                 <div className="login-terms-notice">
                   <CheckCircleOutlined className="terms-icon" />
                   <span>
-                    By signing up, you agree to our Terms of Service and Privacy
-                    Policy
+                    Al registrarte, aceptas nuestros Términos de Servicio y Política de Privacidad
                   </span>
                 </div>
               </motion.div>
@@ -584,11 +583,11 @@ const Login: React.FC = () => {
             <div className="login-help-section">
               <div className="help-links">
                 <a href="#" className="help-link">
-                  Forgot password?
+                  ¿Olvidaste tu contraseña?
                 </a>
                 <span className="help-divider">•</span>
                 <a href="#" className="help-link">
-                  Need support?
+                  ¿Necesitas ayuda?
                 </a>
               </div>
             </div>
@@ -603,15 +602,15 @@ const Login: React.FC = () => {
           >
             <div className="trust-item">
               <GlobalOutlined className="trust-icon" />
-              <span>250+ Companies</span>
+              <span>250+ Empresas</span>
             </div>
             <div className="trust-item">
               <EyeOutlined className="trust-icon" />
-              <span>12.5K+ Interviews</span>
+              <span>12.5K+ Entrevistas</span>
             </div>
             <div className="trust-item">
               <HeartOutlined className="trust-icon" />
-              <span>99.9% Uptime</span>
+              <span>99.9% Disponibilidad</span>
             </div>
           </motion.div>
         </motion.div>
