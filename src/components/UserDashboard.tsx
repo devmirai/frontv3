@@ -88,8 +88,22 @@ const UserDashboard: React.FC = () => {
 
   // Early return if user is not loaded yet
   if (!user) {
+    console.log('⚠️ [UserDashboard] User not loaded yet');
     return <div>Loading...</div>;
   }
+
+  // Validate user has required properties
+  if (!user.id) {
+    console.error('❌ [UserDashboard] User loaded but missing ID:', user);
+    return (
+      <div>
+        <p>Error: Usuario no válido. Por favor cierra sesión e inicia sesión nuevamente.</p>
+        <Button onClick={logout}>Cerrar Sesión</Button>
+      </div>
+    );
+  }
+
+  console.log('✅ [UserDashboard] User validated:', { id: user.id, name: user.name });
 
   const menuItems = [
     {
@@ -207,6 +221,7 @@ const UserDashboard: React.FC = () => {
       console.log("📊 [UserDashboard] Loading dashboard data from backend v2 API...");
 
       // Load active job postings from backend using v2 API
+      console.log("📊 [UserDashboard] Step 1: Loading convocatorias...");
       const convocatoriasResponse = await convocatoriaAPI.getActivasV2();
       console.log("V2 API Response:", convocatoriasResponse.data);
       
@@ -214,42 +229,54 @@ const UserDashboard: React.FC = () => {
       const convocatoriasData = convocatoriasResponse.data;
       const activeJobsData = Array.isArray(convocatoriasData?.data) ? convocatoriasData.data : [];
       
-      // Transform the API response to match our interface
-      const transformedJobs = activeJobsData.map((job: any) => ({
-        id: job.id,
-        titulo: job.jobTitle,
-        descripcion: job.jobDescription,
-        puesto: job.category,
-        categoria: job.category,
-        dificultad: job.dificultad?.toString(),
-        fechaPublicacion: job.publicationDate,
-        fechaCierre: job.closingDate,
-        activo: job.activo,
-        // V2 API fields
-        publicationDate: job.publicationDate,
-        closingDate: job.closingDate,
-        formattedSalaryRange: job.formattedSalaryRange,
-        isActive: job.active,
-        daysUntilClosing: job.daysUntilClosing,
-        status: job.status,
-        // Additional V2 fields
-        experienceLevel: job.experienceLevel,
-        workMode: job.workMode,
-        location: job.location,
-        technicalRequirements: job.technicalRequirements,
-        benefitsPerks: job.benefitsPerks,
-        salaryMin: job.salaryMin,
-        salaryMax: job.salaryMax,
-        salaryCurrency: job.salaryCurrency,
-        empresa: {
-          id: job.empresaId,
-          nombre: job.empresaNombre
-        }
-      }));
+      console.log("📊 [UserDashboard] Step 1.1: Processing jobs...");
       
+      // Transform the API response to match our interface
+      const transformedJobs = activeJobsData.map((job: any, index: number) => {
+        console.log(`📊 [UserDashboard] Processing job ${index + 1}:`, {
+          id: job.id,
+          jobTitle: job.jobTitle,
+          hasRequiredFields: !!(job.id && job.jobTitle)
+        });
+        
+        return {
+          id: job.id,
+          titulo: job.jobTitle,
+          descripcion: job.jobDescription,
+          puesto: job.category,
+          categoria: job.category,
+          dificultad: job.dificultad?.toString(),
+          fechaPublicacion: job.publicationDate,
+          fechaCierre: job.closingDate,
+          activo: job.activo,
+          // V2 API fields
+          publicationDate: job.publicationDate,
+          closingDate: job.closingDate,
+          formattedSalaryRange: job.formattedSalaryRange,
+          isActive: job.active,
+          daysUntilClosing: job.daysUntilClosing,
+          status: job.status,
+          // Additional V2 fields
+          experienceLevel: job.experienceLevel,
+          workMode: job.workMode,
+          location: job.location,
+          technicalRequirements: job.technicalRequirements,
+          benefitsPerks: job.benefitsPerks,
+          salaryMin: job.salaryMin,
+          salaryMax: job.salaryMax,
+          salaryCurrency: job.salaryCurrency,
+          empresa: {
+            id: job.empresaId,
+            nombre: job.empresaNombre
+          }
+        };
+      });
+      
+      console.log("📊 [UserDashboard] Step 1.2: Jobs processed successfully:", transformedJobs.length);
       setAvailableJobs(transformedJobs);
 
       // Load user's applications from backend using JWT-based endpoint
+      console.log("📊 [UserDashboard] Step 2: Loading postulaciones...");
       const postulacionesResponse = await postulacionAPI.getMisPostulaciones();
       console.log("📊 [UserDashboard] Raw postulaciones response:", postulacionesResponse.data);
       
@@ -257,34 +284,73 @@ const UserDashboard: React.FC = () => {
       const postulacionesData = postulacionesResponse.data;
       const userApplicationsData = Array.isArray(postulacionesData?.data) ? postulacionesData.data : [];
       
-      // Transform the API response to match our Postulacion interface
-      const transformedApplications = userApplicationsData.map((app: any) => ({
-        id: app.id,
-        fechaPostulacion: app.fechaPostulacion || new Date().toISOString().split('T')[0], // Use current date if not provided
-        estado: app.estado,
-        preguntasGeneradas: app.preguntasGeneradas,
-        entrevistaSessionId: app.entrevistaSessionId,
-        usuario: app.usuario,
-        convocatoria: {
-          id: app.convocatoria.id,
-          titulo: app.convocatoria.jobTitle,
-          descripcion: app.convocatoria.jobDescription || '',
-          puesto: app.convocatoria.category,
-          categoria: app.convocatoria.category,
-          fechaCierre: app.convocatoria.closingDate,
-          activo: app.convocatoria.activo,
-          // Additional v2 fields from the new API
-          salaryRange: app.convocatoria.salaryRange,
-          experienceLevel: app.convocatoria.experienceLevel,
-          workMode: app.convocatoria.workMode,
-          location: app.convocatoria.location,
-          empresa: {
-            id: app.convocatoria.empresaId,
-            nombre: app.convocatoria.empresaNombre
-          }
-        }
-      }));
+      console.log("📊 [UserDashboard] Processing applications:", userApplicationsData.length);
       
+      // Transform the API response - now we have all the data we need from mis-postulaciones!
+      const transformedApplications = userApplicationsData.map((app: any, index: number) => {
+        console.log(`📊 [UserDashboard] Processing application ${index + 1}:`, {
+          id: app.id,
+          estado: app.estado,
+          preguntasGeneradas: app.preguntasGeneradas,
+          entrevistaSessionId: app.entrevistaSessionId,
+          convocatoriaId: app.convocatoriaId,
+          convocatoriaTitulo: app.convocatoriaTitulo,
+          empresaNombre: app.empresaNombre
+        });
+        
+        // Try to match with the job data from v2 API for enhanced details
+        let matchedJob = null;
+        if (app.convocatoriaId) {
+          matchedJob = transformedJobs.find((job: any) => job.id === app.convocatoriaId);
+          console.log(`📊 [UserDashboard] Matched job for convocatoria ${app.convocatoriaId}:`, matchedJob ? 'Found' : 'Not found');
+        }
+        
+        return {
+          id: app.id,
+          fechaPostulacion: app.fechaPostulacion || new Date().toISOString().split('T')[0],
+          estado: app.estado,
+          preguntasGeneradas: app.preguntasGeneradas,
+          entrevistaSessionId: app.entrevistaSessionId,
+          usuario: {
+            id: app.usuarioId,
+            nombre: app.usuarioNombre
+          },
+          // Use enhanced job data from v2 API if available, otherwise use the data from mis-postulaciones
+          convocatoria: matchedJob ? {
+            id: matchedJob.id,
+            titulo: matchedJob.titulo,
+            descripcion: matchedJob.descripcion || '',
+            puesto: matchedJob.puesto,
+            categoria: matchedJob.categoria,
+            fechaCierre: matchedJob.fechaCierre,
+            activo: matchedJob.activo,
+            // V2 API enhanced fields
+            salaryRange: matchedJob.formattedSalaryRange,
+            experienceLevel: matchedJob.experienceLevel,
+            workMode: matchedJob.workMode,
+            location: matchedJob.location,
+            empresa: {
+              id: matchedJob.empresa?.id,
+              nombre: matchedJob.empresa?.nombre
+            }
+          } : {
+            // Use data directly from mis-postulaciones response
+            id: app.convocatoriaId,
+            titulo: app.convocatoriaTitulo,
+            descripcion: '', // Not available in this response
+            puesto: app.convocatoriaTitulo, // Use title as fallback
+            categoria: '', // Not available in this response
+            fechaCierre: null, // Not available in this response
+            activo: true, // Assume active if in the list
+            empresa: {
+              id: null, // Not available in this response
+              nombre: app.empresaNombre
+            }
+          }
+        };
+      });
+      
+      console.log("📊 [UserDashboard] Step 2.2: Applications processed successfully with enhanced job matching");
       setMyApplications(transformedApplications);
 
       console.log(
@@ -293,7 +359,13 @@ const UserDashboard: React.FC = () => {
       );
 
     } catch (error: any) {
-      console.error("Error loading dashboard data:", error);
+      console.error("❌ [UserDashboard] Error loading dashboard data:", error);
+      console.error("❌ [UserDashboard] Error details:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      
       message.error("Error loading dashboard data. Please check your connection and try again.");
       
       // Set empty arrays if backend fails
@@ -410,7 +482,16 @@ const UserDashboard: React.FC = () => {
 
       const postulacionResponse = await postulacionAPI.create(postulacionData);
       const postulacion = postulacionResponse.data;
-      const postulacionId = postulacion.data.id; // Extract ID from nested data object
+      
+      console.log('🔍 [UserDashboard] Postulation response structure:', postulacion);
+      
+      // Handle different possible response structures
+      const postulacionId = postulacion?.data?.id || postulacion?.id || postulacion;
+      
+      if (!postulacionId) {
+        console.error('❌ [UserDashboard] Could not extract postulation ID from response:', postulacion);
+        throw new Error("No se pudo obtener el ID de la postulación");
+      }
       
       console.log('✅ [UserDashboard] Step 1: Postulation created:', postulacionId);
       
@@ -472,30 +553,39 @@ const UserDashboard: React.FC = () => {
     }
   };
 
-  // Continue Interview function - generates questions again for existing interviews (Step 4)
+  // Continue Interview function - uses existing sessionId or generates questions if needed
   const handleContinueInterview = async (postulacionId: number) => {
     try {
       setStartingInterview(postulacionId);
 
-      console.log('🎯 [UserDashboard] Step 4: Continuing interview and generating questions for postulation:', postulacionId);
-      console.log('🔍 [UserDashboard] DEBUG: preguntaAPI object:', preguntaAPI);
-      console.log('🔍 [UserDashboard] DEBUG: preguntaAPI.generar function:', preguntaAPI.generar);
+      console.log('🎯 [UserDashboard] Step 4: Continuing interview for postulation:', postulacionId);
       
-      message.loading("Generando las preguntas de tu entrevista...", 0);
+      // Find the application to get the existing sessionId
+      const application = myApplications.find(app => app.id === postulacionId);
       
-      // Generate questions for the existing postulation using the API
-      console.log('🔍 [UserDashboard] DEBUG: About to call preguntaAPI.generar with:', { idPostulacion: postulacionId });
-      const questionsResponse = await preguntaAPI.generar({ idPostulacion: postulacionId });
-      console.log('✅ [UserDashboard] Questions generated for continue interview:', questionsResponse.data);
-      
-      message.destroy();
-      message.success("¡Preguntas listas! Redirigiendo a la entrevista...");
-      
-      // Reload data to update the state
-      await loadDashboardData();
-      
-      // Navigate to the interview - now with questions pre-generated
-      navigate(`/usuario/interview/${postulacionId}`);
+      if (application?.entrevistaSessionId) {
+        console.log('✅ [UserDashboard] Using existing sessionId:', application.entrevistaSessionId);
+        message.success("¡Continuando con tu entrevista!");
+        
+        // Navigate directly to the interview with existing session
+        navigate(`/usuario/interview/${postulacionId}?session=${application.entrevistaSessionId}`);
+      } else {
+        console.log('🔍 [UserDashboard] No sessionId found, generating questions...');
+        message.loading("Generando las preguntas de tu entrevista...", 0);
+        
+        // Generate questions for the existing postulation using the API
+        const questionsResponse = await preguntaAPI.generar({ idPostulacion: postulacionId });
+        console.log('✅ [UserDashboard] Questions generated for continue interview:', questionsResponse.data);
+        
+        message.destroy();
+        message.success("¡Preguntas listas! Redirigiendo a la entrevista...");
+        
+        // Reload data to update the state with new sessionId
+        await loadDashboardData();
+        
+        // Navigate to the interview - now with questions pre-generated
+        navigate(`/usuario/interview/${postulacionId}`);
+      }
       
     } catch (error: any) {
       console.error("❌ [UserDashboard] Error continuing interview:", error);
@@ -506,7 +596,7 @@ const UserDashboard: React.FC = () => {
         stack: error.stack
       });
       message.destroy();
-      message.error("Error al generar las preguntas de la entrevista. Por favor intenta de nuevo.");
+      message.error("Error al continuar la entrevista. Por favor intenta de nuevo.");
     } finally {
       setStartingInterview(null);
     }
@@ -718,7 +808,16 @@ const UserDashboard: React.FC = () => {
 
       const postulacionResponse = await postulacionAPI.create(postulacionData);
       const postulacion = postulacionResponse.data;
-      const postulacionId = postulacion.data.id; // Extract ID from nested data object
+      
+      console.log('🔍 [UserDashboard] Postulation response structure:', postulacion);
+      
+      // Handle different possible response structures
+      const postulacionId = postulacion?.data?.id || postulacion?.id || postulacion;
+      
+      if (!postulacionId) {
+        console.error('❌ [UserDashboard] Could not extract postulation ID from response:', postulacion);
+        throw new Error("No se pudo obtener el ID de la postulación");
+      }
 
       console.log('✅ [UserDashboard] Step 1: Postulation created:', postulacionId);
       
