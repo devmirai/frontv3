@@ -15,6 +15,7 @@ import ConvocatoriaDetailsView from "./components/ConvocatoriaDetailsView"
 import CandidatesList from "./components/CandidatesList"
 import CreateConvocatoria from "./components/CreateConvocatoria"
 import AdminDashboard from "./components/AdminDashboard"
+import DemoDataViewer from "./components/DemoDataViewer"
 import { Rol } from "./types/api"
 import "./App.css"
 
@@ -65,6 +66,9 @@ const ThemedApp: React.FC = () => {
               {/* Public Routes */}
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
+              
+              {/* Demo Route - Solo para desarrollo */}
+              <Route path="/demo-data" element={<DemoDataViewer />} />
 
               {/* Dashboard Redirect */}
               <Route

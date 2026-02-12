@@ -35,6 +35,8 @@ import {
 import { motion } from "framer-motion"
 import { useNavigate, useParams } from "react-router-dom"
 import { convocatoriaAPI, postulacionAPI } from "../services/api"
+import { mockJobs, mockApplications } from "../data/mockData"
+import { getApplicationsByJob } from "../data/mockDataUtils"
 import type { Convocatoria, Postulacion } from "../types/api"
 import dayjs from "dayjs"
 
@@ -114,13 +116,25 @@ const ConvocatoriaDetailsView: React.FC = () => {
     try {
       setLoading(true)
 
-      // Load convocatoria details
-      const convocatoriaResponse = await convocatoriaAPI.getById(Number.parseInt(id))
-      setConvocatoria(convocatoriaResponse.data)
-
-      // Load postulaciones for this convocatoria
-      const postulacionesResponse = await postulacionAPI.getByConvocatoria(Number.parseInt(id))
-      setPostulaciones(postulacionesResponse.data)
+      // SIEMPRE usar datos mock para pruebas de diseño
+      console.log('🔧 [ConvocatoriaDetailsView] Usando datos mock para pruebas de diseño');
+      
+      const jobId = Number.parseInt(id);
+      
+      // Buscar convocatoria en datos mock
+      const mockConvocatoria = mockJobs.find(job => job.id === jobId);
+      if (mockConvocatoria) {
+        setConvocatoria(mockConvocatoria);
+        
+        // Buscar postulaciones para esta convocatoria
+        const mockPostulaciones = getApplicationsByJob(jobId);
+        setPostulaciones(mockPostulaciones);
+        
+        console.log(`📊 [ConvocatoriaDetailsView] Mock data loaded: job ${jobId}, ${mockPostulaciones.length} applications`);
+      } else {
+        console.log(`⚠️ [ConvocatoriaDetailsView] Job ${jobId} not found in mock data`);
+        message.error("Job posting not found");
+      }
     } catch (error: any) {
       console.error("Error loading convocatoria details:", error)
       message.error("Error loading job posting details")
@@ -330,7 +344,7 @@ const ConvocatoriaDetailsView: React.FC = () => {
                     <CalendarOutlined className="text-2xl text-blue-600 mb-2" />
                     <div className="text-sm text-gray-600 dark:text-gray-400">Created</div>
                     <div className="font-medium text-gray-800 dark:text-gray-200">
-                      {dayjs(convocatoria.fechaInicio).format("MMM DD, YYYY")}
+                      {dayjs(convocatoria.fechaPublicacion).format("MMM DD, YYYY")}
                     </div>
                   </div>
                 </Col>

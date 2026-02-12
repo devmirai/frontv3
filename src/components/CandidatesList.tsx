@@ -33,6 +33,8 @@ import { motion } from "framer-motion"
 import { useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { convocatoriaAPI, postulacionAPI, evaluacionAPI } from "../services/api"
+import { mockJobs } from "../data/mockData"
+import { getApplicationsByJob } from "../data/mockDataUtils"
 import { type Convocatoria, type Postulacion, type Evaluacion, EstadoPostulacion } from "../types/api"
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from "recharts"
 import ThemeToggle from "./ThemeToggle"
@@ -65,11 +67,26 @@ const CandidatesList: React.FC = () => {
     try {
       setLoading(true)
 
-      const convocatoriaResponse = await convocatoriaAPI.getById(Number.parseInt(id))
-      setConvocatoria(convocatoriaResponse.data)
-
-      const postulacionesResponse = await postulacionAPI.getByConvocatoria(Number.parseInt(id))
-      setPostulaciones(postulacionesResponse.data)
+      // SIEMPRE usar datos mock para pruebas de diseño
+      console.log('🔧 [CandidatesList] Usando datos mock para pruebas de diseño');
+      
+      const jobId = Number.parseInt(id);
+      
+      // Buscar convocatoria en datos mock
+      const mockConvocatoria = mockJobs.find(job => job.id === jobId);
+      if (mockConvocatoria) {
+        setConvocatoria(mockConvocatoria);
+        
+        // Buscar postulaciones para esta convocatoria
+        const mockPostulaciones = getApplicationsByJob(jobId);
+        setPostulaciones(mockPostulaciones);
+        
+        console.log(`📊 [CandidatesList] Mock data loaded: job ${jobId}, ${mockPostulaciones.length} applications`);
+      } else {
+        console.log(`⚠️ [CandidatesList] Job ${jobId} not found in mock data`);
+        message.error("Job posting not found");
+        navigate(-1);
+      }
     } catch (error: any) {
       console.error("Error loading candidates data:", error)
       message.error("Failed to load candidates data")
@@ -329,11 +346,11 @@ const CandidatesList: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <Avatar size={64} className="bg-indigo-600">
-                    {selectedCandidate.usuario?.nome?.charAt(0)}
+                    {selectedCandidate.usuario?.nombre?.charAt(0)}
                   </Avatar>
                   <div className="flex-1">
                     <Title level={4} className="mb-1">
-                      {selectedCandidate.usuario?.nome} {selectedCandidate.usuario?.apellidoPaterno}{" "}
+                      {selectedCandidate.usuario?.nombre} {selectedCandidate.usuario?.apellidoPaterno}{" "}
                       {selectedCandidate.usuario?.apellidoMaterno}
                     </Title>
                     <Paragraph className="text-gray-600 dark:text-gray-400 mb-2">
@@ -350,9 +367,9 @@ const CandidatesList: React.FC = () => {
                   {getStatusTag(selectedCandidate.estado)}
                   <PrintReport
                     data={consolidatedResults}
-                    candidateName={`${selectedCandidate.usuario?.nome} ${selectedCandidate.usuario?.apellidoPaterno} ${selectedCandidate.usuario?.apellidoMaterno}`}
+                    candidateName={`${selectedCandidate.usuario?.nombre} ${selectedCandidate.usuario?.apellidoPaterno} ${selectedCandidate.usuario?.apellidoMaterno}`}
                     jobTitle={convocatoria?.titulo}
-                    companyName={convocatoria?.empresa?.nome}
+                    companyName={convocatoria?.empresa?.nombre}
                   />
                 </div>
               </div>
