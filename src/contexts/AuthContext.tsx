@@ -1,10 +1,8 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { message } from 'antd';
 import { usuarioAPI, empresaAPI, authAPI } from '../services/api';
-import { Usuario, Empresa, Rol } from '../types/api';
+import { Usuario, Empresa, Rol, AuthResponse, UsuarioCreateDTO } from '../types/api';
 import { jwtDecode } from 'jwt-decode';
-import { simulateLogin } from '../data/mockDataUtils';
-import { mockAdmin } from '../data/mockData';
 
 export interface User {
   id: number;
@@ -117,46 +115,71 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'LOGIN_START' });
     
     try {
-      // Try real API first
+      console.log('Attempting login with:', credentials);
       const response = await authAPI.login(credentials);
+      console.log('Login response:', response.data);
       
-      // Get the JWT token from the response
+      // El backend devuelve { jwt: "token" }
       const jwtToken = response.data.jwt;
       
       if (!jwtToken) {
         throw new Error('No token received from server');
       }
       
-      // Decode the JWT token to get user information
+      // Decodificar el JWT para obtener información del usuario
       const decodedToken: any = jwtDecode(jwtToken);
+      console.log('Decoded JWT:', decodedToken);
       
-      // Map role from JWT format to our enum
+      // Determinar el rol basado en userType del JWT
       let userRole: Rol;
-      switch (decodedToken.role) {
-        case 'ROLE_USUARIO':
+      if (decodedToken.userType === 'USUARIO') {
+        userRole = Rol.USUARIO;
+      } else if (decodedToken.userType === 'EMPRESA') {
+        userRole = Rol.EMPRESA;
+      } else if (decodedToken.userType === 'ADMIN') {
+        userRole = Rol.ADMIN;
+      } else {
+        // Fallback: intentar usar role si userType no está disponible
+        if (decodedToken.role === 'ROLE_USUARIO') {
           userRole = Rol.USUARIO;
-          break;
-        case 'ROLE_EMPRESA':
+        } else if (decodedToken.role === 'ROLE_EMPRESA') {
           userRole = Rol.EMPRESA;
-          break;
-        case 'ROLE_ADMIN':
+        } else if (decodedToken.role === 'ROLE_ADMIN') {
           userRole = Rol.ADMIN;
-          break;
-        default:
-          userRole = Rol.USUARIO; // fallback
+        } else {
+          userRole = Rol.USUARIO; // default
+        }
       }
-
-      // Create user object from JWT data
+      
+      // Construir objeto user basado en datos del JWT
       const user: User = {
         id: decodedToken.userId,
-        email: decodedToken.sub, // sub contains the email
-        name: `${decodedToken.nombre} ${decodedToken.apellidoPaterno} ${decodedToken.apellidoMaterno || ''}`.trim(),
+        email: decodedToken.sub || credentials.email,
+        name: decodedToken.nombre || 'User',
         role: userRole,
-        telefono: decodedToken.telefono,
-        apellidoPaterno: decodedToken.apellidoPaterno,
-        apellidoMaterno: decodedToken.apellidoMaterno,
-        nacimiento: decodedToken.nacimiento,
       };
+
+      // Agregar campos adicionales si están disponibles en el JWT
+      if (decodedToken.apellidoPaterno) {
+        user.apellidoPaterno = decodedToken.apellidoPaterno;
+      }
+      if (decodedToken.apellidoMaterno) {
+        user.apellidoMaterno = decodedToken.apellidoMaterno;
+      }
+      if (decodedToken.telefono) {
+        user.telefono = decodedToken.telefono;
+      }
+      if (decodedToken.direccion) {
+        user.direccion = decodedToken.direccion;
+      }
+      if (decodedToken.descripcion) {
+        user.descripcion = decodedToken.descripcion;
+      }
+      if (decodedToken.nacimiento) {
+        user.nacimiento = decodedToken.nacimiento;
+      }
+
+      console.log('Processed user object:', user);
 
       // Store in localStorage
       localStorage.setItem('mirai_token', jwtToken);
@@ -166,31 +189,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       message.success(`Welcome back, ${user.name}!`);
       return true;
     } catch (error: any) {
-      console.error('Login error - trying mock data:', error);
+      console.error('Login error:', error);
       
-      // Fallback to mock data if API fails
-      try {
-        const mockResult = simulateLogin(credentials.email, credentials.password);
-        
-        if (mockResult.success && mockResult.user) {
-          const user: User = mockResult.user;
-          const token = mockResult.token;
-
-          // Store in localStorage
-          localStorage.setItem('mirai_token', token);
-          localStorage.setItem('mirai_user', JSON.stringify(user));
-
-          dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
-          message.success(`Welcome back, ${user.name}! (Demo Mode)`);
-          return true;
-        } else {
-          throw new Error(mockResult.error || 'Invalid credentials');
-        }
-      } catch (mockError: any) {
-        dispatch({ type: 'LOGIN_FAILURE' });
-        message.error('Login failed. Please check your credentials.');
-        return false;
+      // Login failed
+      dispatch({ type: 'LOGIN_FAILURE' });
+      
+      if (error.response?.status === 401) {
+        message.error('Invalid credentials. Please check your email and password.');
+      } else {
+        message.error('Login failed. Please check your connection and try again.');
       }
+      
+      return false;
     }
   };
 
@@ -198,21 +208,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'LOGIN_START' });
 
     try {
-      let response;
-      
       if (data.role === Rol.USUARIO) {
-        const usuarioData: Usuario = {
+        const usuarioData: UsuarioCreateDTO = {
           nombre: data.nombre!,
           apellidoPaterno: data.apellidoPaterno!,
           apellidoMaterno: data.apellidoMaterno!,
           email: data.email,
           password: data.password,
-          nacimiento: data.nacimiento!,
           telefono: data.telefono!,
+          nacimiento: data.nacimiento!,
           rol: Rol.USUARIO
         };
-        response = await usuarioAPI.create(usuarioData);
+        
+        console.log('Creating user with data:', usuarioData);
+        const response = await usuarioAPI.create(usuarioData);
+        console.log('User creation response:', response.data);
+        
+        // After successful registration, automatically log in
+        const loginSuccess = await login({ 
+          email: data.email, 
+          password: data.password 
+        });
+        
+        if (loginSuccess) {
+          message.success(`Account created successfully! Welcome!`);
+          return true;
+        } else {
+          message.error('Account created but login failed. Please try logging in manually.');
+          return false;
+        }
       } else {
+        // Handle empresa registration (if needed)
         const empresaData: Empresa = {
           nombre: data.nombre!,
           email: data.email,
@@ -222,34 +248,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           descripcion: data.descripcion!,
           rol: Rol.EMPRESA
         };
-        response = await empresaAPI.create(empresaData);
+        const response = await empresaAPI.create(empresaData);
+        
+        // After successful registration, automatically log in
+        const loginSuccess = await login({ 
+          email: data.email, 
+          password: data.password 
+        });
+        
+        if (loginSuccess) {
+          message.success(`Company account created successfully! Welcome!`);
+          return true;
+        } else {
+          message.error('Account created but login failed. Please try logging in manually.');
+          return false;
+        }
       }
-
-      const userData = response.data;
-      const user: User = {
-        id: userData.id,
-        email: userData.email,
-        name: data.role === Rol.USUARIO 
-          ? `${userData.nombre} ${userData.apellidoPaterno} ${userData.apellidoMaterno}`
-          : userData.nombre,
-        role: data.role,
-        avatar: data.role === Rol.EMPRESA 
-          ? 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?w=100'
-          : 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?w=100',
-        ...userData
-      };
-
-      const token = 'mock_jwt_token_' + Date.now();
-
-      localStorage.setItem('mirai_token', token);
-      localStorage.setItem('mirai_user', JSON.stringify(user));
-
-      dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
-      message.success(`Account created successfully! Welcome, ${user.name}!`);
-      return true;
     } catch (error: any) {
+      console.error('Registration error:', error);
       dispatch({ type: 'LOGIN_FAILURE' });
-      message.error(error.response?.data?.message || 'Registration failed. Please try again.');
+      
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          'Registration failed. Please try again.';
+      message.error(errorMessage);
       return false;
     }
   };

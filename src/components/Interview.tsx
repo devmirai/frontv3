@@ -31,10 +31,9 @@ import {
   TrophyOutlined,
 } from "@ant-design/icons"
 import { motion } from "framer-motion"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, useLocation } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
-import { preguntaAPI, evaluacionAPI, postulacionAPI } from "../services/api"
-import { generateMockQuestions } from "../data/mockDataUtils"
+import { preguntaAPI, evaluacionAPI, postulacionAPI, convocatoriaAPI, entrevistaAPI } from "../services/api"
 import {
   type Pregunta,
   type Postulacion,
@@ -61,7 +60,7 @@ import ThemeToggle from "./ThemeToggle"
 import PrintReport from "./PrintReport"
 
 const { Header, Content } = Layout
-const { Title, Paragraph } = Typography
+const { Title, Paragraph, Text } = Typography
 const { TextArea } = Input
 
 const Interview: React.FC = () => {
@@ -77,16 +76,122 @@ const Interview: React.FC = () => {
   const [showResults, setShowResults] = useState(false)
   const [interviewCompleted, setInterviewCompleted] = useState(false)
   const [consolidatedResults, setConsolidatedResults] = useState<any>(null)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [entrevistaSessionId, setEntrevistaSessionId] = useState<string | null>(null) // Session ID from API responses
+  
+  // V2 Flow state - Pasos 1-12
+  const [currentStep, setCurrentStep] = useState(3) // Start directly at preparation phase
+  const [job, setJob] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false)
+  
   const navigate = useNavigate()
   const { id } = useParams()
   const { user } = useAuth()
+  const location = useLocation()
+
+  // Detectar modo diseño cuando el ID es "314159" (chiste con π) O la ruta es pública
+  const isDesignMode = id === "314159" || location.pathname.includes('/design/interview/314159')
+
+  // Preguntas mock para modo diseño
+  const mockQuestions: Pregunta[] = [
+    {
+      id: 1,
+      pregunta: "¿Cuál es la diferencia entre useState y useReducer en React? ¿Cuándo usarías cada uno?",
+      tipo: "Técnica",
+      dificultad: "7",
+      categoria: "React",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 2,
+      pregunta: "Explica cómo implementarías testing unitario para un componente React usando Jest y React Testing Library.",
+      tipo: "Técnica",
+      dificultad: "8",
+      categoria: "Testing",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 3,
+      pregunta: "¿Qué estrategias usarías para optimizar el rendimiento de una aplicación React con muchos componentes?",
+      tipo: "Técnica",
+      dificultad: "9",
+      categoria: "Performance",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 4,
+      pregunta: "Describe tu experiencia con metodologías ágiles. ¿Cómo manejas los sprints y la comunicación en equipo?",
+      tipo: "Soft Skills",
+      dificultad: "6",
+      categoria: "Metodologías",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 5,
+      pregunta: "¿Cuál es la diferencia entre trabajar con arrays y objetos en JavaScript? Proporciona ejemplos de cuándo usar cada uno.",
+      tipo: "Técnica",
+      dificultad: "5",
+      categoria: "JavaScript",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 6,
+      pregunta: "Describe un problema técnico complejo que hayas resuelto recientemente. ¿Cuál fue tu proceso de debugging?",
+      tipo: "Experiencia",
+      dificultad: "7",
+      categoria: "Problem Solving",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 7,
+      pregunta: "¿Cuáles son las ventajas y desventajas de TypeScript vs JavaScript? ¿Cuándo recomendarías usar TypeScript?",
+      tipo: "Técnica",
+      dificultad: "6",
+      categoria: "Languages",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 8,
+      pregunta: "Explica tu workflow de Git. ¿Cómo manejas branches, merges y conflicts en proyectos colaborativos?",
+      tipo: "Técnica",
+      dificultad: "5",
+      categoria: "Version Control",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 9,
+      pregunta: "¿Qué son los principios SOLID? Explica uno de ellos con un ejemplo práctico en código.",
+      tipo: "Técnica",
+      dificultad: "8",
+      categoria: "Arquitectura",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    },
+    {
+      id: 10,
+      pregunta: "Describe diferentes algoritmos de ordenamiento. ¿Cuál elegirías para ordenar un array de 1 millón de elementos y por qué?",
+      tipo: "Técnica",
+      dificultad: "9",
+      categoria: "Algorithms",
+      postulacion: { id: 314159, fechaPostulacion: "2025-07-18", estado: "ENTREVISTA" as EstadoPostulacion }
+    }
+  ]
 
   // Add a ref to track if we've initiated question generation
   const questionGenerationInitiated = useRef(false);
 
   useEffect(() => {
-    loadInterviewData()
-  }, [id])
+    // Extract session ID from URL params
+    const searchParams = new URLSearchParams(location.search);
+    const sessionParam = searchParams.get('session');
+    if (sessionParam) {
+      setSessionId(sessionParam);
+      console.log('📝 [Interview] Session ID extracted from URL:', sessionParam);
+    }
+    
+    loadInterviewData();
+  }, [id, location.search, location.pathname])
 
   useEffect(() => {
     if (!showResults && questions.length > 0 && !interviewCompleted) {
@@ -105,171 +210,475 @@ const Interview: React.FC = () => {
     }
   }, [showResults, questions.length, interviewCompleted])
 
+  // Auto-generate questions when currentStep is 4 and no questions exist
+  useEffect(() => {
+    if (currentStep === 4 && questions.length === 0 && id && !questionGenerationInitiated.current && !isGeneratingQuestions) {
+      questionGenerationInitiated.current = true;
+      console.log('🤖 [Interview] Auto-generating questions for step 4');
+      handleGenerateQuestions(Number(id));
+    }
+  }, [currentStep, questions.length, id, isGeneratingQuestions]);
+
+  // Sync currentAnswer with saved responses when currentQuestion changes
+  useEffect(() => {
+    if (questions.length > 0 && currentQuestion >= 0 && currentQuestion < answers.length) {
+      const savedAnswer = answers[currentQuestion] || "";
+      setCurrentAnswer(savedAnswer);
+      console.log('📝 [Interview] Synced to question', currentQuestion + 1, '- Answer length:', savedAnswer.length);
+    }
+  }, [currentQuestion, questions.length, answers]);
+
   const loadInterviewData = async () => {
     if (!id) return
 
-    try {
-      setLoading(true)
-
-      // Load postulacion details
-      const postulacionResponse = await postulacionAPI.getById(Number.parseInt(id))
-      const postulacionData = postulacionResponse.data
-      setPostulacion(postulacionData)
-
-      // Check if interview is completed and we should show results
-      if (window.location.pathname.includes("/results") || postulacionData.estado === EstadoPostulacion.COMPLETADA) {
-        await loadResults(Number.parseInt(id))
-        setShowResults(true)
-        setInterviewCompleted(true)
-        return
-      }
-
-      // Generate questions for the interview
-      await generateQuestions(postulacionData)
-    } catch (error: any) {
-      console.error("Error loading interview data:", error)
-      message.error("Failed to load interview data. Please try again.")
-      setTimeout(() => navigate("/usuario/dashboard"), 2000)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const generateQuestions = async (postulacionData: Postulacion) => {
-    // If we've already initiated question generation in this session, skip
-    if (questionGenerationInitiated.current) {
-      console.log("Question generation already initiated, skipping")
-      return
-    }
-    
-    // Mark that we've initiated question generation
-    questionGenerationInitiated.current = true;
-    
-    try {
-      setLoading(true)
+    // 🥧 Modo diseño activado con ID especial de pi (314159)
+    if (isDesignMode) {
+      console.log('🥧 [Interview] Modo diseño activado con ID π (314159)');
       
-      message.loading({
-        content: "Generating personalized interview questions...",
-        duration: 0,
-        key: "questionGeneration",
-      })
+      // Simular loading breve
+      setTimeout(() => {
+        setQuestions(mockQuestions);
+        setAnswers(new Array(mockQuestions.length).fill(""));
+        setCurrentStep(6); // Ir directo a las preguntas
+        setLoading(false);
+        console.log('🥧 [Interview] Preguntas mock cargadas:', mockQuestions.length);
+      }, 1000);
+      
+      return;
+    }
 
-      if (!postulacionData.id) {
-        throw new Error("Postulation ID is missing")
+    try {
+      setLoading(true);
+      
+      console.log('📝 [Interview] Loading interview data, ID:', id, 'Session ID:', sessionId);
+      
+      // Check if this is a results page
+      const isResultsPage = location.pathname.includes('/results');
+      
+      // The ID now refers to postulacion ID, not convocatoria ID
+      const postulacionId = Number(id);
+      
+      // Step 1: Get postulation details to get job info
+      const postulacionResponse = await postulacionAPI.getById(postulacionId);
+      const postulacionData = postulacionResponse.data;
+      console.log('📝 [Interview] Postulation data loaded:', postulacionData);
+      
+      setPostulacion(postulacionData);
+      
+      // Extract job data from postulation
+      const jobData = postulacionData.convocatoria;
+      console.log('📝 [Interview] Job data from postulation:', jobData);
+      setJob(jobData);
+
+      if (isResultsPage) {
+        // For results page, go directly to complete history endpoint using postulation ID
+        console.log('📝 [Interview] Results page detected - loading complete history directly for postulation:', postulacionId);
+        
+        try {
+          await loadResults(postulacionId);
+          setLoading(false); // Stop loading after results are loaded
+          return;
+        } catch (error) {
+          console.error('📝 [Interview] Error loading results via complete history:', error);
+          message.error("No se pudieron cargar los resultados de la entrevista");
+          setLoading(false);
+          return;
+        }
       }
 
-      // Check if questions already exist for this postulation
+      // Always try to get the latest question state using preguntaAPI.generar() 
+      // which includes estadoRespuestas data
+      console.log('📝 [Interview] Attempting to get latest question state with estadoRespuestas');
       try {
-        const existingResponse = await preguntaAPI.getByPostulacion(postulacionData.id)
-        const existingQuestionsData = existingResponse.data || []
+        const questionsResponse = await preguntaAPI.generar({ idPostulacion: postulacionId });
+        const questionsData = questionsResponse.data;
+        console.log('📝 [Interview] Latest question state loaded:', questionsData);
         
-        if (existingQuestionsData.length > 0) {
-          console.log("Using existing questions", existingQuestionsData)
+        // Extract sessionId from response
+        if (questionsData && questionsData.entrevistaSessionId) {
+          console.log('🔍 [Interview] Session ID from loadInterviewData:', questionsData.entrevistaSessionId);
+          setEntrevistaSessionId(questionsData.entrevistaSessionId.toString());
+        }
+        
+        if (questionsData && questionsData.success && Array.isArray(questionsData.questions) && questionsData.questions.length > 0) {
+          // Sort questions by ID to maintain correct order  
+          const sortedQuestions = questionsData.questions.sort((a: any, b: any) => a.id - b.id);
           
-          // Map existing questions to ensure they have the expected structure
-          const existingQuestions = existingQuestionsData.map(q => ({
-            id: q.id,
-            pregunta: q.textoPregunta || q.pregunta || q.texto || q.question || "Question not available",
-            tipo: q.tipoLegible || q.tipo || q.type || "Technical",
-            dificultad: q.dificultad || 5,
-            categoria: q.categoria || q.tipo || "Technical",
-            postulacion: postulacionData,
-          }))
+          // Map the API response using estadoRespuestas as source of truth
+          const mappedQuestions: Pregunta[] = sortedQuestions.map((q: any) => {
+            const questionId = q.id;
+            const isAnswered = questionsData.estadoRespuestas ? questionsData.estadoRespuestas[questionId.toString()] === true : false;
+            
+            console.log(`🔍 [Interview] Question ${questionId} answered status from estadoRespuestas:`, isAnswered);
+            
+            return {
+              id: questionId,
+              pregunta: q.question || q.textoPregunta, // Support both formats
+              tipo: q.typeReadable || q.tipoLegible || q.type || q.tipo || "Technical",
+              dificultad: q.score ? Math.ceil(q.score / 2).toString() : (q.dificultad || "5"),
+              categoria: q.typeReadable || q.tipoLegible || q.type || q.tipo || "Technical",
+              postulacion: { id: postulacionId },
+              // Keep original fields for reference
+              numero: q.numero,
+              typeKey: q.type || q.tipo,
+              score: q.score,
+              // Progress tracking fields - ONLY use estadoRespuestas as source of truth
+              respondida: isAnswered,
+              evaluada: q.evaluada || false,
+              respuesta: isAnswered ? (q.respuesta || "Respondida anteriormente") : null,
+              fechaRespuesta: q.fechaRespuesta || null,
+            };
+          });
           
-          setQuestions(existingQuestions)
-          setAnswers(new Array(existingQuestions.length).fill(""))
-          setCurrentQuestion(0)
+          // Pre-fill answers array with existing responses or placeholder for answered questions
+          const answersArray = mappedQuestions.map(q => {
+            if (q.respondida) {
+              return q.respuesta || "Respondida anteriormente";
+            }
+            return "";
+          });
           
-          message.success({
-            content: "Interview questions loaded!",
-            key: "questionGeneration",
-          })
-          return
+          // Find the first unanswered question to continue from
+          const firstUnansweredIndex = mappedQuestions.findIndex(q => !q.respondida);
+          const startingQuestion = firstUnansweredIndex >= 0 ? firstUnansweredIndex : 0;
+          
+          setQuestions(mappedQuestions);
+          setAnswers(answersArray);
+          setCurrentQuestion(startingQuestion);
+          setCurrentStep(6); // Ready to answer questions
+          setLoading(false); // Questions ready, stop loading
+          
+          console.log('✅ [Interview] Ready to start answering questions with estadoRespuestas data:', mappedQuestions.length);
+          console.log('📝 [Interview] Continuing from question:', startingQuestion + 1, 'of', mappedQuestions.length);
+          console.log('📊 [Interview] Session ID captured:', questionsData.entrevistaSessionId);
+          console.log('📊 [Interview] estadoRespuestas from API:', questionsData.estadoRespuestas);
+          console.log('📊 [Interview] Progress summary:', {
+            totalQuestions: questionsData.totalPreguntas || mappedQuestions.length,
+            preguntasRespondidas: questionsData.preguntasRespondidas || mappedQuestions.filter(q => q.respondida).length,
+            preguntasPendientes: questionsData.preguntasPendientes || mappedQuestions.filter(q => !q.respondida).length,
+            progresoRespuestas: questionsData.progresoRespuestas || 0,
+            startingFrom: startingQuestion + 1,
+            allQuestionStates: mappedQuestions.map(q => ({
+              id: q.id,
+              respondida: q.respondida,
+              hasResponse: !!q.respuesta
+            }))
+          });
+          
+          return; // Exit early since we have questions with proper estadoRespuestas data
+        } else {
+          console.log('📝 [Interview] No questions found in generar response, will generate new ones');
         }
       } catch (error) {
-        console.log("No existing questions found, will generate new ones")
+        console.log('📝 [Interview] Error loading questions via generar API, will generate new ones:', error);
       }
 
-      // Mark questions as being generated BEFORE generating them
-      // This prevents race conditions with parallel API calls
-      await postulacionAPI.marcarPreguntasGeneradas(postulacionData.id, true)
-
-      // Only generate new questions if none exist
-      console.log(`Generating new questions for postulation ${postulacionData.id}`)
-      const response = await preguntaAPI.generar({ idPostulacion: postulacionData.id })
-
-      if (response.data && response.data.success && Array.isArray(response.data.questions)) {
-        const generatedQuestions: Pregunta[] = response.data.questions.map((q: any, index: number) => ({
-          id: q.id || index + 1,
-          pregunta: q.question,
-          tipo: q.typeReadable || q.type || "Technical",
-          dificultad: q.score ? Math.ceil(q.score / 1.5).toString() : "5",
-          categoria: q.type || "Technical",
-          postulacion: postulacionData,
-        }))
-
-        setQuestions(generatedQuestions)
-        setAnswers(new Array(generatedQuestions.length).fill(""))
-        setCurrentQuestion(0)
-        
-        message.success({
-          content: response.data.mensaje || "Interview questions ready!",
-          key: "questionGeneration",
-        })
-      } else {
-        throw new Error("Invalid response format from question generation API")
+      // If sessionId is available, check if interview is already completed using complete history
+      if (sessionId) {
+        console.log('📝 [Interview] SessionId available, checking for completed interview via complete history');
+        try {
+          const historialResponse = await evaluacionAPI.getHistorialCompleto(postulacionId);
+          const historialData = historialResponse.data;
+          
+          if (historialData && historialData.success && historialData.postulacion?.estado === 'COMPLETADA') {
+            console.log('📝 [Interview] Interview completed, loading complete history:', historialData);
+            
+            // Use the loadResults function to properly transform the data
+            await loadResults(postulacionId);
+            return; // loadResults now handles setLoading(false)
+          }
+        } catch (error) {
+          console.log('📝 [Interview] No complete history found, interview not completed yet');
+        }
       }
+      
+      // Also check if current URL indicates this is a results page (for direct navigation)
+      const urlIndicatesResults = location.pathname.includes('/results');
+      if (urlIndicatesResults) {
+        console.log('📝 [Interview] URL indicates results page, loading complete history directly');
+        await loadResults(postulacionId);
+        return; // loadResults now handles setLoading(false)
+      }
+      
+      // If we reach here, we need to check if this is a results page or generate questions
+      const currentPageIsResults = location.pathname.includes('/results');
+      if (currentPageIsResults) {
+        console.log('📝 [Interview] Results page detected, loading complete history directly');
+        await loadResults(postulacionId);
+        return; // loadResults now handles setLoading(false)
+      }
+      
+      console.log('📝 [Interview] Setting step to 4 for automatic question generation');
+      setCurrentStep(4);
+      setLoading(false); // Let the useEffect handle loading during question generation
+
+      console.log(`📊 [Interview] Interview data loaded successfully, Current Step: 4`);
     } catch (error: any) {
-      console.error("Error generating questions:", error)
-      
-      // 🔧 FALLBACK: Si falla la API, usar preguntas mock para que siempre haya preguntas disponibles
-      console.log('🔧 Usando preguntas mock como fallback para pruebas de diseño');
-      
-      try {
-        const jobTitle = postulacionData.convocatoria?.titulo || 'Software Developer';
-        const jobLevel = postulacionData.convocatoria?.dificultad || 'Mid-Level';
-        
-        const mockQuestions = generateMockQuestions(jobTitle, jobLevel);
-        const formattedMockQuestions: Pregunta[] = mockQuestions.map((q, index) => ({
-          id: index + 1,
-          pregunta: q.texto,
-          tipo: q.tipo,
-          dificultad: q.dificultad.toString(),
-          categoria: q.tipo,
-          postulacion: postulacionData,
-        }));
-
-        setQuestions(formattedMockQuestions);
-        setAnswers(new Array(formattedMockQuestions.length).fill(""));
-        setCurrentQuestion(0);
-        
-        message.success({
-          content: `Interview questions ready! (${formattedMockQuestions.length} questions loaded)`,
-          key: "questionGeneration",
-        });
-        
-        console.log(`📊 Mock questions loaded: ${formattedMockQuestions.length} questions`);
-      } catch (mockError) {
-        console.error("Error loading mock questions:", mockError);
-        message.error({
-          content: "Error loading interview questions. Please try again.",
-          key: "questionGeneration",
-          duration: 5,
-        });
-        setQuestions([]);
-      }
-    } finally {
-      setLoading(false)
+      console.error("❌ [Interview] Error loading interview data:", error);
+      setError('No se pudo cargar la información de la entrevista');
+      message.error("Failed to load interview data. Please try again.");
+      setTimeout(() => navigate("/usuario/dashboard"), 2000);
+      setLoading(false);
     }
   }
 
+  // Paso 4: Generar preguntas con postulacion ID
+  const handleGenerateQuestions = async (postulacionId?: number) => {
+    const targetPostulacionId = postulacionId || Number(id);
+    if (!targetPostulacionId) {
+      message.error('ID de postulación no disponible');
+      questionGenerationInitiated.current = false; // Reset flag on error
+      return;
+    }
+
+    setIsGeneratingQuestions(true);
+    try {
+      console.log('📝 [Interview] Step 4: Generating questions for postulation', targetPostulacionId);
+      
+      const response = await preguntaAPI.generar({ idPostulacion: targetPostulacionId });
+      const questionsData = response.data;
+      
+      // Extract sessionId from response
+      if (questionsData && questionsData.entrevistaSessionId) {
+        console.log('🔍 [Interview] Session ID from preguntaAPI.generar:', questionsData.entrevistaSessionId);
+        setEntrevistaSessionId(questionsData.entrevistaSessionId.toString());
+      }
+      
+      if (questionsData && questionsData.success && Array.isArray(questionsData.questions)) {
+        // Sort questions by ID to maintain correct order
+        const sortedQuestions = questionsData.questions.sort((a: any, b: any) => a.id - b.id);
+        
+        const generatedQuestions: Pregunta[] = sortedQuestions.map((q: any, index: number) => {
+          const questionId = q.id || index + 1;
+          const isAnswered = questionsData.estadoRespuestas ? questionsData.estadoRespuestas[questionId.toString()] === true : false;
+          
+          console.log(`🔍 [Interview] Question ${questionId} answered status from estadoRespuestas:`, isAnswered);
+          
+          return {
+            id: questionId,
+            pregunta: q.question, // Map "question" field to "pregunta"
+            tipo: q.typeReadable || q.type || "Technical", // Use readable type first, then fallback
+            dificultad: q.score ? Math.ceil(q.score / 2).toString() : "5", // Convert score to difficulty (1-10 scale)
+            categoria: q.typeReadable || q.type || "Technical", // Use readable category
+            postulacion: { id: targetPostulacionId }, // Set the postulation reference
+            // Additional fields from new API format
+            score: q.score,
+            typeKey: q.type, // Keep original type key for reference
+            // New progress tracking fields - ONLY use estadoRespuestas as source of truth
+            respondida: isAnswered,
+            evaluada: q.evaluada || false,
+            respuesta: isAnswered ? (q.respuesta || "Respondida anteriormente") : null,
+            fechaRespuesta: q.fechaRespuesta || null,
+          };
+        });
+
+        // Pre-fill answers array with existing responses or placeholder for answered questions
+        const answersArray = generatedQuestions.map(q => {
+          if (q.respondida) {
+            return q.respuesta || "Respondida anteriormente";
+          }
+          return "";
+        });
+        
+        // Find the first unanswered question to continue from (based on estadoRespuestas)
+        const firstUnansweredIndex = generatedQuestions.findIndex(q => !q.respondida);
+        const startingQuestion = firstUnansweredIndex >= 0 ? firstUnansweredIndex : 0;
+
+        setQuestions(generatedQuestions);
+        setAnswers(answersArray);
+        setCurrentQuestion(startingQuestion);
+        setCurrentStep(6); // Ready to answer questions
+        
+        console.log('✅ [Interview] Questions generated successfully:', generatedQuestions.length);
+        console.log('📝 [Interview] Continuing from question:', startingQuestion + 1, 'of', generatedQuestions.length);
+        console.log('📊 [Interview] Session ID captured:', questionsData.entrevistaSessionId);
+        console.log('📊 [Interview] estadoRespuestas from API:', questionsData.estadoRespuestas);
+        console.log('📝 [Interview] Sample question mapping:', {
+          question: generatedQuestions[0]?.pregunta,
+          type: generatedQuestions[0]?.tipo,
+          score: generatedQuestions[0]?.score,
+          answered: generatedQuestions[0]?.respondida,
+          response: generatedQuestions[0]?.respuesta ? 'Has response' : 'No response',
+          questionId: generatedQuestions[0]?.id,
+          estadoRespuesta: questionsData.estadoRespuestas && generatedQuestions[0]?.id ? questionsData.estadoRespuestas[generatedQuestions[0].id.toString()] : 'N/A'
+        });
+        console.log('📊 [Interview] Progress summary:', {
+          totalQuestions: generatedQuestions.length,
+          answeredQuestions: generatedQuestions.filter(q => q.respondida).length,
+          startingFrom: startingQuestion + 1,
+          progressPercentage: questionsData.progresoRespuestas || 0,
+          allQuestionStates: generatedQuestions.map(q => ({
+            id: q.id,
+            respondida: q.respondida,
+            hasResponse: !!q.respuesta
+          }))
+        });
+        
+        // Questions are ready, stop loading
+        setLoading(false);
+        
+      } else {
+        throw new Error("Invalid response format from question generation API");
+      }
+    } catch (error: any) {
+      console.error('❌ [Interview] Error generating questions:', error);
+      message.error('Error al generar las preguntas');
+      setLoading(false); // Stop loading on error too
+      questionGenerationInitiated.current = false; // Reset flag on error
+    } finally {
+      setIsGeneratingQuestions(false);
+    }
+  }
+
+  // Cargar resultados completos usando el nuevo endpoint
   const loadResults = async (postulacionId: number) => {
     try {
-      const evaluationResponse = await evaluacionAPI.getResultados(postulacionId)
-      setConsolidatedResults(evaluationResponse.data)
+      console.log('📝 [Interview] Loading complete interview history for results:', postulacionId);
+      
+      const historialResponse = await evaluacionAPI.getHistorialCompleto(postulacionId);
+      const historialData = historialResponse.data;
+      
+      if (historialData && historialData.success) {
+        console.log('📝 [Interview] Complete history loaded:', historialData);
+        console.log('📝 [Interview] API Response structure:', {
+          postulacionId: historialData.postulacionId,
+          estadisticas: historialData.estadisticas,
+          preguntasCount: historialData.preguntas?.length,
+          sampleQuestion: historialData.preguntas?.[0]
+        });
+        
+        // Use the correct API response structure
+        const questions = historialData.preguntas || [];
+        
+        // Calculate final score from estadisticas (already provided by API)
+        const finalScore = historialData.estadisticas?.puntajeTotalObtenido || 0;
+        const maxScore = historialData.estadisticas?.puntajeMaximoPosible || 100;
+        const finalScorePercentage = maxScore > 0 ? (finalScore / maxScore) * 100 : 0;
+        
+        // Calculate criteria averages from individual question evaluations
+        const criteriaAverages = {
+          claridad_estructura: 0,
+          dominio_tecnico: 0,
+          pertinencia: 0,
+          comunicacion_seguridad: 0
+        };
+        
+        if (questions.length > 0) {
+          questions.forEach((q: any) => {
+            if (q.evaluacion) {
+              criteriaAverages.claridad_estructura += q.evaluacion.claridadEstructura || 0;
+              criteriaAverages.dominio_tecnico += q.evaluacion.dominioTecnico || 0;
+              criteriaAverages.pertinencia += q.evaluacion.pertinencia || 0;
+              criteriaAverages.comunicacion_seguridad += q.evaluacion.comunicacionSeguridad || 0;
+            }
+          });
+          
+          const keys: (keyof typeof criteriaAverages)[] = ['claridad_estructura', 'dominio_tecnico', 'pertinencia', 'comunicacion_seguridad'];
+          keys.forEach(key => {
+            criteriaAverages[key] = criteriaAverages[key] / questions.length;
+          });
+        }
+        
+        // Collect all strengths and improvements from individual questions
+        const allFortalezas: string[] = [];
+        const allOportunidadesMejora: string[] = [];
+        
+        questions.forEach((q: any) => {
+          if (q.evaluacion?.fortalezas && Array.isArray(q.evaluacion.fortalezas)) {
+            allFortalezas.push(...q.evaluacion.fortalezas);
+          }
+          if (q.evaluacion?.oportunidadesMejora && Array.isArray(q.evaluacion.oportunidadesMejora)) {
+            allOportunidadesMejora.push(...q.evaluacion.oportunidadesMejora);
+          }
+        });
+        
+        // Remove duplicates and limit to most relevant
+        const uniqueFortalezas = [...new Set(allFortalezas)].slice(0, 5);
+        const uniqueOportunidadesMejora = [...new Set(allOportunidadesMejora)].slice(0, 5);
+        
+        // Transform the complete history data for results display according to UI expectations
+        const transformedResults = {
+          // Main score (use actual API data)
+          puntajeFinal: finalScorePercentage,
+          
+          // Criteria summary expected by the UI
+          resumenPorCriterio: criteriaAverages,
+          
+          // Question evaluations expected by the UI (map correctly from API response)
+          evaluacionesPorPregunta: questions.map((q: any) => ({
+            pregunta: {
+              texto: q.textoPregunta,
+              tipo: q.tipoLegible || q.tipo
+            },
+            evaluacion: {
+              // Map the actual API fields correctly
+              puntuacionFinal: q.evaluacion?.puntajeTotal || 0, // Use puntajeTotal, not puntuacionFinal
+              claridadEstructura: q.evaluacion?.claridadEstructura || 0,
+              dominioTecnico: q.evaluacion?.dominioTecnico || 0,
+              pertinencia: q.evaluacion?.pertinencia || 0,
+              comunicacionSeguridad: q.evaluacion?.comunicacionSeguridad || 0,
+              feedback: q.evaluacion?.feedback || 'No feedback available'
+            },
+            respuesta: q.respuestaUsuario || 'No response recorded'
+          })),
+          
+          // Use collected strengths and improvements
+          fortalezas: uniqueFortalezas.length > 0 ? uniqueFortalezas : [
+            'Completed all interview questions',
+            'Demonstrated understanding of the requirements',
+            'Provided structured responses'
+          ],
+          oportunidadesMejora: uniqueOportunidadesMejora.length > 0 ? uniqueOportunidadesMejora : [
+            'Consider providing more specific examples',
+            'Include more technical details where applicable',
+            'Expand on practical experience'
+          ],
+          
+          // Raw data for reference (keep original API structure)
+          statistics: historialData.estadisticas,
+          postulacion: historialData.postulacion,
+          questions: historialData.preguntas,
+          entrevistaSessionId: historialData.entrevistaSessionId
+        };
+        
+        console.log('📝 [Interview] Transformed results for display:', {
+          finalScore: transformedResults.puntajeFinal,
+          criteriaCount: Object.keys(transformedResults.resumenPorCriterio).length,
+          questionsCount: transformedResults.evaluacionesPorPregunta.length,
+          strengthsCount: transformedResults.fortalezas.length,
+          improvementsCount: transformedResults.oportunidadesMejora.length
+        });
+        setConsolidatedResults(transformedResults);
+        
+        setShowResults(true);
+        setInterviewCompleted(true);
+        setCurrentStep(12);
+        
+        // Also set questions if available for context
+        if (historialData.preguntas && Array.isArray(historialData.preguntas)) {
+          const mappedQuestions = historialData.preguntas.map((q: any) => ({
+            id: q.preguntaId,
+            pregunta: q.textoPregunta,
+            tipo: q.tipoLegible || q.tipo,
+            score: q.score,
+            respondida: q.respondida,
+            evaluada: q.evaluada,
+            respuesta: q.respuestaUsuario,
+            fechaRespuesta: q.fechaRespuesta,
+            evaluacion: q.evaluacion
+          }));
+          setQuestions(mappedQuestions);
+        }
+        
+        console.log('✅ [Interview] Results loaded successfully from complete history');
+        setLoading(false); // Stop loading when results are ready
+      } else {
+        throw new Error("No history data available");
+      }
     } catch (error: any) {
-      console.error("Error loading results:", error)
-      message.error("Error loading interview results")
+      console.error("❌ [Interview] Error loading complete history:", error);
+      message.error("Error loading interview results");
+      setLoading(false); // Stop loading on error too
     }
   }
 
@@ -277,78 +686,203 @@ const Interview: React.FC = () => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-  }
+  };
 
+  // Paso 7-8: Responder preguntas y evaluar respuestas
   const handleNextQuestion = async () => {
     if (!currentAnswer.trim()) {
-      message.warning("Please provide an answer before proceeding.")
+      message.warning("Por favor proporciona una respuesta antes de continuar.")
       return
     }
 
-    if (!questions[currentQuestion] || !postulacion?.id) {
-      message.error("Interview data not available")
+    if (!questions[currentQuestion] || (!id && !isDesignMode)) {
+      message.error("Datos de la entrevista no disponibles")
       return
     }
 
     setIsSubmitting(true)
 
     try {
+      console.log(`📝 [Interview] Step 7-8: Answering question ${currentQuestion + 1}/${questions.length}`);
+      
       const newAnswers = [...answers]
       newAnswers[currentQuestion] = currentAnswer.trim()
       setAnswers(newAnswers)
 
+      // 🥧 Modo diseño - simulación simple
+      if (isDesignMode) {
+        console.log('🥧 [Interview] Modo diseño - simulando evaluación');
+        
+        // Simular delay de evaluación
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Simular evaluación simple
+        const mockEvaluation = {
+          id: questions[currentQuestion].id,
+          respuesta: currentAnswer.trim(),
+          puntaje: Math.floor(Math.random() * 3) + 8, // Puntaje entre 8-10
+          feedback: "Excelente respuesta en modo diseño",
+          claridad_estructura: 9,
+          dominio_tecnico: 8,
+          resolucion_problemas: 9,
+          comunicacion: 8
+        };
+        
+        setEvaluations((prev) => [...prev, mockEvaluation as any]);
+        
+        // Actualizar pregunta como respondida
+        const updatedQuestions = [...questions];
+        updatedQuestions[currentQuestion] = {
+          ...updatedQuestions[currentQuestion],
+          respondida: true,
+          respuesta: currentAnswer.trim(),
+          fechaRespuesta: new Date().toISOString()
+        };
+        setQuestions(updatedQuestions);
+        
+        if (currentQuestion === questions.length - 1) {
+          console.log('🥧 [Interview] Todas las preguntas completadas en modo diseño');
+          await handleSubmitInterview();
+        } else {
+          setCurrentQuestion((prev) => prev + 1);
+          setCurrentAnswer("");
+          message.success("¡Respuesta evaluada! Pasando a la siguiente pregunta...");
+        }
+        
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Lógica normal para modo producción
+      // Paso 8: Evaluar respuesta - usar postulation ID  
       const evaluationRequest = {
         preguntaId: questions[currentQuestion].id!,
         answer: currentAnswer.trim(),
-        postulacionId: postulacion.id,
+        postulacionId: Number(id), // Usar postulation ID correctamente
       }
 
       const response = await evaluacionAPI.evaluar(evaluationRequest)
 
       if (response.data) {
+        // Extract sessionId from evaluation response
+        if (response.data.entrevistaSessionId) {
+          console.log('🔍 [Interview] Session ID from evaluacionAPI.evaluar:', response.data.entrevistaSessionId);
+          setEntrevistaSessionId(response.data.entrevistaSessionId.toString());
+        }
+
         setEvaluations((prev) => [...prev, response.data])
 
-        if (currentQuestion < questions.length - 1) {
+        // Update question as answered and reload progress
+        const updatedQuestions = [...questions];
+        updatedQuestions[currentQuestion] = {
+          ...updatedQuestions[currentQuestion],
+          respondida: true,
+          respuesta: currentAnswer.trim(),
+          fechaRespuesta: new Date().toISOString()
+        };
+        setQuestions(updatedQuestions);
+
+        // Check if all questions are now answered
+        const allQuestionsAnswered = updatedQuestions.every(q => q.respondida);
+        console.log('🔍 [Interview] After updating question:', {
+          currentQuestion: currentQuestion + 1,
+          totalQuestions: updatedQuestions.length,
+          answeredQuestions: updatedQuestions.filter(q => q.respondida).length,
+          allQuestionsAnswered,
+          isLastQuestion: currentQuestion === questions.length - 1
+        });
+
+        if (allQuestionsAnswered || currentQuestion === questions.length - 1) {
+          // All questions answered, proceed to complete interview
+          console.log('✅ [Interview] All questions completed, calling handleSubmitInterview');
+          await handleSubmitInterview()
+        } else {
+          // Move to next unanswered question
           setCurrentQuestion((prev) => prev + 1)
           setCurrentAnswer("")
-          message.success("Answer submitted successfully! Moving to next question...")
-        } else {
-          await handleSubmitInterview()
+          message.success("¡Respuesta enviada exitosamente! Pasando a la siguiente pregunta...")
         }
       } else {
         throw new Error("Invalid evaluation response")
       }
     } catch (error: any) {
-      console.error("Error submitting answer:", error)
-      message.error("Error evaluating your answer: " + (error.response?.data?.message || "Please try again"))
+      console.error("❌ [Interview] Error submitting answer:", error)
+      message.error("Error al evaluar tu respuesta: " + (error.response?.data?.message || "Por favor intenta de nuevo"))
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  // Pasos 10-12: Finalizar entrevista y mostrar resultados
   const handleSubmitInterview = async () => {
     try {
+      console.log('📝 [Interview] Steps 10-12: Finalizing interview');
       setInterviewCompleted(true)
 
-      // Use the new specific endpoint to complete the interview
-      if (postulacion?.id) {
-        await postulacionAPI.completarEntrevista(postulacion.id)
+      // 🥧 Modo diseño - finalización simulada
+      if (isDesignMode) {
+        console.log('🥧 [Interview] Modo diseño - generando resultados mock');
+        
+        // Simular delay de finalización
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Generar resultados mock básicos
+        const mockResults = {
+          puntajeFinal: Math.floor(Math.random() * 20) + 80, // 80-100%
+          resumenPorCriterio: {
+            claridad_estructura: 8.5,
+            dominio_tecnico: 8.8,
+            resolucion_problemas: 9.0,
+            comunicacion: 8.2
+          },
+          fortalezas: [
+            "Excelente conocimiento técnico",
+            "Respuestas bien estructuradas",
+            "Buen manejo de conceptos avanzados"
+          ],
+          oportunidadesMejora: [
+            "Incluir más ejemplos prácticos",
+            "Profundizar en casos de uso específicos"
+          ]
+        };
+        
+        setConsolidatedResults(mockResults);
+        setShowResults(true);
+        setCurrentStep(12);
+        
+        message.success("¡Entrevista de diseño completada exitosamente! 🥧", 2);
+        console.log('🥧 [Interview] Resultados mock generados');
+        return;
       }
 
-      message.success("Interview completed successfully! Redirecting to results...", 2)
+      // Lógica normal para modo producción
+      // Use sessionId from API responses (entrevistaSessionId)
+      const activeSessionId = entrevistaSessionId || sessionId;
       
-      // Ensure we have the correct ID for navigation
-      const resultId = id || postulacion?.id
+      if (!activeSessionId) {
+        console.error('❌ [Interview] No session ID available for completion');
+        message.error("No se pudo completar la entrevista: ID de sesión no disponible");
+        return;
+      }
+
+      // Paso 10: Completar entrevista usando el nuevo endpoint v2 con sessionId
+      console.log('📝 [Interview] Step 10: Calling /api/v2/entrevistas/finalizar/{sessionId} endpoint:', activeSessionId);
+      const completarResponse = await entrevistaAPI.finalizarV2(activeSessionId);
+      console.log('✅ [Interview] Interview completed via v2 API:', completarResponse.data);
+
+      message.success("¡Entrevista completada exitosamente!", 2)
       
-      // Navigate immediately rather than waiting
-      navigate(`/usuario/interview/${resultId}/results`, { replace: true })
+      // Redirect to results after completing interview
+      console.log('📝 [Interview] Redirecting to results page');
+      navigate(`/usuario/interview/${id}/results`);
+      
     } catch (error) {
-      console.error("Error completing interview:", error)
-      message.error("Error completing interview. Your answers were saved.", 2)
+      console.error("❌ [Interview] Error completing interview:", error)
+      message.error("Error al completar la entrevista. Tus respuestas fueron guardadas.", 2)
       
-      // Still navigate even if there's an error
-      const resultId = id || postulacion?.id
-      navigate(`/usuario/interview/${resultId}/results`, { replace: true })
+      // Still redirect to results even if there's an error
+      console.log('📝 [Interview] Redirecting to results page despite error');
+      navigate(`/usuario/interview/${id}/results`);
     }
   }
 
@@ -365,26 +899,64 @@ const Interview: React.FC = () => {
               <RobotOutlined />
             </div>
             <Title level={2} className="loading-title">
-              Preparing Your Interview
+              Preparing Your AI Interview
             </Title>
             <Paragraph className="loading-message">
-              mirAI is generating personalized questions based on the job requirements.
-              <br />
-              <strong>This process may take a few moments.</strong>
+              Preparing interview questions...
             </Paragraph>
             <div className="loading-progress">
-              <Progress percent={75} strokeColor="#6366f1" showInfo={false} />
+              <Progress percent={50} strokeColor="#6366f1" showInfo={true} format={() => '50% Complete'} />
+            </div>
+            <div className="loading-details">
+              <div className="detail-item">
+                <Text strong>Position:</Text>
+                <Text>{postulacion?.convocatoria?.titulo || 'Loading...'}</Text>
+              </div>
+              <div className="detail-item">
+                <Text strong>Company:</Text>
+                <Text>{postulacion?.convocatoria?.empresa?.nombre || 'Loading...'}</Text>
+              </div>
             </div>
             <div className="loading-tips">
               <div className="loading-tips-title">
                 <InfoCircleOutlined />
-                <span>Did you know?</span>
+                <span>Interview Tips</span>
               </div>
               <Paragraph className="loading-tips-text">
-                Our AI analyzes the position details to create the most relevant questions for your interview. Take a
-                moment to prepare yourself mentally!
+                Our AI will evaluate your responses based on clarity, technical knowledge, problem-solving approach, and communication skills. Take your time to provide thoughtful, detailed answers.
               </Paragraph>
             </div>
+          </motion.div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="error-screen">
+        <div className="error-content">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="error-icon">
+              <InfoCircleOutlined style={{ color: '#ff4d4f', fontSize: '48px' }} />
+            </div>
+            <Title level={2} className="error-title">
+              Error al Cargar la Entrevista
+            </Title>
+            <Paragraph className="error-message">
+              {error}
+            </Paragraph>
+            <Button 
+              type="primary" 
+              onClick={() => navigate('/usuario/dashboard')}
+              style={{ marginTop: '16px' }}
+            >
+              Volver al Dashboard
+            </Button>
           </motion.div>
         </div>
       </div>
@@ -512,47 +1084,69 @@ const Interview: React.FC = () => {
                   <>
                     {/* Performance Charts */}
                     <Row gutter={[24, 24]} className="mb-8">
-                      <Col xs={24} lg={8}>
-                        <Card title="Overall Performance" className="h-full">
-                          <ResponsiveContainer width="100%" height={250}>
-                            <RadarChart data={radarData}>
-                              <PolarGrid />
-                              <PolarAngleAxis dataKey="subject" />
-                              <PolarRadiusAxis domain={[0, 10]} />
-                              <Radar name="Score" dataKey="A" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
-                              <Tooltip />
-                            </RadarChart>
-                          </ResponsiveContainer>
-                        </Card>
+                      <Col xs={24}>
+                        <motion.div
+                          initial={{ opacity: 0, x: -50 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6, delay: 0.1 }}
+                        >
+                          <Card title="Overall Performance" className="h-full">
+                            <ResponsiveContainer width="100%" height={400}>
+                              <RadarChart data={radarData}>
+                                <PolarGrid />
+                                <PolarAngleAxis dataKey="subject" />
+                                <PolarRadiusAxis domain={[0, 10]} />
+                                <Radar name="Score" dataKey="A" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
+                                <Tooltip />
+                              </RadarChart>
+                            </ResponsiveContainer>
+                          </Card>
+                        </motion.div>
                       </Col>
-                      <Col xs={24} lg={8}>
-                        <Card title="Question Scores" className="h-full">
-                          <ResponsiveContainer width="100%" height={250}>
-                            <LineChart data={lineData}>
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis dataKey="question" />
-                              <YAxis domain={[0, 10]} />
-                              <Tooltip />
-                              <Line type="monotone" dataKey="score" stroke="#6366f1" strokeWidth={2} />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        </Card>
+                    </Row>
+                    <Row gutter={[24, 24]} className="mb-8">
+                      <Col xs={24}>
+                        <motion.div
+                          initial={{ opacity: 0, x: 50 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6, delay: 0.2 }}
+                        >
+                          <Card title="Question Scores" className="h-full">
+                            <ResponsiveContainer width="100%" height={400}>
+                              <LineChart data={lineData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="question" />
+                                <YAxis domain={[0, 10]} />
+                                <Tooltip />
+                                <Line type="monotone" dataKey="score" stroke="#6366f1" strokeWidth={3} />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          </Card>
+                        </motion.div>
                       </Col>
-                      <Col xs={24} lg={8}>
-                        <Card title="Skills Breakdown" className="h-full">
-                          <ResponsiveContainer width="100%" height={250}>
-                            <BarChart data={barData}>
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis dataKey="question" />
-                              <YAxis domain={[0, 10]} />
-                              <Tooltip />
-                              <Bar dataKey="clarity" fill="#8884d8" />
-                              <Bar dataKey="technical" fill="#82ca9d" />
-                              <Bar dataKey="relevance" fill="#ffc658" />
-                              <Bar dataKey="communication" fill="#ff7300" />
-                            </BarChart>
-                          </ResponsiveContainer>
-                        </Card>
+                    </Row>
+                    <Row gutter={[24, 24]} className="mb-8">
+                      <Col xs={24}>
+                        <motion.div
+                          initial={{ opacity: 0, x: -50 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6, delay: 0.3 }}
+                        >
+                          <Card title="Skills Breakdown" className="h-full">
+                            <ResponsiveContainer width="100%" height={400}>
+                              <BarChart data={barData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="question" />
+                                <YAxis domain={[0, 10]} />
+                                <Tooltip />
+                                <Bar dataKey="clarity" fill="#8884d8" />
+                                <Bar dataKey="technical" fill="#82ca9d" />
+                                <Bar dataKey="relevance" fill="#ffc658" />
+                                <Bar dataKey="communication" fill="#ff7300" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </Card>
+                        </motion.div>
                       </Col>
                     </Row>
 
@@ -722,48 +1316,122 @@ const Interview: React.FC = () => {
     )
   }
 
-  // Loading state for question generation
-  if (questions.length === 0) {
+  // Simple loading state
+  if (loading) {
     return (
-      <div className="loading-screen">
-        <div className="loading-content">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="loading-icon">
-              <RobotOutlined />
-            </div>
-            <Title level={2} className="loading-title">
-              Preparing Your Interview
-            </Title>
-            <Paragraph className="loading-message">
-              mirAI is generating personalized questions based on the job requirements.
-              <br />
-              <strong>This process may take a few moments.</strong>
-            </Paragraph>
-            <div className="loading-progress">
-              <Progress percent={75} strokeColor="#6366f1" showInfo={false} />
-            </div>
-            <div className="loading-tips">
-              <div className="loading-tips-title">
-                <InfoCircleOutlined />
-                <span>Did you know?</span>
-              </div>
-              <Paragraph className="loading-tips-text">
-                Our AI analyzes the position details to create the most relevant questions for your interview. Take a
-                moment to prepare yourself mentally!
-              </Paragraph>
-            </div>
-          </motion.div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" />
       </div>
     )
   }
 
   const currentQ = questions[currentQuestion]
-  const progress = ((currentQuestion + 1) / questions.length) * 100
+
+  // Debug: Log current question state
+  console.log('🔍 [Interview Debug] Current state:', {
+    questionsLength: questions.length,
+    currentQuestion: currentQuestion + 1,
+    totalQuestions: questions.length,
+    currentQ: currentQ ? { 
+      id: currentQ.id,
+      pregunta: currentQ.pregunta?.substring(0, 50) + '...', 
+      tipo: currentQ.tipo,
+      answered: currentQ.respondida,
+      hasResponse: !!currentQ.respuesta
+    } : null,
+    currentAnswerLength: currentAnswer.length,
+    answersArray: answers.map((ans, idx) => ({
+      questionIndex: idx + 1,
+      answerLength: ans.length,
+      hasAnswer: ans.length > 0,
+      questionAnswered: questions[idx]?.respondida || false
+    })),
+    isGeneratingQuestions,
+    loading,
+    currentStep
+  });
+
+  // Show loading state when generating questions
+  if (isGeneratingQuestions) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="text-center p-8">
+          <Spin size="large" />
+          <Title level={4} className="mt-4">Generating your interview questions...</Title>
+          <Paragraph className="text-gray-600">
+            mirAI is creating personalized questions based on the job requirements.
+          </Paragraph>
+        </Card>
+      </div>
+    )
+  }
+
+  // Show error state when no questions are available
+  if (!loading && !isGeneratingQuestions && questions.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="text-center p-8">
+          <Title level={4}>No questions available</Title>
+          <Paragraph className="text-gray-600">
+            Unable to load interview questions. Please try again.
+          </Paragraph>
+          <Button 
+            type="primary" 
+            onClick={() => navigate("/usuario/dashboard")}
+            className="btn-gradient"
+          >
+            Return to Dashboard
+          </Button>
+        </Card>
+      </div>
+    )
+  }
+
+  // Get specific tips for current question type
+  const getQuestionTypeTips = () => {
+    const tipsByType: Record<string, { tip: string; practice: string }> = {
+      'technical_knowledge': {
+        tip: '💻 Focus on specific technologies, frameworks, and best practices. Provide concrete examples from your experience.',
+        practice: '⚡ Mention specific tools, versions, and implementation details to demonstrate deep technical knowledge.'
+      },
+      'experience': {
+        tip: '📈 Share specific projects and roles. Use the STAR method (Situation, Task, Action, Result) to structure your answer.',
+        practice: '🎯 Quantify your achievements with metrics, timelines, and measurable outcomes whenever possible.'
+      },
+      'problem_solving': {
+        tip: '🧩 Break down your approach step-by-step. Explain your thought process and reasoning clearly.',
+        practice: '🔍 Consider multiple solutions, explain trade-offs, and mention how you would validate your approach.'
+      },
+      'tools': {
+        tip: '🛠️ Be specific about which tools you\'ve used, for how long, and in what contexts (personal, professional, team).',
+        practice: '⚙️ Mention integrations, configurations, and how these tools improved your workflow or project outcomes.'
+      },
+      'methodology': {
+        tip: '📋 Explain the methodologies you prefer and why. Give examples of how you\'ve applied them in real projects.',
+        practice: '🔄 Discuss adaptability - how you adjust methodologies based on team size, project requirements, or constraints.'
+      },
+      'teamwork': {
+        tip: '👥 Share specific examples of collaboration, communication strategies, and conflict resolution.',
+        practice: '🤝 Highlight leadership moments, mentoring experiences, and how you contribute to team culture.'
+      },
+      'challenge': {
+        tip: '⛰️ Describe the challenge clearly, your approach to solving it, and the lessons learned.',
+        practice: '💪 Focus on your problem-solving process, resilience, and how the experience made you a better professional.'
+      },
+      'best_practices': {
+        tip: '✅ Discuss coding standards, code review processes, testing strategies, and quality assurance methods.',
+        practice: '📊 Mention specific tools for code quality, monitoring, documentation, and how you ensure maintainability.'
+      }
+    };
+
+    const questionTypeKey = currentQ?.typeKey || currentQ?.tipo?.toLowerCase().replace(/\s+/g, '_') || '';
+    return tipsByType[questionTypeKey] || {
+      tip: '💡 Be specific and provide concrete examples when possible. The AI evaluates clarity, technical accuracy, relevance, and communication skills.',
+      practice: '⭐ Structure your answers clearly, explain your reasoning, and don\'t hesitate to mention alternative approaches or trade-offs.'
+    };
+  };
+
+  const currentQuestionTips = getQuestionTypeTips();
 
   return (
     <Layout className="main-layout min-h-screen">
@@ -803,38 +1471,50 @@ const Interview: React.FC = () => {
       {/* Main Content */}
       <Content className="content-layout">
         <div className="interview-container">
-          {/* Progress Section */}
+          {/* Question Info Section */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <Card className="progress-container">
-              <Row justify="space-between" align="middle" className="mb-6">
+              <Row justify="space-between" align="middle" className="mb-0">
                 <Col>
                   <Title level={4} className="mb-0">
-                    Question {currentQuestion + 1} of {questions.length}
+                    Question {questions.length > 0 ? currentQuestion + 1 : 0} of {questions.length}
+                    {currentQ?.respondida && (
+                      <Tag color="green" className="ml-2">
+                        <CheckCircleOutlined className="mr-1" />
+                        Answered
+                      </Tag>
+                    )}
                   </Title>
                   <Paragraph className="text-gray-600 dark:text-gray-400 mb-0">
                     {postulacion?.convocatoria?.titulo} - {postulacion?.convocatoria?.empresa?.nombre}
                   </Paragraph>
+                  <div className="mt-1">
+                    <Text className="text-sm text-gray-500 dark:text-gray-400">
+                      Progress: {questions.filter(q => q.respondida).length} answered, {questions.filter(q => !q.respondida).length} remaining
+                      {questions.length > 0 && (
+                        <span className="ml-2">
+                          ({Math.round((questions.filter(q => q.respondida).length / questions.length) * 100)}% complete)
+                        </span>
+                      )}
+                    </Text>
+                  </div>
                 </Col>
                 <Col>
                   <Space size="middle">
-                    <Tag color="blue" className="px-3 py-1">
+                    <Tag color="blue" className="px-3 py-1 text-sm font-medium">
                       {currentQ?.tipo || "Technical"}
                     </Tag>
-                    <Tag color="orange" className="px-3 py-1">
+                    {currentQ?.score && (
+                      <Tag color="purple" className="px-3 py-1 text-sm font-medium">
+                        Score: {currentQ.score}
+                      </Tag>
+                    )}
+                    <Tag color="orange" className="px-3 py-1 text-sm font-medium">
                       Difficulty: {currentQ?.dificultad || 5}/10
                     </Tag>
                   </Space>
                 </Col>
               </Row>
-              <Progress
-                percent={progress}
-                strokeColor={{
-                  "0%": "#6366f1",
-                  "100%": "#8b5cf6",
-                }}
-                strokeWidth={8}
-                className="mb-0"
-              />
             </Card>
           </motion.div>
 
@@ -846,6 +1526,21 @@ const Interview: React.FC = () => {
             transition={{ duration: 0.6 }}
           >
             <Card className="question-card">
+              {/* Show answered status if question is already answered */}
+              {currentQ?.respondida && (
+                <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircleOutlined className="text-green-600" />
+                    <span className="font-medium text-green-800 dark:text-green-300">
+                      Question Already Answered
+                    </span>
+                  </div>
+                  <Paragraph className="text-green-700 dark:text-green-400 mb-0 mt-2">
+                    You have already answered this question. You can review or modify your answer below.
+                  </Paragraph>
+                </div>
+              )}
+              
               {/* AI Assistant Header */}
               <div className="flex items-start space-x-4 mb-8">
                 <div className="mirabot-avatar flex-shrink-0">
@@ -856,7 +1551,9 @@ const Interview: React.FC = () => {
                     <Title level={5} className="mb-3 text-indigo-800 dark:text-indigo-300">
                       mirAI asks:
                     </Title>
-                    <Paragraph className="text-lg mb-0 leading-relaxed">{currentQ?.pregunta}</Paragraph>
+                    <Paragraph className="text-lg mb-0 leading-relaxed">
+                      {currentQ?.pregunta || "Loading question..."}
+                    </Paragraph>
                   </div>
                   <div className="mt-3 flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                     <RobotOutlined className="text-indigo-500" />
@@ -908,7 +1605,7 @@ const Interview: React.FC = () => {
                     icon={
                       isSubmitting ? (
                         <LoadingOutlined />
-                      ) : currentQuestion === questions.length - 1 ? (
+                      ) : (currentQuestion === questions.length - 1 || questions.filter(q => !q.respondida).length <= 1) ? (
                         <CheckCircleOutlined />
                       ) : (
                         <SendOutlined />
@@ -921,9 +1618,11 @@ const Interview: React.FC = () => {
                   >
                     {isSubmitting
                       ? "Analyzing Answer..."
-                      : currentQuestion === questions.length - 1
-                        ? "Complete Interview"
-                        : "Next Question"}
+                      : (currentQuestion === questions.length - 1 || questions.filter(q => !q.respondida).length <= 1)
+                        ? "Complete & View Results"
+                        : currentQ?.respondida 
+                          ? "Update Answer & Next"
+                          : "Submit & Next"}
                   </Button>
                 </div>
               </div>
@@ -942,12 +1641,11 @@ const Interview: React.FC = () => {
                   <div className="flex items-center space-x-3 mb-4">
                     <RobotOutlined className="text-indigo-600 text-xl" />
                     <Title level={5} className="mb-0 text-indigo-800 dark:text-indigo-300">
-                      mirAI Tips
+                      mirAI Tips for {currentQ?.tipo || 'this question'}
                     </Title>
                   </div>
                   <Paragraph className="text-indigo-700 dark:text-indigo-400 mb-0">
-                    💡 Be specific and provide concrete examples when possible. The AI evaluates clarity, technical
-                    accuracy, relevance, and communication skills.
+                    {currentQuestionTips.tip}
                   </Paragraph>
                 </Card>
               </Col>
@@ -960,8 +1658,7 @@ const Interview: React.FC = () => {
                     </Title>
                   </div>
                   <Paragraph className="text-green-700 dark:text-green-400 mb-0">
-                    ⭐ Structure your answers clearly, explain your reasoning, and don't hesitate to mention alternative
-                    approaches or trade-offs.
+                    {currentQuestionTips.practice}
                   </Paragraph>
                 </Card>
               </Col>

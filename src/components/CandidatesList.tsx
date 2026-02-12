@@ -33,8 +33,6 @@ import { motion } from "framer-motion"
 import { useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { convocatoriaAPI, postulacionAPI, evaluacionAPI } from "../services/api"
-import { mockJobs } from "../data/mockData"
-import { getApplicationsByJob } from "../data/mockDataUtils"
 import { type Convocatoria, type Postulacion, type Evaluacion, EstadoPostulacion } from "../types/api"
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from "recharts"
 import ThemeToggle from "./ThemeToggle"
@@ -72,24 +70,28 @@ const CandidatesList: React.FC = () => {
       
       const jobId = Number.parseInt(id);
       
-      // Buscar convocatoria en datos mock
-      const mockConvocatoria = mockJobs.find(job => job.id === jobId);
-      if (mockConvocatoria) {
-        setConvocatoria(mockConvocatoria);
+      // Load job posting from backend
+      const jobResponse = await convocatoriaAPI.getById(jobId);
+      const jobData = jobResponse.data;
+      
+      if (jobData) {
+        setConvocatoria(jobData);
         
-        // Buscar postulaciones para esta convocatoria
-        const mockPostulaciones = getApplicationsByJob(jobId);
-        setPostulaciones(mockPostulaciones);
+        // Load applications for this job posting
+        const applicationsResponse = await postulacionAPI.getByConvocatoria(jobId);
+        const applications = applicationsResponse.data || [];
+        setPostulaciones(applications);
         
-        console.log(`📊 [CandidatesList] Mock data loaded: job ${jobId}, ${mockPostulaciones.length} applications`);
+        console.log(`📊 [CandidatesList] Backend data loaded: job ${jobId}, ${applications.length} applications`);
       } else {
-        console.log(`⚠️ [CandidatesList] Job ${jobId} not found in mock data`);
+        console.log(`⚠️ [CandidatesList] Job ${jobId} not found`);
         message.error("Job posting not found");
         navigate(-1);
       }
     } catch (error: any) {
       console.error("Error loading candidates data:", error)
-      message.error("Failed to load candidates data")
+      message.error("Failed to load candidates data. Please check your connection and try again.")
+      navigate(-1);
       navigate(-1)
     } finally {
       setLoading(false)
